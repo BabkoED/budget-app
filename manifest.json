@@ -1,0 +1,16 @@
+{
+  "name": "Бюджет",
+  "short_name": "Бюджет",
+  "description": "Личный финансовый трекер",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#141414",
+  "theme_color": "#141414",
+  "icons": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIyIiBmaWxsPSIjMTQxNDE0Ii8+PHRleHQgeD0iNTAiIHk9IjY4IiBmb250LXNpemU9IjUyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjRTg2QTNCIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9IjkwMCI+0JE8L3RleHQ+PC9zdmc+",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
