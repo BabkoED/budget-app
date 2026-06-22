@@ -75,6 +75,16 @@ select option{background:var(--card2);}
 
 /* ── HEADER RIGHT GROUP ──────────────────── */
 .hdr-right{display:flex;align-items:center;gap:8px;}
+.hdr-left{display:flex;align-items:center;gap:10px;min-width:0;}
+.cur-btn{
+  font-size:12px;font-weight:800;
+  padding:6px 12px;border-radius:99px;
+  background:rgba(232,106,59,.15);color:var(--accent);
+  white-space:nowrap;flex-shrink:0;
+  border:1px solid rgba(232,106,59,.3);
+  transition:opacity .15s;
+}
+.cur-btn:hover{opacity:.8;}
 .balbtn{
   font-size:13px;font-weight:800;
   padding:7px 13px;border-radius:99px;
@@ -472,22 +482,7 @@ select option{background:var(--card2);}
   width:100%;max-width:380px;
   box-shadow:var(--sh2);
 }
-.auth-google{
-  width:100%;display:flex;align-items:center;justify-content:center;
-  gap:10px;padding:13px;border-radius:14px;
-  background:var(--card2);border:1.5px solid var(--br2);
-  font-size:14px;font-weight:700;color:var(--t);
-  cursor:pointer;transition:border-color .15s;
-}
-.auth-google:hover{border-color:var(--accent);}
-.auth-or{
-  display:flex;align-items:center;gap:10px;
-  margin:16px 0;font-size:12px;font-weight:700;
-  color:var(--mt);
-}
-.auth-or::before,.auth-or::after{
-  content:'';flex:1;height:1px;background:var(--br2);
-}
+
 .auth-err{
   font-size:13px;font-weight:600;color:var(--rd);
   min-height:18px;margin-bottom:8px;
@@ -711,12 +706,7 @@ function renderAuth() {
       '<div class="auth-logo">✦ <span>Б</span>юджет</div>' +
       '<div class="auth-sub">Личный финансовый трекер</div>' +
       '<div class="auth-card">' +
-        /* Google */
-        '<button type="button" class="auth-google" onclick="signInGoogle()">' +
-          '<svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.11 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.61-13.47-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>' +
-          'Войти через Google' +
-        '</button>' +
-        '<div class="auth-or"><span>или</span></div>' +
+        
         /* Email form */
         '<div class="f"><label>Email</label>' +
           '<input class="inp" type="email" id="au-email" placeholder="you@example.com" autocomplete="email"></div>' +
@@ -735,11 +725,7 @@ function renderRegister() {
       '<div class="auth-logo">✦ <span>Б</span>юджет</div>' +
       '<div class="auth-sub">Создать аккаунт</div>' +
       '<div class="auth-card">' +
-        '<button type="button" class="auth-google" onclick="signInGoogle()">' +
-          '<svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.11 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.61-13.47-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>' +
-          'Зарегистрироваться через Google' +
-        '</button>' +
-        '<div class="auth-or"><span>или</span></div>' +
+        
         '<div class="f"><label>Email</label>' +
           '<input class="inp" type="email" id="au-email" placeholder="you@example.com" autocomplete="email"></div>' +
         '<div class="f"><label>Пароль</label>' +
@@ -797,12 +783,7 @@ async function doRegister() {
   }
 }
 
-async function signInGoogle() {
-  await sb.auth.signInWithOAuth({
-    provider: 'google',
-    options: { redirectTo: window.location.origin }
-  });
-}
+
 
 async function signOut() {
   await sb.auth.signOut();
@@ -857,6 +838,16 @@ function getAB(){
   var t=today(),cur=S.budgets.filter(function(b){return b.dateFrom<=t&&b.dateTo>=t;});
   if(cur.length)return cur[0];
   return S.budgets.length?S.budgets[S.budgets.length-1]:null;
+}
+
+function getCurrentBudget(){
+  var t=today();
+  var cur=S.budgets.filter(function(b){return b.dateFrom<=t&&b.dateTo>=t;});
+  return cur.length?cur[0]:null;
+}
+function isViewingCurrent(b){
+  var cb=getCurrentBudget();
+  return cb&&b&&cb.id===b.id;
 }
 
 function calcDayBal(b){
@@ -948,7 +939,10 @@ function rHeader(b){
   var initials=currentUser&&currentUser.email?currentUser.email[0].toUpperCase():'?';
   return '<div class="hdr">'+
     '<div class="hdr-r1">'+
-      '<div class="logo">✦ <span>Б</span>юджет</div>'+
+      '<div class="hdr-left">'+
+        '<div class="logo">✦ <span>Б</span>юджет</div>'+
+        (!isViewingCurrent(b)&&getCurrentBudget()?'<button type="button" class="cur-btn" onclick="goCurrent()">Текущий бюджет</button>':'')+
+      '</div>'+
       '<div class="hdr-right">'+
         '<span id="sync-dot" class="sync-dot s-'+syncState+'" title="Синхронизация"></span>'+
         '<div style="position:relative">'+
@@ -964,8 +958,8 @@ function rHeader(b){
       '</div>'+
     '</div>'+
     '<div class="hdr-r2">'+
-      '<button class="nb '+(tab==='history'?'on':'')+'" onclick="setTab(\'history\')">Выписка</button>'+
       '<button class="nb '+(tab==='incomes'?'on':'')+'" onclick="setTab(\'incomes\')">Доходы</button>'+
+      '<button class="nb '+(tab==='history'?'on':'')+'" onclick="setTab(\'history\')">Выписка</button>'+
       '<button class="nb '+(tab==='planned'?'on':'')+'" onclick="setTab(\'planned\')">Расходы'+(ov?'<span class="tbadge"></span>':'')+
       '</button>'+
     '</div>'+
@@ -1044,6 +1038,7 @@ function rHistory(b){
   txs.sort(function(a,c){return c.date.localeCompare(a.date);});
   var g={};
   for(var i=0;i<txs.length;i++){var tx=txs[i];if(!g[tx.date])g[tx.date]=[];g[tx.date].push(tx);}
+  for(var dk in g){g[dk].sort(function(a,c){return (c.seq||0)-(a.seq||0);});}
   var dates=Object.keys(g).sort(function(a,c){return c.localeCompare(a);});
 
   var catOpts='<option value=""'+(qaSelVal===''?' selected':'')+'>Дневные расходы</option>';
@@ -1401,6 +1396,7 @@ function bindMain(b){
   window.closeModal=function(){modal=null;render();};
   window.ovClick   =function(e){if(e.target.classList.contains('overlay'))closeModal();};
   window.swBdg     =function(id){S.activeBudgetId=id;save();drop=false;render();};
+  window.goCurrent =function(){var cb=getCurrentBudget();if(cb){S.activeBudgetId=cb.id;save();drop=false;render();}};
   window.newBdg    =function(){drop=false;tab='wizard';wizStep=0;wd=initWD();render();};
   window.openBdgEdit=function(){drop=false;modal={type:'budget-edit',data:{dateFrom:b.dateFrom,dateTo:b.dateTo}};render();};
   window.saveBdgDates=function(){
@@ -1448,7 +1444,7 @@ function bindMain(b){
       var fc=b.planned.filter(function(x){return x.id===pcid;});
       if(fc.length){cat=fc[0].name;cate=fc[0].emoji||'📌';}
     }
-    S.txs.push({id:uid(),date:useDate,name:p.name,category:cat,categoryEmoji:cate,plannedCatId:pcid,amount:p.amount,budgetId:b.id});
+    S.txs.push({id:uid(),seq:Date.now(),date:useDate,name:p.name,category:cat,categoryEmoji:cate,plannedCatId:pcid,amount:p.amount,budgetId:b.id});
     qaVal='';qaSelVal='';/* сброс на «Дневные расходы» — как в Sintra */
     save();render();
   };
