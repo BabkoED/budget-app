@@ -1,5 +1,5 @@
 /* Бюджет — Service Worker для офлайн-работы */
-var CACHE = 'budget-v6';
+var CACHE = 'budget-v7';
 var ASSETS = [
   './',
   './index.html',
