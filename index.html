@@ -381,7 +381,7 @@ select option{background:var(--card2);}
 .f label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--mt);}
 .inp{
   border:1.5px solid var(--br2);border-radius:12px;
-  padding:12px 14px;font-size:15px;font-weight:600;
+  padding:12px 14px;font-size:16px;font-weight:600;
   color:var(--t);background:var(--card2);outline:none;width:100%;
 }
 .inp:focus{border-color:var(--accent);}
@@ -543,6 +543,23 @@ select option{background:var(--card2);}
 .sync-dot.s-offline{background:#F5C842;}
 @keyframes pulse{50%{opacity:.35}}
 
+
+/* ── iOS PWA FIXES ───────────────────────── */
+/* Запрет зума при фокусе на input (iOS) */
+input, select, textarea {
+  font-size:16px !important;
+  -webkit-text-size-adjust:100%;
+}
+/* Запрет выделения текста при долгом тапе */
+.auth-card, .qa, .hdr {
+  -webkit-touch-callout:none;
+  -webkit-user-select:none;
+}
+/* Разрешить выделение в полях ввода */
+input, textarea {
+  -webkit-user-select:text;
+  user-select:text;
+}
 </style>
 </head>
 <body>
@@ -752,9 +769,9 @@ function renderAuth() {
         
         /* Email form */
         '<div class="f"><label>Email</label>' +
-          '<input class="inp" type="email" id="au-email" placeholder="you@example.com" autocomplete="email"></div>' +
+          '<input class="inp" type="email" id="au-email" placeholder="you@example.com" autocomplete="email" inputmode="email" tabindex="1"></div>' +
         '<div class="f"><label>Пароль</label>' +
-          '<input class="inp" type="password" id="au-pass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key===\'Enter\')doSignIn()"></div>' +
+          '<input class="inp" type="password" id="au-pass" placeholder="••••••••" autocomplete="current-password" inputmode="text" tabindex="2" onkeydown="if(event.key===\'Enter\')doSignIn()"></div>' +
         '<div id="au-err" class="auth-err"></div>' +
         '<button type="button" class="btn bp" style="width:100%" onclick="doSignIn()">Войти</button>' +
         '<button type="button" class="auth-link" onclick="renderRegister()">Нет аккаунта? Зарегистрироваться →</button>' +
@@ -770,14 +787,19 @@ function renderRegister() {
       '<div class="auth-card">' +
         
         '<div class="f"><label>Email</label>' +
-          '<input class="inp" type="email" id="au-email" placeholder="you@example.com" autocomplete="email"></div>' +
+          '<input class="inp" type="email" id="au-email" placeholder="you@example.com" autocomplete="email" inputmode="email" tabindex="1"></div>' +
         '<div class="f"><label>Пароль</label>' +
-          '<input class="inp" type="password" id="au-pass" placeholder="Минимум 6 символов" autocomplete="new-password" onkeydown="if(event.key===\'Enter\')doRegister()"></div>' +
+          '<input class="inp" type="password" id="au-pass" placeholder="Минимум 6 символов" autocomplete="new-password" inputmode="text" tabindex="2" onkeydown="if(event.key===\'Enter\')doRegister()"></div>' +
         '<div id="au-err" class="auth-err"></div>' +
         '<button type="button" class="btn bp" style="width:100%" onclick="doRegister()">Создать аккаунт</button>' +
         '<button type="button" class="auth-link" onclick="renderAuth()">← Уже есть аккаунт</button>' +
       '</div>' +
     '</div>';
+  setTimeout(function(){var el=document.getElementById('au-email');if(el)el.focus();},150);
+  setTimeout(function(){
+    var el=document.getElementById('au-email');
+    if(el){el.focus();el.click();}
+  },120);
 }
 
 function setAuthErr(msg) {
