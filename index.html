@@ -1557,9 +1557,16 @@ function bindMain(b){
     var fid=(document.getElementById('mf')||{}).value||'';
     var tid=(document.getElementById('mt')||{}).value||'';
     if(fid===tid)return err('Источник и получатель совпадают');
-    /* Валидация: нельзя перевести больше, чем есть в источнике */
-    var avail = fid ? calcCatRem(b,fid) : calcDayBal(b);
-    if(a>avail)return err('В источнике только '+fmt(Math.max(0,avail))+' — перевести '+fmt(a)+' нельзя');
+    /* Валидация источника:
+       - Дневной бюджет (fid==='') — переводить можно всегда. Деньги берутся из
+         месячного распределения, минус на сегодня не блокирует. Дневная норма
+         пересчитается автоматически после перевода.
+       - Категория (fid!=='') — только в пределах её положительного остатка. */
+    if(fid){
+      var rem=calcCatRem(b,fid);
+      if(rem<=0)return err('В категории нет свободных средств');
+      if(a>rem)return err('В категории только '+fmt(rem)+' — перевести '+fmt(a)+' нельзя');
+    }
     if(fid){var cf=b.planned.filter(function(p){return p.id===fid;})[0];if(cf)cf.amount-=a;}
     if(tid){var ct=b.planned.filter(function(p){return p.id===tid;})[0];if(ct)ct.amount+=a;}
     recalcDaily(b);save();modal=null;render();
