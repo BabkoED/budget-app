@@ -544,6 +544,16 @@ select option{background:var(--card2);}
 @keyframes pulse{50%{opacity:.35}}
 
 
+/* ── AUTH SCREEN (static DOM) ───────────── */
+#auth-screen{
+  display:none;
+  min-height:100vh;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:24px 20px;
+  background:var(--bg);
+}
 /* ── iOS PWA FIXES ───────────────────────── */
 /* Запрет зума при фокусе на input (iOS) */
 input, select, textarea {
@@ -563,6 +573,28 @@ input, textarea {
 </style>
 </head>
 <body>
+<!-- iOS PWA fix: форма всегда в DOM, не создаётся через innerHTML -->
+<div id="auth-screen" style="display:none">
+  <div class="auth-wrap">
+    <div class="auth-logo">✦ <span>Б</span>юджет</div>
+    <div class="auth-sub" id="auth-title">Личный финансовый трекер</div>
+    <div class="auth-card">
+      <div class="f"><label>Email</label>
+        <input class="inp" type="email" id="au-email" placeholder="you@example.com"
+          autocomplete="email" inputmode="email" tabindex="1"
+          onkeydown="if(event.key==='Enter')document.getElementById('au-pass').focus()">
+      </div>
+      <div class="f"><label id="au-pass-label">Пароль</label>
+        <input class="inp" type="password" id="au-pass" placeholder="••••••••"
+          autocomplete="current-password" inputmode="text" tabindex="2"
+          onkeydown="if(event.key==='Enter')authSubmit()">
+      </div>
+      <div id="au-err" class="auth-err"></div>
+      <button type="button" class="btn bp" style="width:100%" onclick="authSubmit()" id="au-btn">Войти</button>
+      <button type="button" class="auth-link" id="au-toggle" onclick="toggleAuthMode()"></button>
+    </div>
+  </div>
+</div>
 <div id="app"></div>
 <script>
 
@@ -612,6 +644,7 @@ async function initApp() {
       authReady = false;
       currentUser = null;
       S = {budgets:[], txs:[], activeBudgetId:null};
+      authMode = 'login';
       renderAuth();
     }
   });
@@ -761,50 +794,54 @@ function showLoading() {
 }
 
 function renderAuth() {
-  document.getElementById('app').innerHTML =
-    '<div class="auth-wrap">' +
-      '<div class="auth-logo">✦ <span>Б</span>юджет</div>' +
-      '<div class="auth-sub">Личный финансовый трекер</div>' +
-      '<div class="auth-card">' +
-        
-        /* Email form */
-        '<div class="f"><label>Email</label>' +
-          '<input class="inp" type="email" id="au-email" placeholder="you@example.com" autocomplete="email" inputmode="email" tabindex="1"></div>' +
-        '<div class="f"><label>Пароль</label>' +
-          '<input class="inp" type="password" id="au-pass" placeholder="••••••••" autocomplete="current-password" inputmode="text" tabindex="2" onkeydown="if(event.key===\'Enter\')doSignIn()"></div>' +
-        '<div id="au-err" class="auth-err"></div>' +
-        '<button type="button" class="btn bp" style="width:100%" onclick="doSignIn()">Войти</button>' +
-        '<button type="button" class="auth-link" onclick="renderRegister()">Нет аккаунта? Зарегистрироваться →</button>' +
-      '</div>' +
-    '</div>';
+  /* iOS PWA fix: показываем статичный DOM-элемент вместо innerHTML */
+  document.getElementById('app').style.display = 'none';
+  var scr = document.getElementById('auth-screen');
+  scr.style.display = 'flex';
+  document.getElementById('auth-title').textContent = 'Личный финансовый трекер';
+  document.getElementById('au-pass-label').textContent = 'Пароль';
+  document.getElementById('au-pass').placeholder = '••••••••';
+  document.getElementById('au-pass').autocomplete = 'current-password';
+  document.getElementById('au-btn').textContent = 'Войти';
+  document.getElementById('au-toggle').textContent = 'Нет аккаунта? Зарегистрироваться →';
+  document.getElementById('au-err').textContent = '';
+  document.getElementById('au-email').value = '';
+  document.getElementById('au-pass').value = '';
+  authMode = 'login';
 }
 
 function renderRegister() {
-  document.getElementById('app').innerHTML =
-    '<div class="auth-wrap">' +
-      '<div class="auth-logo">✦ <span>Б</span>юджет</div>' +
-      '<div class="auth-sub">Создать аккаунт</div>' +
-      '<div class="auth-card">' +
-        
-        '<div class="f"><label>Email</label>' +
-          '<input class="inp" type="email" id="au-email" placeholder="you@example.com" autocomplete="email" inputmode="email" tabindex="1"></div>' +
-        '<div class="f"><label>Пароль</label>' +
-          '<input class="inp" type="password" id="au-pass" placeholder="Минимум 6 символов" autocomplete="new-password" inputmode="text" tabindex="2" onkeydown="if(event.key===\'Enter\')doRegister()"></div>' +
-        '<div id="au-err" class="auth-err"></div>' +
-        '<button type="button" class="btn bp" style="width:100%" onclick="doRegister()">Создать аккаунт</button>' +
-        '<button type="button" class="auth-link" onclick="renderAuth()">← Уже есть аккаунт</button>' +
-      '</div>' +
-    '</div>';
-  setTimeout(function(){var el=document.getElementById('au-email');if(el)el.focus();},150);
-  setTimeout(function(){
-    var el=document.getElementById('au-email');
-    if(el){el.focus();el.click();}
-  },120);
+  document.getElementById('app').style.display = 'none';
+  var scr = document.getElementById('auth-screen');
+  scr.style.display = 'flex';
+  document.getElementById('auth-title').textContent = 'Создать аккаунт';
+  document.getElementById('au-pass-label').textContent = 'Пароль';
+  document.getElementById('au-pass').placeholder = 'Минимум 6 символов';
+  document.getElementById('au-pass').autocomplete = 'new-password';
+  document.getElementById('au-btn').textContent = 'Создать аккаунт';
+  document.getElementById('au-toggle').textContent = '← Уже есть аккаунт';
+  document.getElementById('au-err').textContent = '';
+  document.getElementById('au-email').value = '';
+  document.getElementById('au-pass').value = '';
+  authMode = 'register';
 }
 
 function setAuthErr(msg) {
   var el = document.getElementById('au-err');
   if (el) el.textContent = msg;
+}
+
+/* iOS PWA auth state */
+var authMode = 'login';
+
+function toggleAuthMode() {
+  if (authMode === 'login') renderRegister();
+  else renderAuth();
+}
+
+function authSubmit() {
+  if (authMode === 'login') doSignIn();
+  else doRegister();
 }
 
 async function doSignIn() {
@@ -974,7 +1011,11 @@ var _trCtx={pln:[],bid:'',dayBal:0};
 
 /* ── RENDER ──────────────────────────────────── */
 function render(){
+  /* Убеждаемся что auth-экран скрыт, #app виден */
+  var authScr=document.getElementById('auth-screen');
+  if(authScr)authScr.style.display='none';
   var app=document.getElementById('app');
+  if(app)app.style.display='';
   var b=getAB();
   if(!b&&tab!=='wizard'){app.innerHTML=rEmpty();bindEmpty();return;}
   if(tab==='wizard'){app.innerHTML=rWiz();bindWiz();return;}
