@@ -954,7 +954,13 @@ function isViewingCurrent(b){
 
 function calcDayBal(b){
   if(!b)return 0;
-  var t=today(),start=b.createdAt||b.dateFrom;
+  var t=today();
+  /* Берём максимум из createdAt и dateFrom:
+     - создал бюджет в середине месяца → считаем с даты создания (не с 1-го)
+     - создал бюджет заранее (следующий месяц) → считаем с начала периода
+     Это закрывает баг: июльский бюджет созданный в июне не накапливает июньские дни */
+  var cr=b.createdAt||b.dateFrom, df=b.dateFrom;
+  var start=(cr>df)?cr:df;
   if(t<start)return 0;
   var days=daysBw(start,t)+1,acc=b.dailyBudget*days,spent=0;
   for(var i=0;i<S.txs.length;i++){
