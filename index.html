@@ -644,6 +644,7 @@ async function initApp() {
       authReady = false;
       currentUser = null;
       S = {budgets:[], txs:[], activeBudgetId:null};
+      invalidateSpentCache();
       authMode = 'login';
       renderAuth();
     }
@@ -665,6 +666,7 @@ function saveLocal() {
 }
 
 async function loadFromCloud() {
+  invalidateSpentCache();
   var local = loadLocal();
   try {
     var res = await sb.from('user_state')
@@ -675,6 +677,7 @@ async function loadFromCloud() {
     if (res.data && res.data.state && res.data.state.budgets) {
       /* Облако содержит реальные данные — используем их, обновляем локальный бэкап */
       S = res.data.state;
+      invalidateSpentCache();
       saveLocal();
     } else if (local && local.budgets && local.budgets.length) {
       /* В облаке пусто, но есть локальный бэкап — НЕ затираем, восстанавливаем
@@ -708,6 +711,7 @@ function setSync(st) {
 
 /* debounced — не долбим базу на каждый символ */
 function save() {
+  invalidateSpentCache();     /* данные изменились — сбрасываем кэш расчётов */
   saveLocal();                /* мгновенный локальный бэкап — не зависит от сети */
   pendingSave = true;
   setSync('saving');
@@ -976,10 +980,25 @@ function calcTotalBal(b){
   for(var j=0;j<S.txs.length;j++){var tx=S.txs[j];if(tx.budgetId===b.id&&tx.date<=t)spent+=tx.amount;}
   return ti-spent;
 }
+/* Кэш расходов по категориям: один проход по S.txs вместо N проходов.
+   Инвалидируется в save() — при любом изменении данных. */
+var _spentCache={bid:null,map:null};
+function invalidateSpentCache(){_spentCache.bid=null;_spentCache.map=null;}
+function getSpentMap(b){
+  if(_spentCache.bid===b.id&&_spentCache.map)return _spentCache.map;
+  var map={};
+  for(var i=0;i<S.txs.length;i++){
+    var tx=S.txs[i];
+    if(tx.budgetId===b.id&&tx.plannedCatId){
+      map[tx.plannedCatId]=(map[tx.plannedCatId]||0)+tx.amount;
+    }
+  }
+  _spentCache.bid=b.id;_spentCache.map=map;
+  return map;
+}
 function calcCatRem(b,cid){
   var c=b.planned.filter(function(p){return p.id===cid;});if(!c.length)return 0;
-  var spent=0;
-  for(var i=0;i<S.txs.length;i++){var tx=S.txs[i];if(tx.budgetId===b.id&&tx.plannedCatId===cid)spent+=tx.amount;}
+  var spent=getSpentMap(b)[cid]||0;
   return c[0].amount-spent;
 }
 function recalcDaily(b){
@@ -1324,7 +1343,7 @@ function rModal(b){
       '<div class="f"><label>Описание</label><input class="inp" id="mn" value="'+esc(tx.name)+'"></div>'+
       '<div class="ir">'+
         '<div class="f"><label>Сумма ₽</label><input class="inp" id="ma" type="text" inputmode="decimal" oninput="fmtInp(this)" value="'+tx.amount+'"></div>'+
-        '<div class="f"><label>Дата</label><input class="inp" id="md" type="date" value="'+tx.date+'"></div>'+
+        '<div class="f"><label>Дата</label><input class="inp" id="md" type="date" value="'+tx.date+'" min="'+b.dateFrom+'" max="'+(today()<b.dateTo?today():b.dateTo)+'"></div>'+
       '</div>'+
       '<div class="f"><label>Категория</label><select class="inp" id="mc2">'+po+'</select></div>'+
       '<div class="max">'+
@@ -1407,13 +1426,35 @@ function updTrPrev(){
 /* ── WIZARD ──────────────────────────────────── */
 function initWD(){
   var now=new Date(),y=now.getFullYear(),m=now.getMonth();
-  if(S.budgets.length>0){m++;if(m>11){m=0;y++;}}
-  var last=S.budgets.length?S.budgets[S.budgets.length-1]:null;
+  /* Умный выбор месяца:
+     - текущий месяц не покрыт бюджетом → предлагаем текущий
+     - покрыт → месяц после ПОСЛЕДНЕГО бюджета (по датам, не по порядку в массиве) */
+  var sorted=S.budgets.slice().sort(function(a,c){return a.dateFrom.localeCompare(c.dateFrom);});
+  var last=sorted.length?sorted[sorted.length-1]:null;
+  if(last){
+    var t=today();
+    var curCovered=S.budgets.some(function(x){return x.dateFrom<=t&&x.dateTo>=t;});
+    if(curCovered||last.dateFrom>t){
+      /* берём месяц, следующий за последним бюджетом */
+      var ld=new Date(last.dateTo+'T00:00:00');
+      ld.setDate(ld.getDate()+1);
+      y=ld.getFullYear();m=ld.getMonth();
+    }
+    /* иначе текущий месяц (y,m уже = сейчас) */
+  }
+  var df=firstDOM(y,m), dt=lastDOM(y,m);
+  /* Если последний бюджет закончился в середине месяца — начинаем со следующего
+     дня после него, а не с 1-го числа (иначе пересечение) */
+  if(last&&df<=last.dateTo){
+    var nd=new Date(last.dateTo+'T00:00:00');nd.setDate(nd.getDate()+1);
+    df=localISO(nd);
+    if(dt<df)dt=lastDOM(nd.getFullYear(),nd.getMonth());
+  }
   var inc=last?last.incomes.map(function(i){return{id:uid(),name:i.name,emoji:i.emoji,amount:''};}) :[];
   var pln=last?last.planned.map(function(p){return{id:uid(),name:p.name,emoji:p.emoji,amount:''};}) :[{id:uid(),name:'Непредвиденные расходы',emoji:'✨',amount:''}];
   if(!pln.filter(function(p){return p.name==='Непредвиденные расходы';}).length)
     pln.unshift({id:uid(),name:'Непредвиденные расходы',emoji:'✨',amount:''});
-  return{dateFrom:firstDOM(y,m),dateTo:lastDOM(y,m),showDates:false,incomes:inc,planned:pln};
+  return{dateFrom:df,dateTo:dt,showDates:false,incomes:inc,planned:pln};
 }
 function wdTI(){var t=0;for(var i=0;i<wd.incomes.length;i++)t+=pf(wd.incomes[i].amount)||0;return t;}
 function wdTP(){var t=0;for(var i=0;i<wd.planned.length;i++)t+=pf(wd.planned[i].amount)||0;return t;}
@@ -1515,6 +1556,14 @@ function bindMain(b){
     var f=(document.getElementById('be-from')||{}).value, t=(document.getElementById('be-to')||{}).value;
     if(!f||!t){alert('Укажи обе даты');return;}
     if(f>t){alert('Дата начала позже даты конца');return;}
+    for(var bi=0;bi<S.budgets.length;bi++){
+      var ex=S.budgets[bi];
+      if(ex.id===b.id)continue;
+      if(f<=ex.dateTo&&t>=ex.dateFrom){
+        alert('Период пересекается с бюджетом '+fmtSh(ex.dateFrom)+' — '+fmtSh(ex.dateTo));
+        return;
+      }
+    }
     b.dateFrom=f;b.dateTo=t;recalcDaily(b);save();modal=null;render();
   };
   window.delBdg=function(id){
@@ -1693,6 +1742,14 @@ function bindWiz(){
   };
   window.wzCr=function(){
     var d=wd,ti=wdTI(),tp=wdTP(),avail=ti-tp,days=getDays(d.dateFrom,d.dateTo);
+    /* Проверка пересечения с существующими бюджетами */
+    for(var bi=0;bi<S.budgets.length;bi++){
+      var ex=S.budgets[bi];
+      if(d.dateFrom<=ex.dateTo&&d.dateTo>=ex.dateFrom){
+        alert('Период пересекается с бюджетом '+fmtSh(ex.dateFrom)+' — '+fmtSh(ex.dateTo)+'.\nИзмени даты.');
+        return;
+      }
+    }
     var bdg={id:uid(),dateFrom:d.dateFrom,dateTo:d.dateTo,createdAt:today(),
       incomes:d.incomes.map(function(i){return Object.assign({},i,{amount:pf(i.amount)||0});}),
       planned:d.planned.map(function(p){return Object.assign({},p,{amount:pf(p.amount)||0});}),
