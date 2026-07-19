@@ -1138,12 +1138,12 @@ function rCalPop(){
   var h='<div class="cpop" onclick="event.stopPropagation()">';
   // Quick options — use <button type="button">
   h+='<div class="cq">';
-  h+='<button type="button" class="copt'+(qaDate==='today'?' sel':'')+'" onclick="setQD(\'today\')">'+
-    '<div class="cic ctd">'+now.getDate()+'</div><span>Сегодня</span>'+(qaDate==='today'?'<span class="cck">✓</span>':'')+
-  '</button>';
   var ydO=new Date();ydO.setDate(ydO.getDate()-1);
   h+='<button type="button" class="copt'+(qaDate==='yesterday'?' sel':'')+'" onclick="setQD(\'yesterday\')">'+
     '<div class="cic cyd">'+ydO.getDate()+'</div><span>Вчера</span>'+(qaDate==='yesterday'?'<span class="cck">✓</span>':'')+
+  '</button>';
+  h+='<button type="button" class="copt'+(qaDate==='today'?' sel':'')+'" onclick="setQD(\'today\')">'+
+    '<div class="cic ctd">'+now.getDate()+'</div><span>Сегодня</span>'+(qaDate==='today'?'<span class="cck">✓</span>':'')+
   '</button>';
   h+='</div>';
   // Grid header
