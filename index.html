@@ -128,8 +128,23 @@ select option{background:var(--card2);}
 .drop-r{display:flex;justify-content:space-between;align-items:center;padding:8px 16px;font-size:13px;font-weight:600;}
 .drop-r label{color:var(--mt);}
 .drop-item{display:block;width:100%;padding:11px 16px;text-align:left;font-size:13px;font-weight:600;border-top:1px solid var(--br);color:var(--t2);}
+.drop-arch{
+  display:flex;align-items:center;justify-content:space-between;
+  width:100%;padding:10px 14px;text-align:left;
+  font-size:13px;font-weight:700;color:var(--mt);
+  border-top:1px solid var(--br);
+}
+.drop-arch:hover{background:rgba(255,255,255,.04);}
+.arch-item{opacity:.85;font-size:13px;}
 .drop-item.cur{color:var(--accent);}
 .drop-new{display:block;width:100%;padding:12px 16px;text-align:left;font-size:13px;font-weight:700;border-top:1px solid var(--br);color:var(--accent);}
+.newmo-banner{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  background:rgba(232,106,59,.12);border:1px solid rgba(232,106,59,.3);
+  border-radius:16px;padding:14px 16px;margin:12px 16px 0;
+}
+.newmo-txt{font-size:13px;font-weight:700;color:var(--t);}
+.newmo-banner .btn{padding:9px 14px;font-size:13px;white-space:nowrap;}
 .drop-acts{display:flex;flex-direction:column;border-top:1px solid var(--br);}
 .drop-act{display:block;width:100%;padding:10px 14px;text-align:left;font-size:13px;font-weight:600;color:var(--t2);}
 .drop-act:hover{background:rgba(255,255,255,.04);}
@@ -913,6 +928,10 @@ function getDays(a,b){return Math.max(1,Math.floor((new Date(b+'T00:00:00')-new 
 function daysBw(a,b){return Math.max(0,Math.floor((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/864e5));}
 function lastDOM(y,m){var d=new Date(y,m+1,0).getDate();return y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');}
 function firstDOM(y,m){return y+'-'+String(m+1).padStart(2,'0')+'-01';}
+function monthNameNext(dateTo){
+  var d=new Date(dateTo+'T00:00:00');d.setDate(d.getDate()+1);
+  return d.toLocaleDateString('ru-RU',{month:'long',year:'numeric'});
+}
 function fmtSh(s){return new Date(s+'T00:00:00').toLocaleDateString('ru-RU',{day:'numeric',month:'short'});}
 function fmtDay(s){
   var d=new Date(s+'T00:00:00'),td=today(),yd=yesterday();
@@ -925,6 +944,24 @@ function fmtInp(el){
   var raw=el.value.replace(/[^\d.,]/g,'').replace(',','.');
   var p=raw.split('.');
   el.value=p[0].replace(/\B(?=(\d{3})+(?!\d))/g,'\u00A0')+(p.length>1?'.'+p[1]:'');
+}
+/* Автокапитализация: "350 кофе" -> "350 Кофе" во время ввода.
+   Работает только на первой букве после первого пробела, идущего сразу
+   за числом — дальше по слову не трогаем, чтобы не мешать вводу. */
+function qaAutoCap(el){
+  var v=el.value;
+  var pos=el.selectionStart;
+  var m=v.match(/^([\d\u00A0\s.,]*\d)([ \u00A0])([a-zа-яё])(.*)$/i);
+  if(m){
+    var capped=m[1]+m[2]+m[3].toUpperCase()+m[4];
+    if(capped!==v){
+      el.value=capped;
+      /* курсор не съезжает — заменили ровно 1 символ на тот же по длине */
+      el.setSelectionRange(pos,pos);
+      v=capped;
+    }
+  }
+  return v;
 }
 function parseQA(raw){
   var s=raw.trim();
@@ -1028,7 +1065,7 @@ var EC=[
 ];
 
 /* ── UI STATE ────────────────────────────────── */
-var tab='history',drop=false,usrMenu=false,modal=null,wizStep=0,wd=null;
+var tab='history',drop=false,usrMenu=false,modal=null,wizStep=0,wd=null,archOpen=false;
 var qaVal='',qaSelVal='',qaDate='today',qaCustom='',qaDrop=false;
 var txMenu=null,incMenu=null,plnMenu=null;
 var _pc={inc:[],pln:[],eid:'',days:1,curD:0};
@@ -1048,6 +1085,15 @@ function render(){
   if(tab==='history')pg=rHistory(b);
   if(tab==='incomes')pg=rIncomes(b);
   if(tab==='planned')pg=rPlanned(b);
+  /* Период показываемого бюджета закончился, а нового на сегодня нет —
+     не даём тихо "жить в прошлом месяце", предлагаем создать новый */
+  var td=today();
+  if(b.dateTo<td && !S.budgets.some(function(x){return x.dateFrom<=td&&x.dateTo>=td;})){
+    pg='<div class="newmo-banner">'+
+      '<div class="newmo-txt">Период «'+fmtSh(b.dateFrom)+' — '+fmtSh(b.dateTo)+'» закончился</div>'+
+      '<button type="button" class="btn bp" onclick="newBdg()">+ Создать бюджет на '+monthNameNext(b.dateTo)+'</button>'+
+    '</div>'+pg;
+  }
   /* Z-INDEX LAYERS:
      bk-drop  z:90  = behind header(z:100), dropdown stays clickable
      bk-menu  z:180 = above header, covers page for ctx menus
@@ -1099,12 +1145,30 @@ function rHeader(b){
 function rDrop(b,bal){
   var total=calcTotalBal(b),aid=b.id,list='';
   if(S.budgets.length>1){
+    var td=today();
     var sorted=S.budgets.slice().sort(function(a,c){return a.dateFrom.localeCompare(c.dateFrom);});
-    for(var i=0;i<sorted.length;i++){
-      var x=sorted[i];
+    /* Текущий/ближайший к сегодня период — всегда виден сразу.
+       Остальные — сворачиваем в "Архив бюджетов", чтобы список
+       не разрастался со временем. */
+    var visible=sorted.filter(function(x){return x.dateFrom<=td&&x.dateTo>=td;});
+    if(!visible.length)visible=[sorted[sorted.length-1]];
+    var archived=sorted.filter(function(x){return visible.indexOf(x)===-1;});
+    for(var i=0;i<visible.length;i++){
+      var x=visible[i];
       list+='<button class="drop-item '+(x.id===aid?'cur':'')+'" onclick="swBdg(\''+x.id+'\')">'+
         fmtSh(x.dateFrom)+'–'+fmtSh(x.dateTo)+(x.id===aid?' ✓':'')+
       '</button>';
+    }
+    if(archived.length){
+      list+='<button class="drop-arch" onclick="togArch()">📁 Архив бюджетов ('+archived.length+')'+(archOpen?' ▲':' ▼')+'</button>';
+      if(archOpen){
+        for(var j=archived.length-1;j>=0;j--){ /* новые сверху внутри архива */
+          var y=archived[j];
+          list+='<button class="drop-item arch-item '+(y.id===aid?'cur':'')+'" onclick="swBdg(\''+y.id+'\')">'+
+            fmtSh(y.dateFrom)+'–'+fmtSh(y.dateTo)+(y.id===aid?' ✓':'')+
+          '</button>';
+        }
+      }
     }
   }
   return '<div class="drop">'+
@@ -1182,7 +1246,7 @@ function rHistory(b){
 
   var h='<div class="qa">'+
     '<div class="qa-row">'+
-      '<input class="qa-in" id="qa-inp" placeholder="350 кофе — сумма, потом название" autocomplete="off" value="'+esc(qaVal)+'" oninput="qaVal=this.value">'+
+      '<input class="qa-in" id="qa-inp" placeholder="350 кофе — сумма, потом название" autocomplete="off" value="'+esc(qaVal)+'" oninput="qaVal=qaAutoCap(this)">'+
       (b.planned.length?'<select class="qa-sel" onchange="qaSelVal=this.value">'+catOpts+'</select>':'')+
       '<button type="button" class="qa-cal'+(qaDrop?' on':'')+'" onclick="togCal(event)">'+
         '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>'+
@@ -1543,7 +1607,8 @@ function bindEmpty(){window.startWz=function(){tab='wizard';wizStep=0;wd=initWD(
 
 function bindMain(b){
   window.setTab    =function(t){tab=t;drop=false;render();};
-  window.togDrop   =function(){drop=!drop;usrMenu=false;txMenu=null;incMenu=null;plnMenu=null;render();};
+  window.togDrop   =function(){drop=!drop;archOpen=false;usrMenu=false;txMenu=null;incMenu=null;plnMenu=null;render();};
+  window.togArch   =function(){archOpen=!archOpen;render();};
   window.togUsr    =function(){usrMenu=!usrMenu;drop=false;txMenu=null;incMenu=null;plnMenu=null;render();};
   window.closeBk   =function(){drop=false;usrMenu=false;txMenu=null;incMenu=null;plnMenu=null;render();};
   window.closeModal=function(){modal=null;render();};
