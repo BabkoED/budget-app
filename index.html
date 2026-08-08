@@ -1392,7 +1392,7 @@ function rIncomes(b){
     var inc=b.incomes[k];
     /* FIX #2: emoji inline with text using t-nm class */
     rows+='<tr>'+
-      '<td><div class="t-nm"><span class="t-em">'+(inc.emoji||'💰')+'</span>'+esc(inc.name)+'</div></td>'+
+      '<td><div class="t-nm"><span class="t-em">'+(inc.emoji||'💰')+'</span>'+esc(inc.name)+(inc.recur?'<span class="recur-b" title="Повторяющийся — сумма переносится в новый месяц">🔁</span>':'')+'</div></td>'+
       '<td class="t-am">'+fmt(inc.amount)+'</td>'+
       '<td class="t-ax"><div class="ctx-wrap">'+
         '<button type="button" class="dots" onclick="togMenu(\'inc\',\''+inc.id+'\',event)">•••</button>'+
@@ -1511,6 +1511,8 @@ function rModal(b){
       '<div class="ir"><div class="f" style="flex:0 0 68px"><label>Иконка</label><input class="inp" id="me" value="'+esc(d.emoji||'💰')+'" style="text-align:center;font-size:22px" maxlength="4"></div>'+
       '<div class="f"><label>Название</label><input class="inp" id="mn" value="'+esc(d.name)+'" placeholder="Зарплата"></div></div>'+
       '<div class="f"><label>Сумма ₽</label><input class="inp" id="ma" type="text" inputmode="decimal" oninput="fmtInp(this)" value="'+(d.amount||'')+'" placeholder="0"></div>'+
+      '<label class="chkrow"><input type="checkbox" id="mr"'+(d.recur?' checked':'')+'>'+
+        '<span><b>Повторяющийся</b><i>Сумма перенесётся в новый месяц автоматически</i></span></label>'+
       '<div class="max">'+
         (m.type==='edit-income'?'<button type="button" class="btn bd" onclick="delInc(\''+d.id+'\')">Удалить</button>':'')+
         '<button type="button" class="btn bp" onclick="saveInc()">Сохранить</button>'+
@@ -1653,7 +1655,8 @@ function initWD(){
     df=localISO(nd);
     if(dt<df)dt=lastDOM(nd.getFullYear(),nd.getMonth());
   }
-  var inc=last?last.incomes.map(function(i){return{id:uid(),name:i.name,emoji:i.emoji,amount:''};}) :[];
+  /* Регулярные доходы (зарплата, аренда) переносят сумму — как и категории */
+  var inc=last?last.incomes.map(function(i){return{id:uid(),name:i.name,emoji:i.emoji,amount:i.recur?i.amount:'',recur:!!i.recur};}) :[];
   /* Регулярные категории (ипотека, подписки) переносят сумму —
      их не надо вбивать заново каждый месяц. Остальные — пустые. */
   var pln=last?last.planned.map(function(p){return{id:uid(),name:p.name,emoji:p.emoji,amount:p.recur?p.amount:'',recur:!!p.recur};}) :[{id:uid(),name:'Непредвиденные расходы',emoji:'✨',amount:''}];
@@ -1837,8 +1840,9 @@ function bindMain(b){
     var a=pf((document.getElementById('ma')||{}).value);
     var e=((document.getElementById('me')||{}).value||'💰').trim();
     if(!n||!a)return;
-    if(modal.type==='add-income')b.incomes.push({id:uid(),name:n,emoji:e,amount:a});
-    else{var inc=b.incomes.filter(function(x){return x.id===modal.data.id;})[0];if(inc){inc.name=n;inc.emoji=e;inc.amount=a;}}
+    var rc=!!(document.getElementById('mr')||{}).checked;
+    if(modal.type==='add-income')b.incomes.push({id:uid(),name:n,emoji:e,amount:a,recur:rc});
+    else{var inc=b.incomes.filter(function(x){return x.id===modal.data.id;})[0];if(inc){inc.name=n;inc.emoji=e;inc.amount=a;inc.recur=rc;}}
     recalcDaily(b);save();modal=null;render();
   };
 
