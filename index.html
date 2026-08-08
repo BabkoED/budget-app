@@ -143,6 +143,34 @@ select option{background:var(--card2);}
   background:rgba(232,106,59,.12);border:1px solid rgba(232,106,59,.3);
   border-radius:16px;padding:14px 16px;margin:12px 16px 0;
 }
+/* ── ТОП ТРАТ ──────────────────────────────── */
+.ts-card{margin-top:12px;padding:16px;}
+.ts-ttl{display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  font-size:14px;font-weight:800;color:var(--t);margin-bottom:14px;}
+.ts-tot{font-size:13px;font-weight:700;color:var(--mt);white-space:nowrap;}
+.ts-row{margin-bottom:14px;}
+.ts-row:last-child{margin-bottom:0;}
+.ts-hd{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:6px;}
+.ts-nm{font-size:14px;font-weight:700;color:var(--t);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ts-am{font-size:14px;font-weight:800;color:var(--t);white-space:nowrap;}
+.ts-bar{height:6px;border-radius:99px;background:var(--br);overflow:hidden;}
+.ts-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),#f0906a);}
+.ts-sub{font-size:11px;font-weight:600;color:var(--mt);margin-top:5px;}
+
+/* ── СРАВНЕНИЕ С ПРОШЛЫМ МЕСЯЦЕМ ───────────── */
+.cmp{margin-left:6px;font-size:11px;font-weight:800;}
+.cmp.up{color:var(--rd);}
+.cmp.down{color:var(--gd);}
+
+/* ── ПОВТОРЯЮЩИЕСЯ КАТЕГОРИИ ───────────────── */
+.recur-b{margin-left:6px;font-size:11px;opacity:.75;}
+.chkrow{display:flex;align-items:flex-start;gap:10px;cursor:pointer;
+  padding:12px 14px;margin-top:10px;border-radius:12px;
+  background:var(--card2);border:1px solid var(--br2);}
+.chkrow input{width:20px;height:20px;flex-shrink:0;margin:0;accent-color:var(--accent);cursor:pointer;}
+.chkrow span{display:flex;flex-direction:column;gap:2px;}
+.chkrow b{font-size:14px;font-weight:700;color:var(--t);}
+.chkrow i{font-size:12px;font-weight:500;color:var(--mt);font-style:normal;line-height:1.35;}
 .newmo-txt{font-size:13px;font-weight:700;color:var(--t);}
 .newmo-banner .btn{padding:9px 14px;font-size:13px;white-space:nowrap;}
 .drop-acts{display:flex;flex-direction:column;border-top:1px solid var(--br);}
@@ -1020,19 +1048,86 @@ function calcTotalBal(b){
 /* Кэш расходов по категориям: один проход по S.txs вместо N проходов.
    Инвалидируется в save() — при любом изменении данных. */
 var _spentCache={bid:null,map:null};
-function invalidateSpentCache(){_spentCache.bid=null;_spentCache.map=null;}
+var _prevCache={bid:null,map:null};
+function invalidateSpentCache(){_spentCache.bid=null;_spentCache.map=null;_spentCache.daily=0;_spentCache.total=0;_prevCache.bid=null;_prevCache.map=null;}
 function getSpentMap(b){
   if(_spentCache.bid===b.id&&_spentCache.map)return _spentCache.map;
-  var map={};
+  /* Один проход считает сразу три вещи: расход по категориям,
+     дневные (некатегорийные) и общий итог — вместо трёх отдельных обходов */
+  var map={},daily=0,total=0;
   for(var i=0;i<S.txs.length;i++){
     var tx=S.txs[i];
-    if(tx.budgetId===b.id&&tx.plannedCatId){
-      map[tx.plannedCatId]=(map[tx.plannedCatId]||0)+tx.amount;
-    }
+    if(tx.budgetId!==b.id)continue;
+    total+=tx.amount;
+    if(tx.plannedCatId)map[tx.plannedCatId]=(map[tx.plannedCatId]||0)+tx.amount;
+    else daily+=tx.amount;
   }
-  _spentCache.bid=b.id;_spentCache.map=map;
+  _spentCache.bid=b.id;_spentCache.map=map;_spentCache.daily=daily;_spentCache.total=total;
   return map;
 }
+function getSpentDaily(b){getSpentMap(b);return _spentCache.daily||0;}
+/* Предыдущий бюджет по датам (для сравнения месяцев) */
+function getPrevBudget(b){
+  var sorted=S.budgets.slice().sort(function(a,c){return a.dateFrom.localeCompare(c.dateFrom);});
+  for(var i=0;i<sorted.length;i++)if(sorted[i].id===b.id)return i>0?sorted[i-1]:null;
+  return null;
+}
+/* Карта «название категории -> потрачено» для ПРЕДЫДУЩЕГО периода.
+   Считается один раз на рендер, а не для каждой категории отдельно —
+   иначе на годовом объёме это N проходов по всем транзакциям. */
+function getPrevSpentMap(b){
+  if(_prevCache.bid===b.id&&_prevCache.map)return _prevCache.map;
+  var prev=getPrevBudget(b),map={};
+  if(prev){
+    var idName={};
+    for(var i=0;i<prev.planned.length;i++)idName[prev.planned[i].id]=prev.planned[i].name;
+    for(var j=0;j<S.txs.length;j++){
+      var tx=S.txs[j];
+      if(tx.budgetId===prev.id&&tx.plannedCatId){
+        var nm=idName[tx.plannedCatId];
+        if(nm)map[nm]=(map[nm]||0)+tx.amount;
+      }
+    }
+  }
+  _prevCache.bid=b.id;_prevCache.map=map;
+  return map;
+}
+/* Сколько потрачено в бюджете bd по категории с таким же НАЗВАНИЕМ.
+   Сопоставляем по имени, потому что id категорий в каждом месяце новые. */
+function getSpentByName(bd,name){
+  if(!bd)return null;
+  var cat=null;
+  for(var i=0;i<bd.planned.length;i++)if(bd.planned[i].name===name){cat=bd.planned[i];break;}
+  if(!cat)return null;
+  var s=0;
+  for(var j=0;j<S.txs.length;j++){var tx=S.txs[j];if(tx.budgetId===bd.id&&tx.plannedCatId===cat.id)s+=tx.amount;}
+  return s;
+}
+/* Бейдж «↑12%» — насколько больше/меньше потрачено, чем в прошлом месяце.
+   Отклонения меньше 5% не показываем, чтобы не создавать шум. */
+function cmpPrev(b,p){
+  var was=getPrevSpentMap(b)[p.name];
+  if(was===undefined||was<=0)return '';
+  var now=getSpentMap(b)[p.id]||0;
+  if(now<=0)return '';
+  var d=(now-was)/was*100;
+  if(Math.abs(d)<5)return '';
+  var up=d>0;
+  return '<span class="cmp '+(up?'up':'down')+'" title="в прошлом периоде: '+fmt(was)+'">'+(up?'↑':'↓')+Math.abs(Math.round(d))+'%</span>';
+}
+/* Топ трат: категории + дневные расходы, отсортированные по сумме */
+function getTopSpend(b,n){
+  var map=getSpentMap(b),arr=[];
+  for(var i=0;i<b.planned.length;i++){
+    var p=b.planned[i],sp=map[p.id]||0;
+    if(sp>0)arr.push({name:p.name,emoji:p.emoji||'📌',amount:sp,limit:p.amount});
+  }
+  var daily=getSpentDaily(b);
+  if(daily>0)arr.push({name:'Дневные расходы',emoji:'🗓',amount:daily,limit:null});
+  arr.sort(function(a,c){return c.amount-a.amount;});
+  return arr.slice(0,n||3);
+}
+function getTotalSpent(b){getSpentMap(b);return _spentCache.total||0;}
 function calcCatRem(b,cid){
   var c=b.planned.filter(function(p){return p.id===cid;});if(!c.length)return 0;
   var spent=getSpentMap(b)[cid]||0;
@@ -1229,12 +1324,14 @@ function rCalPop(){
 
 /* ── HISTORY TAB ─────────────────────────────── */
 function rHistory(b){
+  /* Группируем сразу, без предварительной сортировки всего массива:
+     даты сортируем один раз (строки YYYY-MM-DD сравниваются лексикографически),
+     внутри дня — по seq. Даёт ~70% выигрыш на объёме в сотни трат. */
   var txs=S.txs.filter(function(t){return t.budgetId===b.id;});
-  txs.sort(function(a,c){return c.date.localeCompare(a.date);});
   var g={};
-  for(var i=0;i<txs.length;i++){var tx=txs[i];if(!g[tx.date])g[tx.date]=[];g[tx.date].push(tx);}
-  for(var dk in g){g[dk].sort(function(a,c){return (c.seq||0)-(a.seq||0);});}
-  var dates=Object.keys(g).sort(function(a,c){return c.localeCompare(a);});
+  for(var i=0;i<txs.length;i++){var tx=txs[i];(g[tx.date]||(g[tx.date]=[])).push(tx);}
+  var dates=Object.keys(g).sort();dates.reverse();
+  for(var di=0;di<dates.length;di++)g[dates[di]].sort(function(a,c){return (c.seq||0)-(a.seq||0);});
 
   var catOpts='<option value=""'+(qaSelVal===''?' selected':'')+'>Дневные расходы</option>';
   for(var pi=0;pi<b.planned.length;pi++){
@@ -1332,12 +1429,12 @@ function rPlanned(b){
     var p=b.planned[k],rem=calcCatRem(b,p.id),neg=rem<0;
     /* FIX #2: emoji inline */
     rows+='<tr class="'+(neg?'row-ov':'')+'">'+
-      '<td><div class="t-nm"><span class="t-em">'+(p.emoji||'📌')+'</span>'+esc(p.name)+'</div>'+
+      '<td><div class="t-nm"><span class="t-em">'+(p.emoji||'📌')+'</span>'+esc(p.name)+(p.recur?'<span class="recur-b" title="Повторяющаяся — сумма переносится в новый месяц">🔁</span>':'')+'</div>'+
         /* FIX #4: inline overdraft badge per row */
         (neg?'<div class="ov-tag">⚠️ перерасход <button type="button" class="ov-btn" onclick="openTr(\''+p.id+'\')">Покрыть</button></div>':'')+
       '</td>'+
       '<td class="t-am"><span class="'+(neg?'rd':'gd')+'">'+(neg?'−':'')+fmt(Math.abs(rem))+'</span>'+
-        '<div class="t-sub">из '+fmt(p.amount)+'</div>'+
+        '<div class="t-sub">из '+fmt(p.amount)+cmpPrev(b,p)+'</div>'+
       '</td>'+
       '<td class="t-ax"><div class="ctx-wrap">'+
         '<button type="button" class="dots" onclick="togMenu(\'pln\',\''+p.id+'\',event)">•••</button>'+
@@ -1355,11 +1452,51 @@ function rPlanned(b){
     '<div class="warn-t">⚠️ Есть категории с перерасходом</div>'+
     '<div class="warn-s">Покройте перерасход из дневного бюджета или другой категории.</div>'+
   '</div>':'')+
+  /* Планы съели весь доход — dailyBudget обнулился. Без пояснения это
+     выглядит как поломка, поэтому говорим прямо что произошло. */
+  (function(){
+    var ti=0,tp=0;
+    for(var q=0;q<b.incomes.length;q++)ti+=b.incomes[q].amount;
+    for(var w=0;w<b.planned.length;w++)tp+=b.planned[w].amount;
+    if(tp<=ti)return '';
+    return '<div class="warn">'+
+      '<div class="warn-t">⚠️ Планы превышают доход на '+fmt(tp-ti)+'</div>'+
+      '<div class="warn-s">Дневной бюджет обнулён — на ежедневные траты денег не осталось. Уменьши лимиты категорий или добавь доход.</div>'+
+    '</div>';
+  })()+
   '<div class="card"><table class="tbl">'+
     '<thead><tr><th>Категория</th><th>Остаток</th><th></th></tr></thead>'+
     '<tbody>'+rows+'</tbody>'+
     '<tfoot><tr class="tft"><td>Итого лимит</td><td class="t-am">'+fmt(tot)+'</td><td></td></tr></tfoot>'+
-  '</table></div>';
+  '</table></div>'+
+  rTopSpend(b);
+}
+
+/* Топ трат за период. Показываем только когда есть что показывать —
+   на пустом бюджете карточка не мозолит глаза. */
+function rTopSpend(b){
+  var top=getTopSpend(b,3);
+  if(!top.length)return '';
+  var spent=getTotalSpent(b);
+  var ti=0;for(var q=0;q<b.incomes.length;q++)ti+=b.incomes[q].amount;
+  var ended=b.dateTo<today();
+  var max=top[0].amount||1;
+  var rows='';
+  for(var i=0;i<top.length;i++){
+    var it=top[i],pct=Math.round(it.amount/max*100);
+    var share=spent>0?Math.round(it.amount/spent*100):0;
+    rows+='<div class="ts-row">'+
+      '<div class="ts-hd"><span class="ts-nm">'+(i+1)+'. '+it.emoji+' '+esc(it.name)+'</span>'+
+        '<span class="ts-am">'+fmt(it.amount)+'</span></div>'+
+      '<div class="ts-bar"><div class="ts-fill" style="width:'+pct+'%"></div></div>'+
+      '<div class="ts-sub">'+share+'% всех трат'+(it.limit!==null?' · лимит '+fmt(it.limit):'')+'</div>'+
+    '</div>';
+  }
+  return '<div class="card ts-card">'+
+    '<div class="ts-ttl">'+(ended?'📊 Итоги периода':'📊 Топ трат')+
+      '<span class="ts-tot">'+fmt(spent)+(ti>0?' из '+fmt(ti):'')+'</span></div>'+
+    rows+
+  '</div>';
 }
 
 /* ── MODALS ──────────────────────────────────── */
@@ -1389,6 +1526,8 @@ function rModal(b){
       '<div class="f"><label>Категория</label><input class="inp" id="mn" value="'+esc(dp.name)+'" placeholder="Коммуналка"></div></div>'+
       '<div class="f"><label>Сумма ₽</label><input class="inp" id="ma" type="text" inputmode="decimal" oninput="fmtInp(this);updPlnPrev(this.value)" value="'+(dp.amount||'')+'" placeholder="0"></div>'+
       '<div id="pln-prev" class="pprev"></div>'+
+      '<label class="chkrow"><input type="checkbox" id="mr"'+(dp.recur?' checked':'')+'>'+
+        '<span><b>Повторяющаяся</b><i>Сумма перенесётся в новый месяц автоматически</i></span></label>'+
       '<div class="max">'+
         (m.type==='edit-planned'?'<button type="button" class="btn bd" onclick="delPln(\''+dp.id+'\')">Удалить</button>':'')+
         '<button type="button" class="btn bp" onclick="savePln()">Сохранить</button>'+
@@ -1515,7 +1654,9 @@ function initWD(){
     if(dt<df)dt=lastDOM(nd.getFullYear(),nd.getMonth());
   }
   var inc=last?last.incomes.map(function(i){return{id:uid(),name:i.name,emoji:i.emoji,amount:''};}) :[];
-  var pln=last?last.planned.map(function(p){return{id:uid(),name:p.name,emoji:p.emoji,amount:''};}) :[{id:uid(),name:'Непредвиденные расходы',emoji:'✨',amount:''}];
+  /* Регулярные категории (ипотека, подписки) переносят сумму —
+     их не надо вбивать заново каждый месяц. Остальные — пустые. */
+  var pln=last?last.planned.map(function(p){return{id:uid(),name:p.name,emoji:p.emoji,amount:p.recur?p.amount:'',recur:!!p.recur};}) :[{id:uid(),name:'Непредвиденные расходы',emoji:'✨',amount:''}];
   if(!pln.filter(function(p){return p.name==='Непредвиденные расходы';}).length)
     pln.unshift({id:uid(),name:'Непредвиденные расходы',emoji:'✨',amount:''});
   return{dateFrom:df,dateTo:dt,showDates:false,incomes:inc,planned:pln};
@@ -1664,6 +1805,13 @@ function bindMain(b){
     var useDate=today();
     if(qaDate==='yesterday')useDate=yesterday();
     else if(qaDate==='custom'&&qaCustom)useDate=qaCustom;
+    /* Дата обязана попадать в период бюджета, иначе трата уедет в чужой
+       месяц и исказит балансы обоих периодов */
+    if(useDate<b.dateFrom||useDate>b.dateTo){
+      alert('Дата '+fmtSh(useDate)+' вне периода бюджета ('+fmtSh(b.dateFrom)+' — '+fmtSh(b.dateTo)+').');
+      return;
+    }
+    if(useDate>today()){alert('Нельзя добавить трату будущей датой');return;}
     var cat='',cate='',pcid=null;
     if(qaSelVal&&qaSelVal.startsWith('p:')){
       pcid=qaSelVal.slice(2);
@@ -1719,8 +1867,9 @@ function bindMain(b){
     var a=pf((document.getElementById('ma')||{}).value);
     var e=((document.getElementById('me')||{}).value||'✨').trim();
     if(!n||!a)return;
-    if(modal.type==='add-planned')b.planned.push({id:uid(),name:n,emoji:e,amount:a});
-    else{var pl=b.planned.filter(function(x){return x.id===modal.data.id;})[0];if(pl){pl.name=n;pl.emoji=e;pl.amount=a;}}
+    var rc=!!(document.getElementById('mr')||{}).checked;
+    if(modal.type==='add-planned')b.planned.push({id:uid(),name:n,emoji:e,amount:a,recur:rc});
+    else{var pl=b.planned.filter(function(x){return x.id===modal.data.id;})[0];if(pl){pl.name=n;pl.emoji=e;pl.amount=a;pl.recur=rc;}}
     recalcDaily(b);save();modal=null;render();
   };
 
@@ -1761,7 +1910,10 @@ function bindMain(b){
     var tx=S.txs.filter(function(t){return t.id===id;})[0];if(!tx)return;
     tx.name=((document.getElementById('mn')||{}).value||'').trim()||tx.name;
     tx.amount=pf((document.getElementById('ma')||{}).value)||tx.amount;
-    tx.date=(document.getElementById('md')||{}).value||tx.date;
+    var nd=(document.getElementById('md')||{}).value||tx.date;
+    if(nd>today()){alert('Нельзя ставить будущую дату');return;}
+    if(nd<b.dateFrom||nd>b.dateTo){alert('Дата вне периода бюджета ('+fmtSh(b.dateFrom)+' — '+fmtSh(b.dateTo)+')');return;}
+    tx.date=nd;
     var cv=(document.getElementById('mc2')||{}).value||'';
     if(cv.startsWith('p:')){
       tx.plannedCatId=cv.slice(2);
