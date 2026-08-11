@@ -2035,9 +2035,12 @@ function rHero(b){
     var t=S.txs[i];
     if(t.budgetId===b.id&&t.date===td&&!t.plannedCatId)spentToday+=t.amount;
   }
-  /* на старте дня было столько — от этого и считаем полосу */
+  /* Полоса — это остаток, а не потраченное: с утра полная, убывает по мере
+     трат, как топливо в баке. Раньше было наоборот (пустая → заполняется
+     потраченным), и при 0 ₽ трат с утра бар выглядел «сломанным» — пустым
+     в момент, когда на самом деле всё хорошо и весь дневной запас на месте. */
   var startOfDay=bal+spentToday;
-  var pct=startOfDay>0?Math.min(100,Math.round(spentToday/startOfDay*100)):100;
+  var remPct=!pos?0:(startOfDay>0?Math.max(0,Math.min(100,Math.round(bal/startOfDay*100))):100);
   var left=daysBw(td,b.dateTo);
   var ended=b.dateTo<td;
 
@@ -2052,7 +2055,7 @@ function rHero(b){
         : 'последний день')+'</span>'+
     '</div>'+
     '<div class="hero-big '+(pos?'gd':'rd')+'">'+fmt(bal)+'</div>'+
-    '<div class="hero-bar"><div class="hero-fill '+(pos?'gd':'rd')+'" style="width:'+(pos?pct:100)+'%"></div></div>'+
+    '<div class="hero-bar"><div class="hero-fill '+(pos?'gd':'rd')+'" style="width:'+(pos?remPct:100)+'%"></div></div>'+
     '<div class="hero-sub">'+
       '<span>сегодня потрачено <b>'+fmt(spentToday)+'</b></span>'+
       (ended?'':'<span>завтра <b>+'+fmt(b.dailyBudget)+'</b></span>')+
