@@ -42,7 +42,25 @@
   --wbg:    rgba(245,200,66,.07);
   --wbr:    rgba(245,200,66,.35);
   --sh:     0 1px 0 rgba(255,255,255,.03), 0 2px 12px rgba(0,0,0,.4);
-  --sh2:    0 4px 28px rgba(0,0,0,.65);
+  --sh2:    0 12px 44px rgba(0,0,0,.7), 0 2px 8px rgba(0,0,0,.5);
+
+  /* Всплывающие панели чуть светлее карточек — так они «лежат сверху»,
+     а не сливаются с фоном. Дальше от глубины зависит вся читаемость меню. */
+  --pop:    #2A2A2C;
+
+  /* Единая шкала скруглений. Раньше радиусы гуляли от 8 до 24 без системы,
+     и интерфейс выглядел собранным из разных наборов. */
+  --r1: 12px;   /* мелкое: кнопки в строке, чипы */
+  --r2: 16px;   /* среднее: поля ввода, кнопки */
+  --r3: 22px;   /* крупное: карточки, меню */
+  --ease: cubic-bezier(.2,.9,.3,1.15);
+}
+
+/* Появление всплывающих панелей с лёгким «доводом» — статичное
+   возникновение из ниоткуда и читается как несовременное */
+@keyframes pop{
+  from{opacity:0;transform:scale(.95) translateY(-6px);}
+  to  {opacity:1;transform:none;}
 }
 
 /* ── RESET ───────────────────────────────── */
@@ -117,28 +135,56 @@ select option{background:var(--card2);}
 
 /* ── DROPDOWN ────────────────────────────── */
 .drop{
-  position:absolute;top:calc(100% + 6px);right:0;
-  background:var(--card2);
-  border-radius:18px;
+  position:absolute;top:calc(100% + 8px);right:0;
+  background:var(--pop);
+  border-radius:var(--r3);
   box-shadow:var(--sh2);
   border:1px solid var(--br2);
-  min-width:240px;overflow:hidden;
-  animation:fi .12s ease;z-index:200;
+  min-width:274px;overflow:hidden;
+  transform-origin:top right;
+  animation:pop .17s var(--ease);z-index:200;
 }
-.drop-s{padding:12px 16px 5px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--mt);}
-.drop-r{display:flex;justify-content:space-between;align-items:center;padding:8px 16px;font-size:13px;font-weight:600;}
+/* Текущий период с галочкой — первая строка, как в Sintra */
+.drop-cur{
+  display:flex;align-items:center;gap:10px;
+  width:100%;padding:15px 18px 12px;text-align:left;
+  font-size:15px;font-weight:700;color:var(--t);
+}
+.drop-ck{color:var(--accent);font-size:15px;font-weight:900;}
+.drop-stats{
+  padding:6px 0;
+  border-top:1px solid var(--br2);border-bottom:1px solid var(--br2);
+}
+.drop-r{
+  display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding:7px 18px;font-size:14px;font-weight:500;
+}
 .drop-r label{color:var(--mt);}
-.drop-item{display:block;width:100%;padding:11px 16px;text-align:left;font-size:13px;font-weight:600;border-top:1px solid var(--br);color:var(--t2);}
-.drop-arch{
-  display:flex;align-items:center;justify-content:space-between;
-  width:100%;padding:10px 14px;text-align:left;
-  font-size:13px;font-weight:700;color:var(--mt);
-  border-top:1px solid var(--br);
+.drop-r b{font-weight:800;white-space:nowrap;}
+.drop-acts{display:flex;flex-direction:column;}
+.drop-act{
+  display:block;width:100%;padding:14px 18px;text-align:left;
+  font-size:15px;font-weight:600;color:var(--t);
 }
-.drop-arch:hover{background:rgba(255,255,255,.04);}
-.arch-item{opacity:.85;font-size:13px;}
-.drop-item.cur{color:var(--accent);}
-.drop-new{display:block;width:100%;padding:12px 16px;text-align:left;font-size:13px;font-weight:700;border-top:1px solid var(--br);color:var(--accent);}
+.drop-act:hover{background:rgba(255,255,255,.05);}
+.drop-act:active{background:rgba(255,255,255,.09);}
+.drop-act.acc{color:var(--accent);}
+.drop-act.del{color:var(--rd);border-top:1px solid var(--br2);}
+.drop-arch{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  width:100%;padding:14px 18px;text-align:left;
+  font-size:15px;font-weight:600;color:var(--t);
+}
+.drop-arch:hover{background:rgba(255,255,255,.05);}
+.drop-cnt{font-size:13px;font-weight:700;color:var(--mt);}
+.drop-item{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  width:100%;padding:12px 18px 12px 30px;text-align:left;
+  font-size:14px;font-weight:600;color:var(--t2);
+  background:rgba(0,0,0,.18);
+}
+.drop-item:hover{color:var(--t);}
+.drop-now{font-size:11px;font-weight:800;color:var(--gd);}
 .newmo-banner{
   display:flex;align-items:center;justify-content:space-between;gap:12px;
   background:rgba(232,106,59,.12);border:1px solid rgba(232,106,59,.3);
@@ -174,10 +220,6 @@ select option{background:var(--card2);}
 .chkrow i{font-size:12px;font-weight:500;color:var(--mt);font-style:normal;line-height:1.35;}
 .newmo-txt{font-size:13px;font-weight:700;color:var(--t);}
 .newmo-banner .btn{padding:9px 14px;font-size:13px;white-space:nowrap;}
-.drop-acts{display:flex;flex-direction:column;border-top:1px solid var(--br);}
-.drop-act{display:block;width:100%;padding:10px 14px;text-align:left;font-size:13px;font-weight:600;color:var(--t2);}
-.drop-act:hover{background:rgba(255,255,255,.04);}
-.drop-act.del{color:var(--rd);}
 .drop-act.del:hover{background:rgba(255,79,71,.08);}
 
 /* ── PAGE ────────────────────────────────── */
@@ -190,7 +232,7 @@ select option{background:var(--card2);}
 /* ── STAT CARD (Incomes tab) ─────────────── */
 .stat-card{
   background:var(--card);
-  border-radius:18px;
+  border-radius:var(--r3);
   padding:18px 16px 14px;
   margin-bottom:12px;
   box-shadow:var(--sh);
@@ -208,7 +250,7 @@ select option{background:var(--card2);}
 /* ── CARD ────────────────────────────────── */
 .card{
   background:var(--card);
-  border-radius:18px;
+  border-radius:var(--r3);
   box-shadow:var(--sh);
   overflow:visible;
   border:1px solid var(--br);
@@ -239,12 +281,14 @@ select option{background:var(--card2);}
 .t-em{font-size:18px;line-height:1;flex-shrink:0;}
 .t-am{font-size:14px;font-weight:800;text-align:right;white-space:nowrap;}
 .t-sub{font-size:12px;font-weight:500;color:var(--mt);margin-top:3px;}
-.t-ax{width:44px;text-align:right;padding-right:10px!important;}
+/* Колонка действий: фиксированная ширина и нулевые боковые отступы —
+   кнопка сама себе даёт площадь, поэтому стоит на одном месте во всех строках */
+.t-ax{width:46px;padding:0 8px 0 0!important;text-align:right;}
 
 /* column widths */
 .tbl th:nth-child(1),.tbl td:nth-child(1){width:auto;}
 .tbl th:nth-child(2),.tbl td:nth-child(2){width:110px;}
-.tbl th:nth-child(3),.tbl td:nth-child(3){width:50px;overflow:visible;}
+.tbl th:nth-child(3),.tbl td:nth-child(3){width:46px;overflow:visible;}
 
 /* overdraft row */
 .row-ov{background:var(--rl);}
@@ -252,32 +296,43 @@ select option{background:var(--card2);}
 .ov-tag{display:flex;align-items:center;gap:7px;margin-top:5px;font-size:12px;font-weight:700;color:var(--rd);}
 .ov-btn{font-size:11px;font-weight:800;color:var(--accent);background:rgba(232,106,59,.15);border-radius:8px;padding:3px 9px;}
 
-/* ── DOTS MENU ───────────────────────────── */
+/* ── DOTS MENU ───────────────────────────────
+   Кнопка с фиксированным квадратом 32×32: текстовые «•••» разъезжались
+   от строки к строке, потому что ширина зависела от шрифта и трекинга. */
 .dots{
-  font-size:14px;font-weight:400;letter-spacing:2px;
-  color:var(--mt);padding:5px 7px;border-radius:8px;
-  line-height:1;white-space:nowrap;
+  width:32px;height:32px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:10px;color:var(--mt);
+  transition:background .16s,color .16s;
 }
-.dots:hover{background:var(--card2);color:var(--t2);}
+.dots svg{display:block;fill:currentColor;}
+.dots:hover{background:rgba(255,255,255,.06);color:var(--t2);}
+.dots.on{background:rgba(255,255,255,.09);color:var(--t);}
+
 .ctx{
-  position:absolute;right:0;top:calc(100% + 3px);
-  background:var(--card2);
-  border-radius:14px;
+  position:absolute;right:0;top:calc(100% + 6px);
+  background:var(--pop);
+  border-radius:var(--r3);
   box-shadow:var(--sh2);
   border:1px solid var(--br2);
-  overflow:hidden;min-width:180px;
-  z-index:300;animation:fi .1s ease;
+  overflow:hidden;min-width:238px;
+  z-index:300;
+  transform-origin:top right;
+  animation:pop .17s cubic-bezier(.2,.9,.3,1.15);
 }
 .ctx button{
-  display:block;width:100%;padding:13px 16px;
-  font-size:14px;font-weight:600;text-align:left;
-  color:var(--t);border-bottom:1px solid var(--br);
+  display:block;width:100%;padding:15px 18px;
+  font-size:15px;font-weight:600;text-align:left;
+  color:var(--t);
 }
-.ctx button.ctx-lines{display:flex;flex-direction:column;align-items:flex-start;gap:2px;}
-.ctx-t{font-size:14px;font-weight:700;color:var(--t);}
-.ctx-s{font-size:11.5px;font-weight:600;color:var(--gd);}
-.ctx button:last-child{border-bottom:none;}
+/* Разделители только между смысловыми группами, а не после каждой строки —
+   сплошная сетка линий и делала меню похожим на таблицу */
+.ctx button.ctx-sep{border-top:1px solid var(--br2);}
+.ctx button.ctx-lines{display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding-top:14px;padding-bottom:14px;}
+.ctx-t{font-size:15px;font-weight:600;color:var(--t);}
+.ctx-s{font-size:12.5px;font-weight:500;color:var(--mt);line-height:1.35;}
 .ctx button:hover{background:rgba(255,255,255,.05);}
+.ctx button:active{background:rgba(255,255,255,.09);}
 .ctx button.del{color:var(--rd);}
 
 /* ── WARN BANNER ─────────────────────────── */
@@ -291,9 +346,9 @@ select option{background:var(--card2);}
 
 /* ── КАРТОЧКА ДНЯ ────────────────────────── */
 .hero{
-  background:linear-gradient(158deg,#202020 0%,#1A1A1A 100%);
+  background:linear-gradient(158deg,#212121 0%,#191919 100%);
   border:1px solid var(--br2);
-  border-radius:22px;
+  border-radius:var(--r3);
   padding:18px 18px 16px;
   margin-bottom:12px;
   box-shadow:var(--sh);
@@ -326,7 +381,7 @@ select option{background:var(--card2);}
 /* ── HISTORY / QA ────────────────────────── */
 .qa{
   background:var(--card);
-  border-radius:18px;padding:11px;
+  border-radius:var(--r3);padding:11px;
   margin-bottom:12px;
   box-shadow:var(--sh);
   border:1px solid var(--br);
@@ -334,7 +389,7 @@ select option{background:var(--card2);}
 }
 .qa-row{display:flex;align-items:center;gap:8px;}
 .qa-in{
-  flex:1;border:1.5px solid var(--br2);border-radius:14px;
+  flex:1;border:1.5px solid var(--br2);border-radius:var(--r2);
   padding:14px 15px;font-size:17px;font-weight:700;
   background:var(--card2);color:var(--t);outline:none;min-width:0;
   transition:border-color .15s;
@@ -343,7 +398,7 @@ select option{background:var(--card2);}
 .qa-in::placeholder{color:var(--mt);font-weight:600;font-size:15px;}
 .qa-go{
   background:var(--accent);color:#fff;
-  border-radius:14px;
+  border-radius:var(--r2);
   width:52px;height:52px;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
   font-size:20px;font-weight:900;
@@ -354,48 +409,56 @@ select option{background:var(--card2);}
 
 /* второй ряд: куда и когда — мелким, не мешает главному полю */
 .qa-meta{display:flex;gap:8px;margin-top:8px;}
-.qa-sel{
+.qa-chip{
   flex:1;min-width:0;
-  border:1.5px solid var(--br2);border-radius:12px;
-  padding:9px 10px;font-size:13px;font-weight:700;
-  background:var(--card2);color:var(--t2);outline:none;
-  appearance:none;-webkit-appearance:none;
-  background-image:url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236B6B6B' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:right 11px center;padding-right:26px;
+  display:flex;align-items:center;gap:7px;
+  border:1.5px solid var(--br2);border-radius:var(--r1);
+  padding:9px 11px;font-size:13px;font-weight:700;
+  background:var(--card2);color:var(--t2);
+  transition:border-color .16s,color .16s;
 }
-.qa-sel.pick{color:var(--accent);border-color:rgba(232,106,59,.4);}
+.qa-chip-em{font-size:14px;line-height:1;flex-shrink:0;}
+.qa-chip-tx{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left;}
+.qa-chip-ar{font-size:9px;color:var(--mt);flex-shrink:0;}
+.qa-chip.pick{color:var(--accent);border-color:rgba(232,106,59,.45);}
+.qa-chip.on{border-color:var(--accent);}
 .qa-cal{
-  border:1.5px solid var(--br2);border-radius:12px;
+  border:1.5px solid var(--br2);border-radius:var(--r1);
   padding:9px 12px;background:var(--card2);color:var(--t2);
   display:flex;align-items:center;gap:6px;
   font-size:13px;font-weight:700;flex-shrink:0;
+  transition:border-color .16s,color .16s;
 }
 .qa-cal.on{border-color:var(--accent);color:var(--accent);}
 
-/* ── ПОИСК ───────────────────────────────── */
-.srch{
-  display:flex;align-items:center;gap:9px;
-  background:var(--card);border:1px solid var(--br);
-  border-radius:14px;padding:0 13px;margin-bottom:10px;
+/* ── СПИСОК КАТЕГОРИЙ ────────────────────── */
+.crow{
+  display:flex;align-items:center;gap:11px;
+  width:100%;padding:11px 12px;border-radius:14px;
+  font-size:14px;font-weight:600;color:var(--t);text-align:left;
 }
-.srch svg{flex-shrink:0;color:var(--mt);}
-.srch input{
-  flex:1;border:none;background:none;outline:none;
-  padding:12px 0;font-size:15px;font-weight:600;color:var(--t);min-width:0;
-}
-.srch input::placeholder{color:var(--mt);font-weight:600;}
-.srch-x{color:var(--mt);font-size:18px;font-weight:700;padding:4px 2px;line-height:1;}
-.srch-n{font-size:12px;font-weight:700;color:var(--mt);white-space:nowrap;}
+.crow+.crow{margin-top:2px;}
+.crow:hover{background:rgba(255,255,255,.05);}
+.crow.sel{background:rgba(232,106,59,.14);}
+.crow-em{font-size:17px;line-height:1;flex-shrink:0;width:22px;text-align:center;}
+.crow-nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.crow-am{font-size:13px;font-weight:800;color:var(--t2);white-space:nowrap;flex-shrink:0;}
+.crow-am.gd{color:var(--gd);}
+.crow-am.rd{color:var(--rd);}
 
-/* ── CALENDAR POPUP ──────────────────────── */
+/* ── CALENDAR / CATEGORY POPUP ───────────── */
 .cpop{
-  background:var(--card2);
-  border-radius:18px;
+  background:var(--pop);
+  border-radius:var(--r3);
   box-shadow:var(--sh2);
   border:1px solid var(--br2);
-  padding:12px;margin-top:8px;
+  padding:10px;margin-top:8px;
   z-index:300;position:relative;
   pointer-events:auto;
+  max-height:min(58vh,420px);overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  transform-origin:top center;
+  animation:pop .17s var(--ease);
 }
 .cq{display:flex;gap:8px;margin-bottom:10px;}
 .copt{
@@ -430,7 +493,7 @@ select option{background:var(--card2);}
 .no-tx{text-align:center;padding:48px 20px;color:var(--mt);font-size:14px;font-weight:600;}
 .dg{
   background:var(--card);
-  border-radius:18px;margin-bottom:10px;
+  border-radius:var(--r3);margin-bottom:10px;
   overflow:visible;
   box-shadow:var(--sh);
   border:1px solid var(--br);
@@ -451,14 +514,15 @@ select option{background:var(--card2);}
   animation:fi .18s ease;
 }
 .txr:last-child{border-bottom:none;}
-/* кружок с эмодзи категории — взгляд цепляется за него быстрее, чем за текст */
+/* кружок с эмодзи категории — взгляд цепляется за него быстрее, чем за текст.
+   Без обводки: рамка вокруг каждой иконки дробила список на клетки */
 .txe{
-  width:36px;height:36px;border-radius:12px;flex-shrink:0;
+  width:38px;height:38px;border-radius:50%;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
   font-size:17px;line-height:1;
-  background:var(--card2);border:1px solid var(--br2);
+  background:rgba(255,255,255,.055);
 }
-.txe.day{background:rgba(232,106,59,.12);border-color:rgba(232,106,59,.22);}
+.txe.day{background:rgba(232,106,59,.13);}
 .txi{flex:1;min-width:0;}
 .txn{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .txc{font-size:12px;font-weight:500;color:var(--mt);margin-top:2px;}
@@ -469,27 +533,31 @@ select option{background:var(--card2);}
 .txr.fresh{animation:flash 1.1s ease-out;}
 
 /* ── BUTTONS ─────────────────────────────── */
-.btn{border-radius:14px;padding:13px 22px;font-size:15px;font-weight:800;cursor:pointer;transition:opacity .1s;}
+.btn{border-radius:var(--r2);padding:13px 22px;font-size:15px;font-weight:800;cursor:pointer;transition:opacity .12s,transform .12s;}
+.btn:active{transform:scale(.97);}
 .btn:hover{opacity:.85;}
 .btn:active{opacity:.65;}
 .bp{background:var(--accent);color:#fff;}
 .bs{background:var(--card2);color:var(--t);border:1.5px solid var(--br2);}
 .bd{background:rgba(255,79,71,.12);color:var(--rd);}
-.sm{font-size:13px;padding:9px 15px;border-radius:12px;}
+.sm{font-size:13px;padding:9px 15px;border-radius:var(--r1);}
 
 /* ── MODAL ───────────────────────────────── */
 .overlay{
   position:fixed;inset:0;
-  background:rgba(0,0,0,.65);
+  background:rgba(0,0,0,.62);
+  backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
   z-index:500;display:flex;align-items:flex-end;justify-content:center;
+  animation:fi .18s ease;
 }
 .modal{
   background:var(--card);
-  border-radius:24px 24px 0 0;
+  border-radius:28px 28px 0 0;
   width:100%;max-width:480px;
   max-height:92vh;overflow-y:auto;
   padding-bottom:max(24px,env(safe-area-inset-bottom,24px));
-  animation:su .2s ease;
+  /* с «доводом» вместо линейного выезда — шторка ощущается физичной */
+  animation:su .28s var(--ease);
   border:1px solid var(--br2);
   border-bottom:none;
 }
@@ -1464,8 +1532,8 @@ var EC=[
 /* ── UI STATE ────────────────────────────────── */
 var tab='history',drop=false,usrMenu=false,modal=null,wizStep=0,wd=null,archOpen=false;
 var qaVal='',qaSelVal='',qaDate='today',qaCustom='',qaDrop=false;
-var qSearch='';      /* строка поиска по тратам */
 var freshTx=null;    /* id только что добавленной траты — подсвечиваем её */
+var catPick=false;   /* открыт ли выбор категории в строке ввода */
 var txMenu=null,incMenu=null,plnMenu=null;
 var _pc={inc:[],pln:[],eid:'',days:1,curD:0};
 var _trCtx={pln:[],bid:'',dayBal:0};
@@ -1498,14 +1566,14 @@ function render(){
      bk-menu  z:180 = above header, covers page for ctx menus
      bk-cal   z:149 = below cpop(z:300)
      modal    z:500 */
-  var showMenuBk = (txMenu||incMenu||plnMenu)&&!qaDrop;
+  var showMenuBk = (txMenu||incMenu||plnMenu)&&!qaDrop&&!catPick;
   app.innerHTML=
     ((drop||usrMenu)?'<div class="bk-drop" onclick="closeBk()"></div>':'')+
     rHeader(b)+
     '<div class="pg">'+pg+'</div>'+
     (modal?rModal(b):'')+
     (showMenuBk?'<div class="bk-menu" onclick="closeBk()"></div>':'')+
-    (qaDrop?'<div class="bk-cal" onclick="closeQaCal()"></div>':'');
+    ((qaDrop||catPick)?'<div class="bk-cal" onclick="closeQaCal()"></div>':'');
   bindMain(b);
 }
 
@@ -1544,47 +1612,48 @@ function rHeader(b){
     '</div>'+
   '</div>';
 }
+/* Меню периода. Раньше сюда вываливался весь список бюджетов и панель
+   вытягивалась на пол-экрана. Теперь как в Sintra: текущий период с галочкой,
+   три цифры, остальное — за «Архивом». */
 function rDrop(b,bal){
-  var total=calcTotalBal(b),aid=b.id,list='';
-  if(S.budgets.length>1){
-    var td=today();
-    var sorted=S.budgets.slice().sort(function(a,c){return a.dateFrom.localeCompare(c.dateFrom);});
-    /* Текущий/ближайший к сегодня период — всегда виден сразу.
-       Остальные — сворачиваем в "Архив бюджетов", чтобы список
-       не разрастался со временем. */
-    var visible=sorted.filter(function(x){return x.dateFrom<=td&&x.dateTo>=td;});
-    if(!visible.length)visible=[sorted[sorted.length-1]];
-    var archived=sorted.filter(function(x){return visible.indexOf(x)===-1;});
-    for(var i=0;i<visible.length;i++){
-      var x=visible[i];
-      list+='<button class="drop-item '+(x.id===aid?'cur':'')+'" onclick="swBdg(\''+x.id+'\')">'+
-        fmtSh(x.dateFrom)+'–'+fmtSh(x.dateTo)+(x.id===aid?' ✓':'')+
-      '</button>';
-    }
-    if(archived.length){
-      list+='<button class="drop-arch" onclick="togArch()">📁 Архив бюджетов ('+archived.length+')'+(archOpen?' ▲':' ▼')+'</button>';
-      if(archOpen){
-        for(var j=archived.length-1;j>=0;j--){ /* новые сверху внутри архива */
-          var y=archived[j];
-          list+='<button class="drop-item arch-item '+(y.id===aid?'cur':'')+'" onclick="swBdg(\''+y.id+'\')">'+
-            fmtSh(y.dateFrom)+'–'+fmtSh(y.dateTo)+(y.id===aid?' ✓':'')+
-          '</button>';
-        }
+  var total=calcTotalBal(b),aid=b.id,td=today();
+  var sorted=S.budgets.slice().sort(function(a,c){return a.dateFrom.localeCompare(c.dateFrom);});
+  var others=sorted.filter(function(x){return x.id!==aid;});
+
+  var arch='';
+  if(others.length){
+    arch+='<button class="drop-arch" onclick="togArch()">'+
+      '<span>Архив бюджетов</span>'+
+      '<span class="drop-cnt">'+others.length+(archOpen?' ▲':' ▼')+'</span>'+
+    '</button>';
+    if(archOpen){
+      for(var j=others.length-1;j>=0;j--){   /* новые сверху */
+        var y=others[j];
+        arch+='<button class="drop-item" onclick="swBdg(\''+y.id+'\')">'+
+          fmtSh(y.dateFrom)+' — '+fmtSh(y.dateTo)+
+          (y.dateFrom<=td&&y.dateTo>=td?'<span class="drop-now">сейчас</span>':'')+
+        '</button>';
       }
     }
   }
+
   return '<div class="drop">'+
-    '<div class="drop-s">'+fmtSh(b.dateFrom)+' — '+fmtSh(b.dateTo)+'</div>'+
-    '<div class="drop-r"><label>Дневной остаток</label><b style="color:'+(bal>=0?'var(--gd)':'var(--rd)')+'">'+fmt(bal)+'</b></div>'+
-    '<div class="drop-r"><label>Добавится завтра</label><b>'+fmt(b.dailyBudget)+'</b></div>'+
-    '<div class="drop-r"><label>Общий остаток</label><b style="color:'+(total>=0?'var(--gd)':'var(--rd)')+'">'+fmt(total)+'</b></div>'+
-    list+
-    '<div class="drop-acts">'+
-      '<button class="drop-act" onclick="openBdgEdit()">⚙️ Изменить даты</button>'+
-      '<button class="drop-act" onclick="exportCSV()">⬇️ Выгрузить в CSV</button>'+
-      (S.budgets.length>1?'<button class="drop-act del" onclick="delBdg(\''+b.id+'\')">🗑 Удалить бюджет</button>':'')+
+    '<button class="drop-cur" onclick="togDrop()">'+
+      '<span class="drop-ck">✓</span>'+
+      '<span>'+fmtSh(b.dateFrom)+' — '+fmtSh(b.dateTo)+'</span>'+
+    '</button>'+
+    '<button class="drop-act" onclick="openBdgEdit()">Настройки бюджета</button>'+
+    '<div class="drop-stats">'+
+      '<div class="drop-r"><label>Осталось на сегодня</label><b style="color:'+(bal>=0?'var(--gd)':'var(--rd)')+'">'+fmt(bal)+'</b></div>'+
+      '<div class="drop-r"><label>Прибавится завтра</label><b>'+fmt(b.dailyBudget)+'</b></div>'+
+      '<div class="drop-r"><label>Общий остаток</label><b style="color:'+(total>=0?'var(--gd)':'var(--rd)')+'">'+fmt(total)+'</b></div>'+
     '</div>'+
-    '<button class="drop-new" onclick="newBdg()">🗓 Новый бюджет</button>'+
+    '<div class="drop-acts">'+
+      arch+
+      '<button class="drop-act" onclick="exportCSV()">Выгрузить в CSV</button>'+
+      '<button class="drop-act acc" onclick="newBdg()">Создать бюджет на будущее</button>'+
+      (S.budgets.length>1?'<button class="drop-act del" onclick="delBdg(\''+b.id+'\')">Удалить бюджет</button>':'')+
+    '</div>'+
   '</div>';
 }
 
@@ -1630,34 +1699,44 @@ function rCalPop(){
   return h;
 }
 
+/* Список категорий для строки ввода. Показываем остаток по каждой —
+   это ровно то, что нужно знать в момент выбора. */
+function rCatPop(b){
+  var h='<div class="cpop" onclick="event.stopPropagation()">'+
+    '<button type="button" class="crow'+(qaSelVal===''?' sel':'')+'" onclick="pickCat(\'\')">'+
+      '<span class="crow-em">💳</span>'+
+      '<span class="crow-nm">Дневные расходы</span>'+
+      '<span class="crow-am">'+fmt(calcDayBal(b))+'</span>'+
+    '</button>';
+  for(var i=0;i<b.planned.length;i++){
+    var p=b.planned[i],rem=calcCatRem(b,p.id),neg=rem<0,v='p:'+p.id;
+    h+='<button type="button" class="crow'+(qaSelVal===v?' sel':'')+'" onclick="pickCat(\''+v+'\')">'+
+      '<span class="crow-em">'+(p.emoji||'📌')+'</span>'+
+      '<span class="crow-nm">'+esc(p.name)+'</span>'+
+      '<span class="crow-am '+(neg?'rd':'gd')+'">'+(neg?'−':'')+fmt(Math.abs(rem))+'</span>'+
+    '</button>';
+  }
+  return h+'</div>';
+}
+
 /* ── HISTORY TAB ─────────────────────────────── */
 function rHistory(b){
   /* Группируем сразу, без предварительной сортировки всего массива:
      даты сортируем один раз (строки YYYY-MM-DD сравниваются лексикографически),
      внутри дня — по seq. Даёт ~70% выигрыш на объёме в сотни трат. */
   var txs=S.txs.filter(function(t){return t.budgetId===b.id;});
-  var shown=txs, found='';
-  if(qSearch){
-    var q=qSearch.toLowerCase();
-    shown=txs.filter(function(t){
-      return (t.name||'').toLowerCase().indexOf(q)>-1
-          || (t.category||'').toLowerCase().indexOf(q)>-1;
-    });
-    var qs=0;for(var qi=0;qi<shown.length;qi++)qs+=shown[qi].amount;
-    found=shown.length+' · '+fmt(qs);
-  }
   var g={};
-  for(var i=0;i<shown.length;i++){var tx=shown[i];(g[tx.date]||(g[tx.date]=[])).push(tx);}
+  for(var i=0;i<txs.length;i++){var tx=txs[i];(g[tx.date]||(g[tx.date]=[])).push(tx);}
   var dates=Object.keys(g).sort();dates.reverse();
   for(var di=0;di<dates.length;di++)g[dates[di]].sort(function(a,c){return (c.seq||0)-(a.seq||0);});
 
-  var catOpts='<option value=""'+(qaSelVal===''?' selected':'')+'>Дневные расходы</option>';
-  for(var pi=0;pi<b.planned.length;pi++){
-    var p=b.planned[pi],rem=calcCatRem(b,p.id);
-    var rs=(rem<0?'−':'')+fmt(Math.abs(rem));
-    catOpts+='<option value="p:'+p.id+'"'+(qaSelVal==='p:'+p.id?' selected':'')+'>'+(p.emoji||'📌')+' '+esc(p.name)+' · '+rs+'</option>';
-  }
   var dLbl=qaDate==='today'?'Сегодня':qaDate==='yesterday'?'Вчера':(qaCustom?fmtSh(qaCustom):'Дата');
+  /* Подпись на чипе категории */
+  var cLbl='Дневные', cEm='💳';
+  if(qaSelVal&&qaSelVal.indexOf('p:')===0){
+    var cp=b.planned.filter(function(x){return x.id===qaSelVal.slice(2);})[0];
+    if(cp){cLbl=cp.name;cEm=cp.emoji||'📌';}else{qaSelVal='';}
+  }
 
   var h=rHero(b)+
   '<div class="qa">'+
@@ -1666,26 +1745,24 @@ function rHistory(b){
       '<button type="button" class="qa-go" id="qa-go" onclick="doQA()">→</button>'+
     '</div>'+
     '<div class="qa-meta">'+
-      (b.planned.length?'<select class="qa-sel'+(qaSelVal?' pick':'')+'" onchange="qaSelVal=this.value">'+catOpts+'</select>':'<span style="flex:1"></span>')+
+      /* Системный <select> на iOS открывает громоздкое колесо и не умеет
+         показывать остатки — свой список читается лучше и выглядит живее */
+      (b.planned.length?'<button type="button" class="qa-chip'+(qaSelVal?' pick':'')+(catPick?' on':'')+'" onclick="togCat(event)">'+
+        '<span class="qa-chip-em">'+cEm+'</span>'+
+        '<span class="qa-chip-tx">'+esc(cLbl)+'</span>'+
+        '<span class="qa-chip-ar">▾</span>'+
+      '</button>':'<span style="flex:1"></span>')+
       '<button type="button" class="qa-cal'+(qaDrop?' on':'')+'" onclick="togCal(event)">'+
         '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>'+
         '<span>'+dLbl+'</span>'+
       '</button>'+
     '</div>'+
     (qaDrop?rCalPop():'')+
+    (catPick?rCatPop(b):'')+
   '</div>';
 
-  /* Поиск появляется, только когда трат уже много — иначе он просто шум */
-  if(txs.length>12||qSearch){
-    h+='<div class="srch">'+
-      '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>'+
-      '<input id="srch-inp" placeholder="Поиск по тратам" autocomplete="off" value="'+esc(qSearch)+'" oninput="setSearch(this.value)">'+
-      (qSearch?'<span class="srch-n">'+found+'</span><button type="button" class="srch-x" onclick="setSearch(\'\')">×</button>':'')+
-    '</div>';
-  }
-
   if(!dates.length){
-    return h+'<div class="no-tx">'+(qSearch?'Ничего не нашлось':'Расходов пока нет — хорошее начало 👏')+'</div>';
+    return h+'<div class="no-tx">Расходов пока нет — хорошее начало 👏</div>';
   }
   for(var di2=0;di2<dates.length;di2++){
     var date=dates[di2],dt=g[date],sum=0;
@@ -1702,10 +1779,10 @@ function rHistory(b){
         '</div>'+
         '<div class="txa">'+fmt(t2.amount)+'</div>'+
         '<div class="txd"><div class="ctx-wrap">'+
-          '<button type="button" class="dots" onclick="togMenu(\'tx\',\''+t2.id+'\',event)">•••</button>'+
+          '<button type="button" class="dots'+(txMenu===t2.id?' on':'')+'" onclick="togMenu(\'tx\',\''+t2.id+'\',event)"><svg width=\'16\' height=\'4\' viewBox=\'0 0 16 4\'><circle cx=\'2\' cy=\'2\' r=\'1.7\'/><circle cx=\'8\' cy=\'2\' r=\'1.7\'/><circle cx=\'14\' cy=\'2\' r=\'1.7\'/></svg></button>'+
           (txMenu===t2.id?'<div class="ctx" onclick="event.stopPropagation()">'+
             '<button onclick="editTx(\''+t2.id+'\')">Редактировать</button>'+
-            '<button class="del" onclick="delTx(\''+t2.id+'\')">Удалить</button>'+
+            '<button class="del ctx-sep" onclick="delTx(\''+t2.id+'\')">Удалить</button>'+
           '</div>':'')+
         '</div></div>'+
       '</div>';
@@ -1769,10 +1846,10 @@ function rIncomes(b){
       '<td><div class="t-nm"><span class="t-em">'+(inc.emoji||'💰')+'</span>'+esc(inc.name)+(inc.recur?'<span class="recur-b" title="Повторяющийся — сумма переносится в новый месяц">🔁</span>':'')+'</div></td>'+
       '<td class="t-am">'+fmt(inc.amount)+'</td>'+
       '<td class="t-ax"><div class="ctx-wrap">'+
-        '<button type="button" class="dots" onclick="togMenu(\'inc\',\''+inc.id+'\',event)">•••</button>'+
+        '<button type="button" class="dots'+(incMenu===inc.id?' on':'')+'" onclick="togMenu(\'inc\',\''+inc.id+'\',event)"><svg width=\'16\' height=\'4\' viewBox=\'0 0 16 4\'><circle cx=\'2\' cy=\'2\' r=\'1.7\'/><circle cx=\'8\' cy=\'2\' r=\'1.7\'/><circle cx=\'14\' cy=\'2\' r=\'1.7\'/></svg></button>'+
         (incMenu===inc.id?'<div class="ctx" onclick="event.stopPropagation()">'+
           '<button onclick="editInc(\''+inc.id+'\')">Редактировать</button>'+
-          '<button class="del" onclick="delInc(\''+inc.id+'\')">Удалить</button>'+
+          '<button class="del ctx-sep" onclick="delInc(\''+inc.id+'\')">Удалить</button>'+
         '</div>':'')+
       '</div></td>'+
     '</tr>';
@@ -1811,15 +1888,15 @@ function rPlanned(b){
         '<div class="t-sub">из '+fmt(p.amount)+cmpPrev(b,p)+'</div>'+
       '</td>'+
       '<td class="t-ax"><div class="ctx-wrap">'+
-        '<button type="button" class="dots" onclick="togMenu(\'pln\',\''+p.id+'\',event)">•••</button>'+
+        '<button type="button" class="dots'+(plnMenu===p.id?' on':'')+'" onclick="togMenu(\'pln\',\''+p.id+'\',event)"><svg width=\'16\' height=\'4\' viewBox=\'0 0 16 4\'><circle cx=\'2\' cy=\'2\' r=\'1.7\'/><circle cx=\'8\' cy=\'2\' r=\'1.7\'/><circle cx=\'14\' cy=\'2\' r=\'1.7\'/></svg></button>'+
         (plnMenu===p.id?'<div class="ctx" onclick="event.stopPropagation()">'+
           '<button onclick="editPln(\''+p.id+'\')">Редактировать</button>'+
           '<button onclick="openTr(\''+p.id+'\')">Перераспределить</button>'+
-          (rem>0?'<button class="ctx-lines" onclick="moveRemToDaily(\''+p.id+'\')">'+
-            '<span class="ctx-t">🔁 Перевести остаток в дневные</span>'+
-            '<span class="ctx-s">Бюджет на день увеличится на '+fmt(rem/getDays(b.dateFrom,b.dateTo))+'</span>'+
+          (rem>0?'<button class="ctx-lines ctx-sep" onclick="moveRemToDaily(\''+p.id+'\')">'+
+            '<span class="ctx-t">Перевести остаток в дневные</span>'+
+            '<span class="ctx-s">Бюджет на каждый день увеличится на '+fmt(rem/Math.max(1,getDays(today()>b.dateFrom?today():b.dateFrom,b.dateTo)))+'</span>'+
           '</button>':'')+
-          '<button class="del" onclick="delPln(\''+p.id+'\')">Удалить</button>'+
+          '<button class="del ctx-sep" onclick="delPln(\''+p.id+'\')">Удалить</button>'+
         '</div>':'')+
       '</div></td>'+
     '</tr>';
@@ -2147,12 +2224,6 @@ function bindEmpty(){window.startWz=function(){tab='wizard';wizStep=0;wd=initWD(
 
 function bindMain(b){
   window.setTab    =function(t){tab=t;drop=false;render();};
-  /* Поиск перерисовывает список, но не должен ронять фокус и каретку */
-  window.setSearch =function(v){
-    qSearch=v;render();
-    var el=document.getElementById('srch-inp');
-    if(el&&v){el.focus();el.setSelectionRange(v.length,v.length);}
-  };
   window.togDrop   =function(){drop=!drop;archOpen=false;usrMenu=false;txMenu=null;incMenu=null;plnMenu=null;render();};
   window.togArch   =function(){archOpen=!archOpen;render();};
   window.moveRemToDaily=function(pid){
@@ -2214,10 +2285,12 @@ function bindMain(b){
 
   function gQV(){return(document.getElementById('qa-inp')||{}).value||qaVal||'';}
   function rQV(v){qaVal=v;var el=document.getElementById('qa-inp');if(el)el.value=v;}
-  window.togCal    =function(e){e.stopPropagation();var v=gQV();qaDrop=!qaDrop;render();rQV(v);};
-  window.closeQaCal=function(){var v=gQV();qaDrop=false;render();rQV(v);};
+  window.togCal    =function(e){e.stopPropagation();var v=gQV();qaDrop=!qaDrop;catPick=false;render();rQV(v);};
+  window.closeQaCal=function(){var v=gQV();qaDrop=false;catPick=false;render();rQV(v);};
   window.setQD     =function(v){var sv=gQV();qaDate=v;qaDrop=false;render();rQV(sv);};
   window.pickDay   =function(ds){var sv=gQV();qaCustom=ds;qaDate='custom';qaDrop=false;render();rQV(sv);};
+  window.togCat    =function(e){e.stopPropagation();var v=gQV();catPick=!catPick;qaDrop=false;render();rQV(v);};
+  window.pickCat   =function(v){var sv=gQV();qaSelVal=v;catPick=false;render();rQV(sv);};
 
   window.doQA=function(){
     var raw=((document.getElementById('qa-inp')||{}).value||qaVal||'').trim();
@@ -2242,7 +2315,7 @@ function bindMain(b){
     var nid=uid();
     S.txs.push(touch({id:nid,seq:Date.now(),date:useDate,name:p.name,category:cat,categoryEmoji:cate,plannedCatId:pcid,amount:p.amount,budgetId:b.id}));
     qaVal='';qaSelVal='';/* сброс на «Дневные расходы» — как в Sintra */
-    qSearch='';
+    catPick=false;
     /* Подтверждение, что трата записалась: короткая вибрация, зелёная
        кнопка и подсветка строки. Без этого непонятно, сработало ли. */
     freshTx=nid;
