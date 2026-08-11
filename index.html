@@ -65,8 +65,10 @@
 
 /* ── RESET ───────────────────────────────── */
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+/* height:100% обрезало всё, что не влезло в один экран, и страница
+   переставала скроллиться — поэтому только минимальная высота */
 html,body{
-  height:100%;
+  min-height:100%;
   background:var(--bg);
   color:var(--t);
   font-family:'Manrope',-apple-system,sans-serif;
@@ -97,15 +99,17 @@ select option{background:var(--card2);}
 /* ── HEADER RIGHT GROUP ──────────────────── */
 .hdr-right{display:flex;align-items:center;gap:8px;}
 .hdr-left{display:flex;align-items:center;gap:10px;min-width:0;}
-.cur-btn{
-  font-size:12px;font-weight:800;
-  padding:6px 12px;border-radius:99px;
-  background:rgba(232,106,59,.15);color:var(--accent);
-  white-space:nowrap;flex-shrink:0;
-  border:1px solid rgba(232,106,59,.3);
-  transition:opacity .15s;
+/* Полоса «вы смотрите прошлый период» — своей строкой во всю ширину,
+   поэтому ни на что не наезжает и не ломает первый ряд шапки */
+.cur-bar{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  width:100%;padding:8px 16px;
+  font-size:12.5px;font-weight:700;
+  background:rgba(232,106,59,.13);color:var(--accent);
+  border-top:1px solid rgba(232,106,59,.22);
 }
-.cur-btn:hover{opacity:.8;}
+.cur-bar span:first-child{color:var(--t2);font-weight:600;}
+.cur-go{white-space:nowrap;}
 .balbtn{
   font-size:13px;font-weight:800;
   padding:7px 13px;border-radius:99px;
@@ -204,13 +208,38 @@ select option{background:var(--card2);}
 .ts-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),#f0906a);}
 .ts-sub{font-size:11px;font-weight:600;color:var(--mt);margin-top:5px;}
 
+/* ── СВОДКА ЗА ПЕРИОД ──────────────────────── */
+.rchips{display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.rchips::-webkit-scrollbar{display:none;}
+.rchip{
+  flex-shrink:0;padding:7px 13px;border-radius:99px;
+  font-size:13px;font-weight:700;white-space:nowrap;
+  background:var(--card);color:var(--t2);border:1px solid var(--br2);
+  transition:background .15s,color .15s;
+}
+.rchip.on{background:var(--accent);color:#fff;border-color:var(--accent);}
+.st-row{margin-bottom:13px;}
+.st-row:last-child{margin-bottom:0;}
+.st-hd{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.st-em{font-size:15px;line-height:1;flex-shrink:0;}
+.st-nm{flex:1;min-width:0;font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.st-am{font-size:14px;font-weight:800;white-space:nowrap;flex-shrink:0;}
+.st-bar{height:6px;border-radius:99px;background:var(--br);overflow:hidden;}
+.st-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),#f0906a);}
+.st-sub{font-size:11px;font-weight:600;color:var(--mt);margin-top:5px;}
+
 /* ── СРАВНЕНИЕ С ПРОШЛЫМ МЕСЯЦЕМ ───────────── */
 .cmp{margin-left:6px;font-size:11px;font-weight:800;}
 .cmp.up{color:var(--rd);}
 .cmp.down{color:var(--gd);}
 
 /* ── ПОВТОРЯЮЩИЕСЯ КАТЕГОРИИ ───────────────── */
-.recur-b{margin-left:6px;font-size:11px;opacity:.75;}
+/* Значок повтора стоит перед суммой в правой колонке: раньше он шёл сразу
+   за названием и «плавал» по строке в зависимости от длины слова */
+.recur-b{font-size:11px;opacity:.65;flex-shrink:0;line-height:1;}
+/* space-between, а не flex-end: значок прижат к левому краю колонки
+   фиксированной ширины, поэтому стоит на одном месте во всех строках */
+.t-amw{display:flex;align-items:center;justify-content:space-between;gap:6px;}
 .chkrow{display:flex;align-items:flex-start;gap:10px;cursor:pointer;
   padding:12px 14px;margin-top:10px;border-radius:12px;
   background:var(--card2);border:1px solid var(--br2);}
@@ -223,25 +252,42 @@ select option{background:var(--card2);}
 .drop-act.del:hover{background:rgba(255,79,71,.08);}
 
 /* ── PAGE ────────────────────────────────── */
-.pg{padding:16px 14px;max-width:520px;margin:0 auto;}
-.ph{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;}
-.ph-acts{display:flex;gap:8px;flex-shrink:0;}
-.ptl{font-size:22px;font-weight:900;letter-spacing:-.3px;}
+/* Нижний отступ с запасом под домашнюю полоску iPhone — без него
+   последняя строка списка упиралась в самый край экрана */
+.pg{
+  padding:12px 12px calc(28px + env(safe-area-inset-bottom,0px));
+  max-width:520px;margin:0 auto;
+}
+.ph{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:11px;}
+.ph-acts{display:flex;gap:6px;flex-shrink:0;}
+/* Заголовок держим в одну строку: перенос «Плановые / расходы» раздувал
+   блок по высоте и выталкивал кнопки */
+.ptl{font-size:19px;font-weight:900;letter-spacing:-.3px;white-space:nowrap;}
+/* Кнопка-иконка: подпись «Перевести» съедала ширину, значка достаточно */
+.ib{
+  width:38px;height:38px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:var(--r1);font-size:16px;
+  background:var(--card2);color:var(--t);border:1.5px solid var(--br2);
+  transition:transform .12s;
+}
+.ib:active{transform:scale(.94);}
 .mt10{margin-top:10px;}
 
 /* ── STAT CARD (Incomes tab) ─────────────── */
 .stat-card{
   background:var(--card);
   border-radius:var(--r3);
-  padding:18px 16px 14px;
-  margin-bottom:12px;
+  padding:14px 14px 11px;
+  margin-bottom:10px;
   box-shadow:var(--sh);
   border:1px solid var(--br);
 }
 .srow-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--mt);margin-bottom:6px;}
-.srow-big{font-size:36px;font-weight:900;letter-spacing:-.5px;margin-bottom:4px;}
-.srow-divider{height:1px;background:var(--br2);margin:12px 0 10px;}
-.srow{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:14px;font-weight:600;border-bottom:1px solid var(--br);}
+.srow-big{font-size:30px;font-weight:900;letter-spacing:-.7px;margin-bottom:2px;}
+.srow-divider{height:1px;background:var(--br2);margin:10px 0 6px;}
+.srow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:5px 0;font-size:13.5px;font-weight:600;border-bottom:1px solid var(--br);}
+.srow b{white-space:nowrap;}
 .srow:last-child{border-bottom:none;}
 .srow span{color:var(--t2);}
 .gd{color:var(--gd);}
@@ -259,14 +305,14 @@ select option{background:var(--card2);}
 /* ── TABLE ───────────────────────────────── */
 .tbl{width:100%;border-collapse:collapse;table-layout:fixed;}
 .tbl thead th{
-  padding:10px 14px;
+  padding:8px 12px;
   font-size:10px;font-weight:700;
   text-transform:uppercase;letter-spacing:.6px;
   color:var(--mt);text-align:left;
   border-bottom:1px solid var(--br2);
 }
 .tbl tbody td{
-  padding:13px 14px;
+  padding:10px 12px;
   border-bottom:1px solid var(--br);
   font-size:14px;vertical-align:middle;
 }
@@ -277,17 +323,20 @@ select option{background:var(--card2);}
 }
 
 /* emoji inline */
-.t-nm{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;line-height:1.35;}
+/* Название в одну строку с многоточием: перенос на вторую строку
+   раздувал таблицу по высоте и ломал выравнивание правой колонки */
+.t-nm{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;line-height:1.3;min-width:0;}
+.t-tx{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
 .t-em{font-size:18px;line-height:1;flex-shrink:0;}
 .t-am{font-size:14px;font-weight:800;text-align:right;white-space:nowrap;}
-.t-sub{font-size:12px;font-weight:500;color:var(--mt);margin-top:3px;}
+.t-sub{font-size:11.5px;font-weight:500;color:var(--mt);margin-top:2px;white-space:nowrap;}
 /* Колонка действий: фиксированная ширина и нулевые боковые отступы —
    кнопка сама себе даёт площадь, поэтому стоит на одном месте во всех строках */
 .t-ax{width:46px;padding:0 8px 0 0!important;text-align:right;}
 
 /* column widths */
 .tbl th:nth-child(1),.tbl td:nth-child(1){width:auto;}
-.tbl th:nth-child(2),.tbl td:nth-child(2){width:110px;}
+.tbl th:nth-child(2),.tbl td:nth-child(2){width:118px;}
 .tbl th:nth-child(3),.tbl td:nth-child(3){width:46px;overflow:visible;}
 
 /* overdraft row */
@@ -334,6 +383,17 @@ select option{background:var(--card2);}
 .ctx button:hover{background:rgba(255,255,255,.05);}
 .ctx button:active{background:rgba(255,255,255,.09);}
 .ctx button.del{color:var(--rd);}
+/* У нижних строк места под меню нет — раскрываем его вверх, иначе
+   часть пунктов оказывалась за краем экрана и доскроллить было нельзя */
+@keyframes popup{
+  from{opacity:0;transform:scale(.95) translateY(6px);}
+  to  {opacity:1;transform:none;}
+}
+.ctx.up{
+  top:auto;bottom:calc(100% + 6px);
+  transform-origin:bottom right;
+  animation:popup .17s var(--ease);
+}
 
 /* ── WARN BANNER ─────────────────────────── */
 .warn{
@@ -349,40 +409,41 @@ select option{background:var(--card2);}
   background:linear-gradient(158deg,#212121 0%,#191919 100%);
   border:1px solid var(--br2);
   border-radius:var(--r3);
-  padding:18px 18px 16px;
-  margin-bottom:12px;
+  padding:12px 14px 11px;
+  margin-bottom:10px;
   box-shadow:var(--sh);
 }
-.hero-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px;}
+.hero-top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;}
+.hero-l{min-width:0;}
 .hero-lbl{
-  font-size:11px;font-weight:800;letter-spacing:.8px;
+  font-size:10.5px;font-weight:800;letter-spacing:.7px;
   text-transform:uppercase;color:var(--mt);
 }
-.hero-days{font-size:12px;font-weight:700;color:var(--mt);white-space:nowrap;}
 .hero-big{
-  font-size:40px;font-weight:900;letter-spacing:-1.4px;
-  line-height:1;margin:8px 0 0;
+  font-size:29px;font-weight:900;letter-spacing:-1px;
+  line-height:1.05;margin-top:2px;
 }
 .hero-big.gd{color:var(--gd);}
 .hero-big.rd{color:var(--rd);}
+/* правая колонка — служебные цифры, намеренно мелкие */
+.hero-r{
+  text-align:right;flex-shrink:0;
+  font-size:11.5px;font-weight:500;color:var(--mt);line-height:1.5;
+}
+.hero-r b{color:var(--t2);font-weight:800;}
 .hero-bar{
-  height:8px;border-radius:99px;background:#2A2A2A;
-  overflow:hidden;margin:15px 0 9px;
+  height:6px;border-radius:99px;background:#2A2A2A;
+  overflow:hidden;margin-top:10px;
 }
 .hero-fill{height:100%;border-radius:99px;transition:width .4s cubic-bezier(.4,0,.2,1);}
 .hero-fill.gd{background:linear-gradient(90deg,var(--gd),#5FE0A0);}
 .hero-fill.rd{background:linear-gradient(90deg,var(--rd),#FF8A85);}
-.hero-sub{
-  display:flex;align-items:baseline;justify-content:space-between;gap:12px;
-  font-size:12.5px;font-weight:600;color:var(--mt);
-}
-.hero-sub b{color:var(--t2);font-weight:800;}
 
 /* ── HISTORY / QA ────────────────────────── */
 .qa{
   background:var(--card);
-  border-radius:var(--r3);padding:11px;
-  margin-bottom:12px;
+  border-radius:var(--r3);padding:9px;
+  margin-bottom:10px;
   box-shadow:var(--sh);
   border:1px solid var(--br);
   position:relative;
@@ -390,7 +451,7 @@ select option{background:var(--card2);}
 .qa-row{display:flex;align-items:center;gap:8px;}
 .qa-in{
   flex:1;border:1.5px solid var(--br2);border-radius:var(--r2);
-  padding:14px 15px;font-size:17px;font-weight:700;
+  padding:12px 14px;font-size:16px;font-weight:700;
   background:var(--card2);color:var(--t);outline:none;min-width:0;
   transition:border-color .15s;
 }
@@ -399,7 +460,7 @@ select option{background:var(--card2);}
 .qa-go{
   background:var(--accent);color:#fff;
   border-radius:var(--r2);
-  width:52px;height:52px;flex-shrink:0;
+  width:48px;height:48px;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
   font-size:20px;font-weight:900;
   transition:transform .12s,opacity .12s;
@@ -493,14 +554,14 @@ select option{background:var(--card2);}
 .no-tx{text-align:center;padding:48px 20px;color:var(--mt);font-size:14px;font-weight:600;}
 .dg{
   background:var(--card);
-  border-radius:var(--r3);margin-bottom:10px;
+  border-radius:var(--r3);margin-bottom:8px;
   overflow:visible;
   box-shadow:var(--sh);
   border:1px solid var(--br);
 }
 .dh{
   display:flex;justify-content:space-between;align-items:center;
-  padding:11px 15px 10px;
+  padding:8px 13px 7px;
   border-bottom:1px solid var(--br2);
 }
 /* Без capitalize: он ломает русскую дату — «11 Августа» вместо «11 августа» */
@@ -508,7 +569,7 @@ select option{background:var(--card2);}
 .ds{font-size:13px;font-weight:800;color:var(--t2);}
 .txr{
   display:flex;align-items:center;gap:11px;
-  padding:12px 14px;
+  padding:9px 13px;
   /* visible divider between transactions */
   border-bottom:1px solid var(--br);
   animation:fi .18s ease;
@@ -517,16 +578,16 @@ select option{background:var(--card2);}
 /* кружок с эмодзи категории — взгляд цепляется за него быстрее, чем за текст.
    Без обводки: рамка вокруг каждой иконки дробила список на клетки */
 .txe{
-  width:38px;height:38px;border-radius:50%;flex-shrink:0;
+  width:34px;height:34px;border-radius:50%;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
-  font-size:17px;line-height:1;
+  font-size:15px;line-height:1;
   background:rgba(255,255,255,.055);
 }
 .txe.day{background:rgba(232,106,59,.13);}
 .txi{flex:1;min-width:0;}
-.txn{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.txn{font-size:14.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .txc{font-size:12px;font-weight:500;color:var(--mt);margin-top:2px;}
-.txa{font-size:15px;font-weight:800;flex-shrink:0;color:var(--t);}
+.txa{font-size:14.5px;font-weight:800;flex-shrink:0;color:var(--t);white-space:nowrap;}
 .txd{flex-shrink:0;}
 /* подсветка только что добавленной траты — глазу нужно подтверждение */
 @keyframes flash{0%{background:rgba(48,201,124,.22);}100%{background:transparent;}}
@@ -1456,19 +1517,37 @@ function recalcDaily(b){
   touch(b);   /* доходы или планы изменились — помечаем бюджет для слияния */
 
   var pot=ti-tp;                       /* весь котёл на дневные расходы */
+  var prevPot=(typeof b.pot==='number')?b.pot:null;
+  b.pot=pot;
   var t=today(), start=accrualStart(b);
-  /* Период ещё не начался или уже закрыт — считаем ровно как раньше */
+
+  /* Период не начался или уже закрыт — считаем обычной формулой */
   if(t<=start||t>b.dateTo){
     b.rates=[{from:b.dateFrom,v:Math.max(0,pot/getDays(b.dateFrom,b.dateTo))}];
     b.dailyBudget=b.rates[0].v;
     return;
   }
-  /* Правка в середине периода. Прожитые дни уже начислены по старой норме
-     и переписывать их нечестно: человек эти деньги уже потратил или отложил.
-     Поэтому остаток котла делим только на оставшиеся дни. */
-  var past=accrued(b,start,prevDay(t));
+  /* Первый пересчёт бюджета, созданного до появления b.pot: сколько именно
+     изменилось — неизвестно, поэтому ставки не трогаем, только запоминаем котёл.
+     Иначе пришлось бы гадать и цифра прыгнула бы на ровном месте. */
+  if(prevPot===null){
+    if(!b.rates||!b.rates.length){
+      b.rates=[{from:b.dateFrom,v:Math.max(0,pot/getDays(b.dateFrom,b.dateTo))}];
+    }
+    b.dailyBudget=rateOn(b,t);
+    return;
+  }
+
+  /* Правка в середине периода. Прожитые дни уже начислены по старой норме и
+     переписывать их нечестно — деньги за них человек уже потратил или отложил.
+     Поэтому размазываем ТОЛЬКО изменение котла по оставшимся дням.
+     Считать норму заново от общей суммы нельзя: если бюджет создан не с первого
+     дня периода, основания расходятся и «плюс 100 000, потом минус 100 000»
+     не возвращает исходную цифру. */
+  var delta=pot-prevPot;
+  if(delta===0){b.dailyBudget=rateOn(b,t);return;}
   var leftDays=getDays(t,b.dateTo);
-  var v=Math.max(0,(pot-past)/leftDays);
+  var v=Math.max(0,rateOn(b,t)+delta/leftDays);
   var segs=rateSegs(b).filter(function(s){return s.from<t;});
   segs.push({from:t,v:v});
   b.rates=segs;
@@ -1552,6 +1631,7 @@ function render(){
   if(tab==='history')pg=rHistory(b);
   if(tab==='incomes')pg=rIncomes(b);
   if(tab==='planned')pg=rPlanned(b);
+  if(tab==='stats')  pg=rStats();
   /* Период показываемого бюджета закончился, а нового на сегодня нет —
      не даём тихо "жить в прошлом месяце", предлагаем создать новый */
   var td=today();
@@ -1575,6 +1655,21 @@ function render(){
     (showMenuBk?'<div class="bk-menu" onclick="closeBk()"></div>':'')+
     ((qaDrop||catPick)?'<div class="bk-cal" onclick="closeQaCal()"></div>':'');
   bindMain(b);
+  fixMenus();
+}
+
+/* Разворачиваем открытое меню вверх, если снизу не помещается.
+   Замеряем после отрисовки — до неё высоты меню ещё нет. */
+function fixMenus(){
+  var list=document.querySelectorAll('.ctx');
+  for(var i=0;i<list.length;i++){
+    var el=list[i];
+    el.classList.remove('up');
+    var r=el.getBoundingClientRect();
+    var vh=window.innerHeight||document.documentElement.clientHeight;
+    /* 12px — воздух до края, чтобы меню не липло к самому низу */
+    if(r.bottom>vh-12&&r.height<vh-120)el.classList.add('up');
+  }
 }
 
 /* ── HEADER ──────────────────────────────────── */
@@ -1585,7 +1680,6 @@ function rHeader(b){
     '<div class="hdr-r1">'+
       '<div class="hdr-left">'+
         '<div class="logo">✦ <span>Б</span>юджет</div>'+
-        (!isViewingCurrent(b)&&getCurrentBudget()?'<button type="button" class="cur-btn" onclick="goCurrent()">Текущий бюджет</button>':'')+
       '</div>'+
       '<div class="hdr-right">'+
         '<span id="sync-dot" class="sync-dot s-'+syncState+'" title="Синхронизация"></span>'+
@@ -1610,6 +1704,14 @@ function rHeader(b){
       '<button class="nb '+(tab==='planned'?'on':'')+'" onclick="setTab(\'planned\')">Расходы'+(ov?'<span class="tbadge"></span>':'')+
       '</button>'+
     '</div>'+
+    /* Отдельной строкой, а не рядом с логотипом: в первом ряду кнопка налезала
+       на точку синхронизации и сталкивала «Бюджет» на вторую строку */
+    (!isViewingCurrent(b)&&getCurrentBudget()
+      ? '<button type="button" class="cur-bar" onclick="goCurrent()">'+
+          '<span>Смотрите прошлый период</span>'+
+          '<span class="cur-go">К текущему →</span>'+
+        '</button>'
+      : '')+
   '</div>';
 }
 /* Меню периода. Раньше сюда вываливался весь список бюджетов и панель
@@ -1650,6 +1752,7 @@ function rDrop(b,bal){
     '</div>'+
     '<div class="drop-acts">'+
       arch+
+      '<button class="drop-act" onclick="openStats()">Сводка по категориям</button>'+
       '<button class="drop-act" onclick="exportCSV()">Выгрузить в CSV</button>'+
       '<button class="drop-act acc" onclick="newBdg()">Создать бюджет на будущее</button>'+
       (S.budgets.length>1?'<button class="drop-act del" onclick="delBdg(\''+b.id+'\')">Удалить бюджет</button>':'')+
@@ -1718,6 +1821,93 @@ function rCatPop(b){
   }
   return h+'</div>';
 }
+
+/* ── СВОДКА ЗА ПЕРИОД ──────────────────────────
+   Бюджет живёт месяцами, но вопрос «сколько всего ушло на машину за год»
+   в месячную рамку не помещается. Здесь считаем сквозь все периоды.
+   Категории сопоставляем по названию: id у них в каждом месяце новые. */
+var statRange='3m';   /* cur | 3m | 12m | all */
+
+function statBounds(){
+  var t=today(), d=new Date(t+'T00:00:00');
+  if(statRange==='cur'){
+    var b=getAB();
+    return b?{from:b.dateFrom,to:b.dateTo,label:fmtSh(b.dateFrom)+' — '+fmtSh(b.dateTo)}:{from:t,to:t,label:''};
+  }
+  if(statRange==='all'){
+    var min=t;
+    for(var i=0;i<S.txs.length;i++)if(S.txs[i].date<min)min=S.txs[i].date;
+    return {from:min,to:t,label:'с '+fmtSh(min)};
+  }
+  var months=statRange==='12m'?12:3;
+  d.setMonth(d.getMonth()-months);d.setDate(d.getDate()+1);
+  var f=localISO(d);
+  return {from:f,to:t,label:fmtSh(f)+' — '+fmtSh(t)};
+}
+
+function rStats(){
+  var R=statBounds();
+  var map={},total=0;
+  for(var i=0;i<S.txs.length;i++){
+    var tx=S.txs[i];
+    if(tx.date<R.from||tx.date>R.to)continue;
+    var key=tx.category||'Дневные расходы';
+    var em=tx.category?(tx.categoryEmoji||'📌'):'💳';
+    if(!map[key])map[key]={name:key,emoji:em,sum:0,n:0};
+    map[key].sum+=tx.amount;map[key].n++;
+    total+=tx.amount;
+  }
+  var arr=[];for(var k in map)arr.push(map[k]);
+  arr.sort(function(a,c){return c.sum-a.sum;});
+
+  /* Доход берём из бюджетов, целиком попавших в интервал: он задан планом,
+     а не транзакциями, поэтому дробить его по дням было бы враньём */
+  var inc=0,nb=0;
+  for(var j=0;j<S.budgets.length;j++){
+    var bd=S.budgets[j];
+    if(bd.dateFrom>=R.from&&bd.dateTo<=R.to){
+      nb++;
+      for(var q=0;q<bd.incomes.length;q++)inc+=bd.incomes[q].amount;
+    }
+  }
+
+  var chips='';
+  var opts=[['cur','Период'],['3m','3 месяца'],['12m','Год'],['all','Всё время']];
+  for(var c=0;c<opts.length;c++){
+    chips+='<button type="button" class="rchip'+(statRange===opts[c][0]?' on':'')+
+      '" onclick="setRange(\''+opts[c][0]+'\')">'+opts[c][1]+'</button>';
+  }
+
+  var max=arr.length?arr[0].sum:1;
+  var rows='';
+  for(var r=0;r<arr.length;r++){
+    var it=arr[r],pct=Math.round(it.sum/max*100),share=total>0?Math.round(it.sum/total*100):0;
+    rows+='<div class="st-row">'+
+      '<div class="st-hd">'+
+        '<span class="st-em">'+it.emoji+'</span>'+
+        '<span class="st-nm">'+esc(it.name)+'</span>'+
+        '<span class="st-am">'+fmt(it.sum)+'</span>'+
+      '</div>'+
+      '<div class="st-bar"><div class="st-fill" style="width:'+pct+'%"></div></div>'+
+      '<div class="st-sub">'+share+'% · '+it.n+'&nbsp;'+plurOps(it.n)+'</div>'+
+    '</div>';
+  }
+  if(!arr.length)rows='<div class="no-tx">За этот интервал трат нет</div>';
+
+  return '<div class="ph"><h2 class="ptl">Сводка</h2>'+
+      '<button type="button" class="btn bs sm" onclick="setTab(\'history\')">← Назад</button></div>'+
+    '<div class="rchips">'+chips+'</div>'+
+    '<div class="stat-card">'+
+      '<div class="srow-lbl">ПОТРАЧЕНО · '+esc(R.label)+'</div>'+
+      '<div class="srow-big">'+fmt(total)+'</div>'+
+      (nb?'<div class="srow-divider"></div>'+
+        '<div class="srow"><span>Доход за '+nb+'&nbsp;'+plurPeriods(nb)+'</span><b class="gd">'+fmt(inc)+'</b></div>'+
+        '<div class="srow"><span>Разница</span><b class="'+(inc-total>=0?'gd':'rd')+'">'+fmt(inc-total)+'</b></div>':'')+
+    '</div>'+
+    '<div class="card ts-card">'+rows+'</div>';
+}
+function plurOps(n){var a=n%100,b=n%10;if(a>4&&a<21)return 'операций';if(b===1)return 'операция';if(b>1&&b<5)return 'операции';return 'операций';}
+function plurPeriods(n){var a=n%100,b=n%10;if(a>4&&a<21)return 'периодов';if(b===1)return 'период';if(b>1&&b<5)return 'периода';return 'периодов';}
 
 /* ── HISTORY TAB ─────────────────────────────── */
 function rHistory(b){
@@ -1809,19 +1999,22 @@ function rHero(b){
   var left=daysBw(td,b.dateTo);
   var ended=b.dateTo<td;
 
+  /* Всё в два ряда вместо пяти: цифра слева, подробности справа мелким.
+     Раньше блок занимал треть экрана ради трёх чисел. */
   return '<div class="hero">'+
     '<div class="hero-top">'+
-      '<span class="hero-lbl">'+(ended?'Итог периода':'Осталось на сегодня')+'</span>'+
-      '<span class="hero-days">'+(ended?'период закрыт'
-        : left>0?left+'&nbsp;'+plurDays(left)+' до конца'
-        : 'последний день')+'</span>'+
+      '<div class="hero-l">'+
+        '<div class="hero-lbl">'+(ended?'Итог периода':'Осталось на сегодня')+'</div>'+
+        '<div class="hero-big '+(pos?'gd':'rd')+'">'+fmt(bal)+'</div>'+
+      '</div>'+
+      '<div class="hero-r">'+
+        '<div>сегодня <b>'+fmt(spentToday)+'</b></div>'+
+        '<div>'+(ended?'период закрыт'
+          : left>0?'<b>+'+fmt(b.dailyBudget)+'</b> · '+left+'&nbsp;'+plurDays(left)
+          : 'последний день')+'</div>'+
+      '</div>'+
     '</div>'+
-    '<div class="hero-big '+(pos?'gd':'rd')+'">'+fmt(bal)+'</div>'+
     '<div class="hero-bar"><div class="hero-fill '+(pos?'gd':'rd')+'" style="width:'+(pos?pct:100)+'%"></div></div>'+
-    '<div class="hero-sub">'+
-      '<span>Сегодня потрачено <b>'+fmt(spentToday)+'</b></span>'+
-      (ended?'':'<span><b>+'+fmt(b.dailyBudget)+'</b> завтра</span>')+
-    '</div>'+
   '</div>';
 }
 function plurDays(n){
@@ -1843,8 +2036,10 @@ function rIncomes(b){
     var inc=b.incomes[k];
     /* FIX #2: emoji inline with text using t-nm class */
     rows+='<tr>'+
-      '<td><div class="t-nm"><span class="t-em">'+(inc.emoji||'💰')+'</span>'+esc(inc.name)+(inc.recur?'<span class="recur-b" title="Повторяющийся — сумма переносится в новый месяц">🔁</span>':'')+'</div></td>'+
-      '<td class="t-am">'+fmt(inc.amount)+'</td>'+
+      '<td><div class="t-nm"><span class="t-em">'+(inc.emoji||'💰')+'</span><span class="t-tx">'+esc(inc.name)+'</span></div></td>'+
+      '<td class="t-am"><span class="t-amw">'+
+        (inc.recur?'<span class="recur-b" title="Повторяющийся — сумма переносится в новый месяц">🔁</span>':'')+
+        fmt(inc.amount)+'</span></td>'+
       '<td class="t-ax"><div class="ctx-wrap">'+
         '<button type="button" class="dots'+(incMenu===inc.id?' on':'')+'" onclick="togMenu(\'inc\',\''+inc.id+'\',event)"><svg width=\'16\' height=\'4\' viewBox=\'0 0 16 4\'><circle cx=\'2\' cy=\'2\' r=\'1.7\'/><circle cx=\'8\' cy=\'2\' r=\'1.7\'/><circle cx=\'14\' cy=\'2\' r=\'1.7\'/></svg></button>'+
         (incMenu===inc.id?'<div class="ctx" onclick="event.stopPropagation()">'+
@@ -1880,11 +2075,13 @@ function rPlanned(b){
     var p=b.planned[k],rem=calcCatRem(b,p.id),neg=rem<0;
     /* FIX #2: emoji inline */
     rows+='<tr class="'+(neg?'row-ov':'')+'">'+
-      '<td><div class="t-nm"><span class="t-em">'+(p.emoji||'📌')+'</span>'+esc(p.name)+(p.recur?'<span class="recur-b" title="Повторяющаяся — сумма переносится в новый месяц">🔁</span>':'')+'</div>'+
+      '<td><div class="t-nm"><span class="t-em">'+(p.emoji||'📌')+'</span><span class="t-tx">'+esc(p.name)+'</span></div>'+
         /* FIX #4: inline overdraft badge per row */
         (neg?'<div class="ov-tag">⚠️ перерасход <button type="button" class="ov-btn" onclick="openTr(\''+p.id+'\')">Покрыть</button></div>':'')+
       '</td>'+
-      '<td class="t-am"><span class="'+(neg?'rd':'gd')+'">'+(neg?'−':'')+fmt(Math.abs(rem))+'</span>'+
+      '<td class="t-am"><span class="t-amw">'+
+        (p.recur?'<span class="recur-b" title="Повторяющаяся — сумма переносится в новый месяц">🔁</span>':'')+
+        '<span class="'+(neg?'rd':'gd')+'">'+(neg?'−':'')+fmt(Math.abs(rem))+'</span></span>'+
         '<div class="t-sub">из '+fmt(p.amount)+cmpPrev(b,p)+'</div>'+
       '</td>'+
       '<td class="t-ax"><div class="ctx-wrap">'+
@@ -1905,7 +2102,7 @@ function rPlanned(b){
     '<div class="ph-acts">'+
       /* «Перевести» раньше пряталось в меню категории — а это основной способ
          добрать денег в категорию за счёт оставшихся дней */
-      (b.planned.length?'<button type="button" class="btn bs sm" onclick="openTr(\'\')">⇄ Перевести</button>':'')+
+      (b.planned.length?'<button type="button" class="ib" title="Перевести" onclick="openTr(\'\')">⇄</button>':'')+
       '<button type="button" class="btn bp sm" onclick="om(\'add-planned\')">+ Добавить</button>'+
     '</div></div>'+
   (ov?'<div class="warn">'+
@@ -2224,6 +2421,8 @@ function bindEmpty(){window.startWz=function(){tab='wizard';wizStep=0;wd=initWD(
 
 function bindMain(b){
   window.setTab    =function(t){tab=t;drop=false;render();};
+  window.openStats =function(){tab='stats';drop=false;render();};
+  window.setRange  =function(r){statRange=r;render();};
   window.togDrop   =function(){drop=!drop;archOpen=false;usrMenu=false;txMenu=null;incMenu=null;plnMenu=null;render();};
   window.togArch   =function(){archOpen=!archOpen;render();};
   window.moveRemToDaily=function(pid){
@@ -2477,6 +2676,7 @@ function bindWiz(){
       incomes:d.incomes.map(function(i){return Object.assign({},i,{amount:pf(i.amount)||0});}),
       planned:d.planned.map(function(p){return Object.assign({},p,{amount:pf(p.amount)||0});}),
       dailyBudget:avail>0?avail/days:0,
+      pot:avail,
       rates:[{from:d.dateFrom,v:avail>0?avail/days:0}]};
     S.budgets.push(touch(bdg));S.activeBudgetId=bdg.id;save();tab='history';wd=null;render();
   };
