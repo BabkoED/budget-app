@@ -20,3 +20,15 @@ create policy "owner_only"
 -- "Automatically expose new tables" — иначе будет ошибка 403)
 grant usage on schema public to anon, authenticated;
 grant all on table public.user_state to anon, authenticated;
+
+-- Живая синхронизация между устройствами.
+-- Без этой строки приложение работает, но правки со второго устройства
+-- подтягиваются только при возврате на вкладку, а не мгновенно.
+-- REPLICA IDENTITY FULL нужен, чтобы realtime отдавал user_id в фильтре.
+alter table user_state replica identity full;
+do $$
+begin
+  alter publication supabase_realtime add table user_state;
+exception
+  when duplicate_object then null;   -- уже добавлена, это нормально
+end $$;

@@ -96,6 +96,7 @@ select option{background:var(--card2);}
 }
 .balbtn.gd{color:var(--gd);background:rgba(48,201,124,.13);}
 .balbtn.rd{color:var(--rd);background:rgba(255,79,71,.13);}
+.balbtn.nt{color:var(--t2);background:var(--card);border:1px solid var(--br2);}
 .balbtn .cv{font-size:9px;opacity:.5;}
 
 .nb{
@@ -181,7 +182,8 @@ select option{background:var(--card2);}
 
 /* ── PAGE ────────────────────────────────── */
 .pg{padding:16px 14px;max-width:520px;margin:0 auto;}
-.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.ph{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;}
+.ph-acts{display:flex;gap:8px;flex-shrink:0;}
 .ptl{font-size:22px;font-weight:900;letter-spacing:-.3px;}
 .mt10{margin-top:10px;}
 
@@ -287,41 +289,103 @@ select option{background:var(--card2);}
 .warn-t{font-size:14px;font-weight:800;color:#D4A800;margin-bottom:3px;}
 .warn-s{font-size:13px;font-weight:500;color:#9A8030;}
 
+/* ── КАРТОЧКА ДНЯ ────────────────────────── */
+.hero{
+  background:linear-gradient(158deg,#202020 0%,#1A1A1A 100%);
+  border:1px solid var(--br2);
+  border-radius:22px;
+  padding:18px 18px 16px;
+  margin-bottom:12px;
+  box-shadow:var(--sh);
+}
+.hero-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px;}
+.hero-lbl{
+  font-size:11px;font-weight:800;letter-spacing:.8px;
+  text-transform:uppercase;color:var(--mt);
+}
+.hero-days{font-size:12px;font-weight:700;color:var(--mt);white-space:nowrap;}
+.hero-big{
+  font-size:40px;font-weight:900;letter-spacing:-1.4px;
+  line-height:1;margin:8px 0 0;
+}
+.hero-big.gd{color:var(--gd);}
+.hero-big.rd{color:var(--rd);}
+.hero-bar{
+  height:8px;border-radius:99px;background:#2A2A2A;
+  overflow:hidden;margin:15px 0 9px;
+}
+.hero-fill{height:100%;border-radius:99px;transition:width .4s cubic-bezier(.4,0,.2,1);}
+.hero-fill.gd{background:linear-gradient(90deg,var(--gd),#5FE0A0);}
+.hero-fill.rd{background:linear-gradient(90deg,var(--rd),#FF8A85);}
+.hero-sub{
+  display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+  font-size:12.5px;font-weight:600;color:var(--mt);
+}
+.hero-sub b{color:var(--t2);font-weight:800;}
+
 /* ── HISTORY / QA ────────────────────────── */
 .qa{
   background:var(--card);
-  border-radius:18px;padding:10px;
+  border-radius:18px;padding:11px;
   margin-bottom:12px;
   box-shadow:var(--sh);
   border:1px solid var(--br);
   position:relative;
 }
-.qa-row{display:flex;align-items:center;gap:6px;}
+.qa-row{display:flex;align-items:center;gap:8px;}
 .qa-in{
-  flex:1;border:1.5px solid var(--br2);border-radius:12px;
-  padding:11px 13px;font-size:15px;font-weight:600;
+  flex:1;border:1.5px solid var(--br2);border-radius:14px;
+  padding:14px 15px;font-size:17px;font-weight:700;
   background:var(--card2);color:var(--t);outline:none;min-width:0;
+  transition:border-color .15s;
 }
 .qa-in:focus{border-color:var(--accent);}
-.qa-in::placeholder{color:var(--mt);}
-.qa-sel{
-  border:1.5px solid var(--br2);border-radius:12px;
-  padding:10px 8px;font-size:13px;font-weight:600;
-  background:var(--card2);color:var(--t);
-  max-width:140px;outline:none;
-}
-.qa-cal{
-  border:1.5px solid var(--br2);border-radius:12px;
-  padding:10px 11px;background:var(--card2);color:var(--mt);
-  display:flex;align-items:center;gap:5px;
-  font-size:12px;font-weight:700;flex-shrink:0;
-}
-.qa-cal.on{border-color:var(--accent);color:var(--accent);}
+.qa-in::placeholder{color:var(--mt);font-weight:600;font-size:15px;}
 .qa-go{
   background:var(--accent);color:#fff;
-  border-radius:12px;padding:10px 15px;
-  font-size:17px;font-weight:900;flex-shrink:0;
+  border-radius:14px;
+  width:52px;height:52px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;font-weight:900;
+  transition:transform .12s,opacity .12s;
 }
+.qa-go:active{transform:scale(.92);}
+.qa-go.ok{background:var(--gd);}
+
+/* второй ряд: куда и когда — мелким, не мешает главному полю */
+.qa-meta{display:flex;gap:8px;margin-top:8px;}
+.qa-sel{
+  flex:1;min-width:0;
+  border:1.5px solid var(--br2);border-radius:12px;
+  padding:9px 10px;font-size:13px;font-weight:700;
+  background:var(--card2);color:var(--t2);outline:none;
+  appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236B6B6B' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 11px center;padding-right:26px;
+}
+.qa-sel.pick{color:var(--accent);border-color:rgba(232,106,59,.4);}
+.qa-cal{
+  border:1.5px solid var(--br2);border-radius:12px;
+  padding:9px 12px;background:var(--card2);color:var(--t2);
+  display:flex;align-items:center;gap:6px;
+  font-size:13px;font-weight:700;flex-shrink:0;
+}
+.qa-cal.on{border-color:var(--accent);color:var(--accent);}
+
+/* ── ПОИСК ───────────────────────────────── */
+.srch{
+  display:flex;align-items:center;gap:9px;
+  background:var(--card);border:1px solid var(--br);
+  border-radius:14px;padding:0 13px;margin-bottom:10px;
+}
+.srch svg{flex-shrink:0;color:var(--mt);}
+.srch input{
+  flex:1;border:none;background:none;outline:none;
+  padding:12px 0;font-size:15px;font-weight:600;color:var(--t);min-width:0;
+}
+.srch input::placeholder{color:var(--mt);font-weight:600;}
+.srch-x{color:var(--mt);font-size:18px;font-weight:700;padding:4px 2px;line-height:1;}
+.srch-n{font-size:12px;font-weight:700;color:var(--mt);white-space:nowrap;}
 
 /* ── CALENDAR POPUP ──────────────────────── */
 .cpop{
@@ -376,20 +440,33 @@ select option{background:var(--card2);}
   padding:11px 15px 10px;
   border-bottom:1px solid var(--br2);
 }
-.dt{font-size:12px;font-weight:700;color:var(--mt);text-transform:capitalize;}
+/* Без capitalize: он ломает русскую дату — «11 Августа» вместо «11 августа» */
+.dt{font-size:12px;font-weight:700;color:var(--mt);}
 .ds{font-size:13px;font-weight:800;color:var(--t2);}
 .txr{
-  display:flex;align-items:center;gap:10px;
-  padding:13px 14px;
+  display:flex;align-items:center;gap:11px;
+  padding:12px 14px;
   /* visible divider between transactions */
   border-bottom:1px solid var(--br);
+  animation:fi .18s ease;
 }
 .txr:last-child{border-bottom:none;}
+/* кружок с эмодзи категории — взгляд цепляется за него быстрее, чем за текст */
+.txe{
+  width:36px;height:36px;border-radius:12px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;line-height:1;
+  background:var(--card2);border:1px solid var(--br2);
+}
+.txe.day{background:rgba(232,106,59,.12);border-color:rgba(232,106,59,.22);}
 .txi{flex:1;min-width:0;}
 .txn{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.txc{font-size:12px;font-weight:500;color:var(--mt);margin-top:3px;}
+.txc{font-size:12px;font-weight:500;color:var(--mt);margin-top:2px;}
 .txa{font-size:15px;font-weight:800;flex-shrink:0;color:var(--t);}
 .txd{flex-shrink:0;}
+/* подсветка только что добавленной траты — глазу нужно подтверждение */
+@keyframes flash{0%{background:rgba(48,201,124,.22);}100%{background:transparent;}}
+.txr.fresh{animation:flash 1.1s ease-out;}
 
 /* ── BUTTONS ─────────────────────────────── */
 .btn{border-radius:14px;padding:13px 22px;font-size:15px;font-weight:800;cursor:pointer;transition:opacity .1s;}
@@ -457,6 +534,9 @@ select option{background:var(--card2);}
 .trprow:last-child{border-bottom:none;}
 .trprow span:first-child{color:var(--mt);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .trprow b{font-weight:800;}
+/* цена решения в пересчёте на день — выделяем, это главная строка */
+.trpday{margin-top:2px;border-top:1px solid var(--br2);border-bottom:none;padding-top:9px;}
+.trpday span:first-child{color:var(--t2);font-weight:700;}
 
 /* ── BACKDROPS ───────────────────────────── */
 /* behind header: lets dropdown stay clickable */
@@ -668,6 +748,7 @@ async function initApp() {
   if (session) {
     currentUser = session.user;
     await loadFromCloud();
+    startRealtime();
     render();
   } else {
     renderAuth();
@@ -684,17 +765,79 @@ async function initApp() {
       authReady = true;
       currentUser = sess.user;
       await loadFromCloud();
+      startRealtime();
       render();
     }
     if (event === 'SIGNED_OUT') {
       authReady = false;
+      stopRealtime();
       currentUser = null;
-      S = {budgets:[], txs:[], activeBudgetId:null};
+      S = {budgets:[], txs:[], activeBudgetId:null, rip:{}, at:0};
       invalidateSpentCache();
       authMode = 'login';
       renderAuth();
     }
   });
+}
+
+/* ── МОДЕЛЬ СЛИЯНИЯ ───────────────────────────
+   Раньше сохранение затирало состояние в облаке целиком: кто записал
+   последним — тот и прав, траты со второго устройства пропадали.
+   Теперь у каждой траты и каждого бюджета есть mod — момент последней
+   правки, а удаления не стираются молча, а оставляют метку в S.rip.
+   При встрече двух версий по каждой сущности побеждает более свежая. */
+function nowMs(){ return Date.now(); }
+function touch(o){ if(o) o.mod = nowMs(); return o; }
+function ripEnt(kind, id){ if(!S.rip) S.rip = {}; S.rip[kind+':'+id] = nowMs(); }
+
+var RIP_TTL = 180*864e5;   /* метки удаления живут полгода, потом чистим */
+
+function mergeState(A, B) {
+  A = A || {}; B = B || {};
+  /* метки удаления объединяем, оставляя самую позднюю */
+  var rip = {}, k;
+  var ra = A.rip||{}, rb = B.rip||{}, cut = nowMs() - RIP_TTL;
+  for (k in ra) if (ra[k] > cut) rip[k] = ra[k];
+  for (k in rb) if (rb[k] > cut && (!rip[k] || rb[k] > rip[k])) rip[k] = rb[k];
+
+  function mergeList(kind, la, lb) {
+    var by = {}, i, x, cur;
+    var all = (la||[]).concat(lb||[]);
+    for (i = 0; i < all.length; i++) {
+      x = all[i];
+      if (!x || !x.id) continue;
+      cur = by[x.id];
+      if (!cur || (x.mod||0) > (cur.mod||0)) by[x.id] = x;
+    }
+    var out = [];
+    for (var id in by) {
+      var t = rip[kind+':'+id];
+      /* удалено позже, чем правилось — значит удалено по-настоящему */
+      if (t && t >= (by[id].mod||0)) continue;
+      out.push(by[id]);
+    }
+    return out;
+  }
+
+  var newer = (B.at||0) > (A.at||0) ? B : A;
+  return {
+    budgets: mergeList('bdg', A.budgets, B.budgets),
+    txs:     mergeList('tx',  A.txs,     B.txs),
+    activeBudgetId: newer.activeBudgetId || A.activeBudgetId || B.activeBudgetId || null,
+    rip: rip,
+    at: Math.max(A.at||0, B.at||0)
+  };
+}
+
+/* Старые данные создавались без mod. Проставляем один раз, чтобы любая
+   новая правка гарантированно перевесила запись, пришедшую из прошлого. */
+function stampLegacy(st) {
+  if (!st) return st;
+  var i, mark = 1;
+  for (i = 0; i < (st.budgets||[]).length; i++) if (!st.budgets[i].mod) st.budgets[i].mod = mark;
+  for (i = 0; i < (st.txs||[]).length; i++)     if (!st.txs[i].mod)     st.txs[i].mod     = mark;
+  if (!st.rip) st.rip = {};
+  return st;
 }
 
 /* ── CLOUD LOAD/SAVE ──────────────────────── */
@@ -711,36 +854,67 @@ function saveLocal() {
   try { localStorage.setItem(localKey(), JSON.stringify(S)); } catch(e) {}
 }
 
+async function fetchCloud() {
+  var res = await sb.from('user_state')
+    .select('state')
+    .eq('user_id', currentUser.id)
+    .maybeSingle();
+  if (res.error) throw res.error;
+  return (res.data && res.data.state && res.data.state.budgets) ? res.data.state : null;
+}
+
 async function loadFromCloud() {
   invalidateSpentCache();
-  var local = loadLocal();
+  var local = stampLegacy(loadLocal());
   try {
-    var res = await sb.from('user_state')
-      .select('state')
-      .eq('user_id', currentUser.id)
-      .maybeSingle();
-    if (res.error) throw res.error;
-    if (res.data && res.data.state && res.data.state.budgets) {
-      /* Облако содержит реальные данные — используем их, обновляем локальный бэкап */
-      S = res.data.state;
-      invalidateSpentCache();
+    var cloud = stampLegacy(await fetchCloud());
+    if (cloud && local) {
+      /* Обе стороны живые — не выбираем одну, а сливаем.
+         Трата, внесённая с телефона, больше не пропадает от того,
+         что ноутбук сохранился последним. */
+      S = mergeState(cloud, local);
+      saveLocal();
+      saveToCloud();
+    } else if (cloud) {
+      S = cloud;
       saveLocal();
     } else if (local && local.budgets && local.budgets.length) {
-      /* В облаке пусто, но есть локальный бэкап — НЕ затираем, восстанавливаем
-         и сразу заливаем обратно в облако */
+      /* В облаке пусто, локальный бэкап есть — восстанавливаем и заливаем */
       S = local;
       saveToCloud();
     } else {
-      S = {budgets:[], txs:[], activeBudgetId:null};
+      S = {budgets:[], txs:[], activeBudgetId:null, rip:{}, at:0};
     }
   } catch(e) {
     /* Сеть упала — берём локальный бэкап, не теряем данные */
-    if (local && local.budgets) {
-      S = local;
-    } else {
-      S = {budgets:[], txs:[], activeBudgetId:null};
-    }
+    S = (local && local.budgets) ? local : {budgets:[], txs:[], activeBudgetId:null, rip:{}, at:0};
   }
+  invalidateSpentCache();
+}
+
+/* Отпечаток состояния. Считать только количество записей мало: правка суммы
+   на втором устройстве их не меняет — поэтому берём ещё и максимальный mod. */
+function stateSig(st) {
+  var mx = 0, i;
+  for (i = 0; i < (st.txs||[]).length; i++)     if ((st.txs[i].mod||0) > mx)     mx = st.txs[i].mod;
+  for (i = 0; i < (st.budgets||[]).length; i++) if ((st.budgets[i].mod||0) > mx) mx = st.budgets[i].mod;
+  return (st.txs||[]).length + '/' + (st.budgets||[]).length + '/' + mx;
+}
+
+/* Подтянуть чужие правки и влить в текущее состояние.
+   Возвращает true, если что-то реально изменилось. */
+async function pullAndMerge() {
+  if (!currentUser) return false;
+  try {
+    var cloud = stampLegacy(await fetchCloud());
+    if (!cloud) return false;
+    var before = stateSig(S);
+    var merged = mergeState(cloud, S);
+    S = merged;
+    invalidateSpentCache();
+    saveLocal();
+    return stateSig(merged) !== before;
+  } catch(e) { return false; }
 }
 
 /* ── СИНХРОНИЗАЦИЯ ─────────────────────────
@@ -768,6 +942,17 @@ function save() {
 async function saveToCloud() {
   if (!currentUser) return;
   try {
+    /* Читаем облако перед записью и сливаем: если со второго устройства
+       что-то прилетело, пока мы редактировали, оно не будет затёрто. */
+    var cloud = stampLegacy(await fetchCloud());
+    if (cloud) {
+      var sig0 = stateSig(S);
+      S = mergeState(cloud, S);
+      invalidateSpentCache();
+      /* слияние принесло чужие записи — показываем их сразу */
+      if (stateSig(S) !== sig0) render();
+    }
+    S.at = nowMs();
     var res = await sb.from('user_state').upsert({
       user_id: currentUser.id,
       state: S,
@@ -829,11 +1014,36 @@ function sbToken() {
   } catch(e) {}
   return null;
 }
+/* ── ЖИВАЯ СИНХРОНИЗАЦИЯ ──────────────────────
+   Трата, внесённая на телефоне, появляется на ноутбуке сразу, а не при
+   следующем открытии. Сокет иногда отваливается в фоне — поэтому при
+   возврате на вкладку дополнительно перечитываем облако вручную. */
+var rtChannel = null;
+function startRealtime() {
+  if (!currentUser || rtChannel) return;
+  try {
+    rtChannel = sb.channel('state-' + currentUser.id)
+      .on('postgres_changes',
+          {event:'*', schema:'public', table:'user_state', filter:'user_id=eq.' + currentUser.id},
+          function(){ pullAndMerge().then(function(changed){ if (changed) render(); }); })
+      .subscribe();
+  } catch(e) { rtChannel = null; }
+}
+function stopRealtime() {
+  if (!rtChannel) return;
+  try { sb.removeChannel(rtChannel); } catch(e) {}
+  rtChannel = null;
+}
+
 window.addEventListener('visibilitychange', function() {
-  if (document.visibilityState === 'hidden') flushSave();
+  if (document.visibilityState === 'hidden') { flushSave(); return; }
+  if (currentUser) pullAndMerge().then(function(changed){ if (changed) render(); });
 });
 window.addEventListener('pagehide', flushSave);
-window.addEventListener('online',  function(){ if(pendingSave) saveToCloud(); else setSync('saved'); });
+window.addEventListener('online',  function(){
+  if (pendingSave) saveToCloud();
+  else { setSync('saved'); if (currentUser) pullAndMerge().then(function(c){ if(c) render(); }); }
+});
 window.addEventListener('offline', function(){ setSync('offline'); });
 
 /* ── AUTH UI ──────────────────────────────── */
@@ -1004,7 +1214,7 @@ function parseQA(raw){
 }
 
 /* save() и load() переопределены в auth.js */
-var S = {budgets:[],txs:[],activeBudgetId:null};
+var S = {budgets:[],txs:[],activeBudgetId:null,rip:{},at:0};
 
 /* ── COMPUTED ────────────────────────────────── */
 function getAB(){
@@ -1024,6 +1234,40 @@ function isViewingCurrent(b){
   return cb&&b&&cb.id===b.id;
 }
 
+/* ── ИСТОРИЯ ДНЕВНОЙ НОРМЫ ─────────────────────
+   Раньше норма была одним числом: подняли аренду в середине месяца —
+   и накопление за уже прожитые дни менялось задним числом.
+   Теперь норма хранится отрезками [{from, v}]: правка создаёт новый
+   отрезок с сегодняшнего дня, а прошлое остаётся как было. */
+function rateSegs(b){
+  if(b.rates&&b.rates.length)return b.rates;
+  return [{from:b.dateFrom,v:b.dailyBudget||0}];   /* старые бюджеты — одна ставка */
+}
+function rateOn(b,d){
+  var segs=rateSegs(b),v=segs[0].v;
+  for(var i=0;i<segs.length;i++)if(segs[i].from<=d)v=segs[i].v;
+  return v;
+}
+function nextDay(d){var x=new Date(d+'T00:00:00');x.setDate(x.getDate()+1);return localISO(x);}
+function prevDay(d){var x=new Date(d+'T00:00:00');x.setDate(x.getDate()-1);return localISO(x);}
+/* Сколько всего начислено за дни from..to включительно */
+function accrued(b,from,to){
+  if(to<from)return 0;
+  var segs=rateSegs(b),total=0,cur=from,guard=0;
+  while(cur<=to&&guard++<800){
+    var v=segs[0].v;
+    for(var i=0;i<segs.length;i++)if(segs[i].from<=cur)v=segs[i].v;
+    total+=v;cur=nextDay(cur);
+  }
+  return total;
+}
+/* Начало начисления: бюджет, созданный в середине месяца, не должен
+   задним числом накапливать дни, которых ещё не было */
+function accrualStart(b){
+  var cr=b.createdAt||b.dateFrom;
+  return cr>b.dateFrom?cr:b.dateFrom;
+}
+
 function calcDayBal(b){
   if(!b)return 0;
   var t=today();
@@ -1031,10 +1275,11 @@ function calcDayBal(b){
      - создал бюджет в середине месяца → считаем с даты создания (не с 1-го)
      - создал бюджет заранее (следующий месяц) → считаем с начала периода
      Это закрывает баг: июльский бюджет созданный в июне не накапливает июньские дни */
-  var cr=b.createdAt||b.dateFrom, df=b.dateFrom;
-  var start=(cr>df)?cr:df;
+  var start=accrualStart(b);
   if(t<start)return 0;
-  var days=daysBw(start,t)+1,acc=b.dailyBudget*days,spent=0;
+  /* период мог уже закончиться — начисляем только по dateTo */
+  var upto=t>b.dateTo?b.dateTo:t;
+  var acc=accrued(b,start,upto),spent=0;
   for(var i=0;i<S.txs.length;i++){
     var tx=S.txs[i];
     if(tx.budgetId===b.id&&tx.date<=t&&!tx.plannedCatId)spent+=tx.amount;
@@ -1140,11 +1385,65 @@ function recalcDaily(b){
   var ti=0,tp=0;
   for(var i=0;i<b.incomes.length;i++)ti+=b.incomes[i].amount;
   for(var j=0;j<b.planned.length;j++)tp+=b.planned[j].amount;
-  b.dailyBudget=Math.max(0,(ti-tp)/getDays(b.dateFrom,b.dateTo));
+  touch(b);   /* доходы или планы изменились — помечаем бюджет для слияния */
+
+  var pot=ti-tp;                       /* весь котёл на дневные расходы */
+  var t=today(), start=accrualStart(b);
+  /* Период ещё не начался или уже закрыт — считаем ровно как раньше */
+  if(t<=start||t>b.dateTo){
+    b.rates=[{from:b.dateFrom,v:Math.max(0,pot/getDays(b.dateFrom,b.dateTo))}];
+    b.dailyBudget=b.rates[0].v;
+    return;
+  }
+  /* Правка в середине периода. Прожитые дни уже начислены по старой норме
+     и переписывать их нечестно: человек эти деньги уже потратил или отложил.
+     Поэтому остаток котла делим только на оставшиеся дни. */
+  var past=accrued(b,start,prevDay(t));
+  var leftDays=getDays(t,b.dateTo);
+  var v=Math.max(0,(pot-past)/leftDays);
+  var segs=rateSegs(b).filter(function(s){return s.from<t;});
+  segs.push({from:t,v:v});
+  b.rates=segs;
+  b.dailyBudget=v;
 }
 function hasOv(b){
   for(var i=0;i<b.planned.length;i++){if(calcCatRem(b,b.planned[i].id)<0)return true;}
   return false;
+}
+
+/* ── ВЫГРУЗКА В CSV ────────────────────────────
+   Разделитель «;» и BOM — иначе Excel на русской локали
+   склеивает всё в одну колонку и ломает кириллицу. */
+function csvCell(v){
+  var s=String(v==null?'':v);
+  return /[";\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s;
+}
+function exportCSV(){
+  var b=getAB(); if(!b) return;
+  var rows=[['Дата','Название','Категория','Сумма']];
+  var txs=S.txs.filter(function(t){return t.budgetId===b.id;})
+    .sort(function(a,c){return a.date.localeCompare(c.date)||((a.seq||0)-(c.seq||0));});
+  for(var i=0;i<txs.length;i++){
+    var t=txs[i];
+    rows.push([t.date, t.name, t.category||'Дневные расходы', Math.round(t.amount)]);
+  }
+  rows.push([]);
+  rows.push(['Доходы','','','']);
+  for(var j=0;j<b.incomes.length;j++)rows.push(['',b.incomes[j].name,'',Math.round(b.incomes[j].amount)]);
+  rows.push(['Плановые расходы','','','']);
+  for(var k=0;k<b.planned.length;k++){
+    var p=b.planned[k];
+    rows.push(['',p.name,'потрачено '+Math.round((getSpentMap(b)[p.id]||0)),Math.round(p.amount)]);
+  }
+  var csv=rows.map(function(r){return r.map(csvCell).join(';');}).join('\r\n');
+  var blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8;'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url; a.download='budget_'+b.dateFrom+'_'+b.dateTo+'.csv';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  setTimeout(function(){URL.revokeObjectURL(url);},1000);
+  drop=false; render();
 }
 
 /* ── PRESET CATEGORIES ───────────────────────── */
@@ -1165,6 +1464,8 @@ var EC=[
 /* ── UI STATE ────────────────────────────────── */
 var tab='history',drop=false,usrMenu=false,modal=null,wizStep=0,wd=null,archOpen=false;
 var qaVal='',qaSelVal='',qaDate='today',qaCustom='',qaDrop=false;
+var qSearch='';      /* строка поиска по тратам */
+var freshTx=null;    /* id только что добавленной траты — подсвечиваем её */
 var txMenu=null,incMenu=null,plnMenu=null;
 var _pc={inc:[],pln:[],eid:'',days:1,curD:0};
 var _trCtx={pln:[],bid:'',dayBal:0};
@@ -1221,8 +1522,11 @@ function rHeader(b){
       '<div class="hdr-right">'+
         '<span id="sync-dot" class="sync-dot s-'+syncState+'" title="Синхронизация"></span>'+
         '<div style="position:relative">'+
-          '<button class="balbtn '+(pos?'gd':'rd')+'" onclick="togDrop()">'+
-            fmt(bal)+' / день<span class="cv"> ▾</span>'+
+          /* На «Выписке» остаток уже крупно в карточке дня — дублировать его
+             в шапке незачем, там полезнее видеть период бюджета */
+          '<button class="balbtn '+(tab==='history'?'nt':(pos?'gd':'rd'))+'" onclick="togDrop()">'+
+            (tab==='history'?fmtSh(b.dateFrom)+' — '+fmtSh(b.dateTo):fmt(bal)+' / день')+
+            '<span class="cv"> ▾</span>'+
           '</button>'+
           (drop?rDrop(b,bal):'')+
         '</div>'+
@@ -1277,6 +1581,7 @@ function rDrop(b,bal){
     list+
     '<div class="drop-acts">'+
       '<button class="drop-act" onclick="openBdgEdit()">⚙️ Изменить даты</button>'+
+      '<button class="drop-act" onclick="exportCSV()">⬇️ Выгрузить в CSV</button>'+
       (S.budgets.length>1?'<button class="drop-act del" onclick="delBdg(\''+b.id+'\')">🗑 Удалить бюджет</button>':'')+
     '</div>'+
     '<button class="drop-new" onclick="newBdg()">🗓 Новый бюджет</button>'+
@@ -1331,8 +1636,18 @@ function rHistory(b){
      даты сортируем один раз (строки YYYY-MM-DD сравниваются лексикографически),
      внутри дня — по seq. Даёт ~70% выигрыш на объёме в сотни трат. */
   var txs=S.txs.filter(function(t){return t.budgetId===b.id;});
+  var shown=txs, found='';
+  if(qSearch){
+    var q=qSearch.toLowerCase();
+    shown=txs.filter(function(t){
+      return (t.name||'').toLowerCase().indexOf(q)>-1
+          || (t.category||'').toLowerCase().indexOf(q)>-1;
+    });
+    var qs=0;for(var qi=0;qi<shown.length;qi++)qs+=shown[qi].amount;
+    found=shown.length+' · '+fmt(qs);
+  }
   var g={};
-  for(var i=0;i<txs.length;i++){var tx=txs[i];(g[tx.date]||(g[tx.date]=[])).push(tx);}
+  for(var i=0;i<shown.length;i++){var tx=shown[i];(g[tx.date]||(g[tx.date]=[])).push(tx);}
   var dates=Object.keys(g).sort();dates.reverse();
   for(var di=0;di<dates.length;di++)g[dates[di]].sort(function(a,c){return (c.seq||0)-(a.seq||0);});
 
@@ -1344,30 +1659,46 @@ function rHistory(b){
   }
   var dLbl=qaDate==='today'?'Сегодня':qaDate==='yesterday'?'Вчера':(qaCustom?fmtSh(qaCustom):'Дата');
 
-  var h='<div class="qa">'+
+  var h=rHero(b)+
+  '<div class="qa">'+
     '<div class="qa-row">'+
-      '<input class="qa-in" id="qa-inp" placeholder="350 кофе — сумма, потом название" autocomplete="off" value="'+esc(qaVal)+'" oninput="qaVal=qaAutoCap(this)">'+
-      (b.planned.length?'<select class="qa-sel" onchange="qaSelVal=this.value">'+catOpts+'</select>':'')+
+      '<input class="qa-in" id="qa-inp" placeholder="350 кофе" autocomplete="off" inputmode="text" value="'+esc(qaVal)+'" oninput="qaVal=qaAutoCap(this)">'+
+      '<button type="button" class="qa-go" id="qa-go" onclick="doQA()">→</button>'+
+    '</div>'+
+    '<div class="qa-meta">'+
+      (b.planned.length?'<select class="qa-sel'+(qaSelVal?' pick':'')+'" onchange="qaSelVal=this.value">'+catOpts+'</select>':'<span style="flex:1"></span>')+
       '<button type="button" class="qa-cal'+(qaDrop?' on':'')+'" onclick="togCal(event)">'+
         '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>'+
-        (qaDate!=='today'?'<span>'+dLbl+'</span>':'')+
+        '<span>'+dLbl+'</span>'+
       '</button>'+
-      '<button type="button" class="qa-go" onclick="doQA()">→</button>'+
     '</div>'+
     (qaDrop?rCalPop():'')+
   '</div>';
 
-  if(!dates.length)return h+'<div class="no-tx">Расходов пока нет — хорошее начало 👏</div>';
+  /* Поиск появляется, только когда трат уже много — иначе он просто шум */
+  if(txs.length>12||qSearch){
+    h+='<div class="srch">'+
+      '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>'+
+      '<input id="srch-inp" placeholder="Поиск по тратам" autocomplete="off" value="'+esc(qSearch)+'" oninput="setSearch(this.value)">'+
+      (qSearch?'<span class="srch-n">'+found+'</span><button type="button" class="srch-x" onclick="setSearch(\'\')">×</button>':'')+
+    '</div>';
+  }
+
+  if(!dates.length){
+    return h+'<div class="no-tx">'+(qSearch?'Ничего не нашлось':'Расходов пока нет — хорошее начало 👏')+'</div>';
+  }
   for(var di2=0;di2<dates.length;di2++){
     var date=dates[di2],dt=g[date],sum=0;
     for(var si=0;si<dt.length;si++)sum+=dt[si].amount;
     h+='<div class="dg"><div class="dh"><span class="dt">'+fmtDay(date)+'</span><span class="ds">'+fmt(sum)+'</span></div>';
     for(var ti2=0;ti2<dt.length;ti2++){
       var t2=dt[ti2];
-      h+='<div class="txr">'+
+      var isDay=!t2.plannedCatId;
+      h+='<div class="txr'+(t2.id===freshTx?' fresh':'')+'">'+
+        '<div class="txe'+(isDay?' day':'')+'">'+(isDay?'💳':(t2.categoryEmoji||'📌'))+'</div>'+
         '<div class="txi">'+
           '<div class="txn">'+esc(t2.name)+'</div>'+
-          (t2.category?'<div class="txc">'+(t2.categoryEmoji?t2.categoryEmoji+' ':'')+esc(t2.category)+'</div>':'')+
+          (t2.category?'<div class="txc">'+esc(t2.category)+'</div>':'')+
         '</div>'+
         '<div class="txa">'+fmt(t2.amount)+'</div>'+
         '<div class="txd"><div class="ctx-wrap">'+
@@ -1382,6 +1713,46 @@ function rHistory(b){
     h+='</div>';
   }
   return h;
+}
+
+/* ── КАРТОЧКА ДНЯ ──────────────────────────────
+   Главный экран должен за секунду отвечать на один вопрос:
+   сколько я ещё могу потратить сегодня. Всё остальное — ниже. */
+function rHero(b){
+  var bal=calcDayBal(b), pos=bal>=0;
+  var td=today();
+  var spentToday=0;
+  for(var i=0;i<S.txs.length;i++){
+    var t=S.txs[i];
+    if(t.budgetId===b.id&&t.date===td&&!t.plannedCatId)spentToday+=t.amount;
+  }
+  /* на старте дня было столько — от этого и считаем полосу */
+  var startOfDay=bal+spentToday;
+  var pct=startOfDay>0?Math.min(100,Math.round(spentToday/startOfDay*100)):100;
+  var left=daysBw(td,b.dateTo);
+  var ended=b.dateTo<td;
+
+  return '<div class="hero">'+
+    '<div class="hero-top">'+
+      '<span class="hero-lbl">'+(ended?'Итог периода':'Осталось на сегодня')+'</span>'+
+      '<span class="hero-days">'+(ended?'период закрыт'
+        : left>0?left+'&nbsp;'+plurDays(left)+' до конца'
+        : 'последний день')+'</span>'+
+    '</div>'+
+    '<div class="hero-big '+(pos?'gd':'rd')+'">'+fmt(bal)+'</div>'+
+    '<div class="hero-bar"><div class="hero-fill '+(pos?'gd':'rd')+'" style="width:'+(pos?pct:100)+'%"></div></div>'+
+    '<div class="hero-sub">'+
+      '<span>Сегодня потрачено <b>'+fmt(spentToday)+'</b></span>'+
+      (ended?'':'<span><b>+'+fmt(b.dailyBudget)+'</b> завтра</span>')+
+    '</div>'+
+  '</div>';
+}
+function plurDays(n){
+  var a=n%100,b2=n%10;
+  if(a>4&&a<21)return 'дней';
+  if(b2===1)return 'день';
+  if(b2>1&&b2<5)return 'дня';
+  return 'дней';
 }
 
 /* ── INCOMES TAB ─────────────────────────────── */
@@ -1454,7 +1825,12 @@ function rPlanned(b){
     '</tr>';
   }
   return '<div class="ph"><h2 class="ptl">Плановые расходы</h2>'+
-    '<button type="button" class="btn bp sm" onclick="om(\'add-planned\')">+ Добавить</button></div>'+
+    '<div class="ph-acts">'+
+      /* «Перевести» раньше пряталось в меню категории — а это основной способ
+         добрать денег в категорию за счёт оставшихся дней */
+      (b.planned.length?'<button type="button" class="btn bs sm" onclick="openTr(\'\')">⇄ Перевести</button>':'')+
+      '<button type="button" class="btn bp sm" onclick="om(\'add-planned\')">+ Добавить</button>'+
+    '</div></div>'+
   (ov?'<div class="warn">'+
     '<div class="warn-t">⚠️ Есть категории с перерасходом</div>'+
     '<div class="warn-s">Покройте перерасход из дневного бюджета или другой категории.</div>'+
@@ -1632,6 +2008,19 @@ function updTrPrev(){
   var fC=getRem(fid),fN=fC-amt,tC=getRem(tid),tN=tC+amt;
   var rows='<div class="trprow"><span>'+esc(getName(fid))+'</span><span>'+fmt(fC)+' → <b style="color:'+(fN<0?'var(--rd)':'var(--gd)')+'">'+fmt(fN)+'</b></span></div>';
   rows+='<div class="trprow"><span>'+esc(getName(tid))+'</span><span>'+fmt(tC)+' → <b style="color:'+(tN<0?'var(--rd)':'var(--gd)')+'">'+fmt(tN)+'</b></span></div>';
+  /* Когда деньги берутся из дневного бюджета — сразу показываем цену решения
+     в понятных единицах: на сколько похудеет каждый оставшийся день */
+  var bb=getAB();
+  if(bb&&(!fid||!tid)){
+    var t=today();
+    var leftDays=t>bb.dateTo?0:getDays(t>bb.dateFrom?t:bb.dateFrom,bb.dateTo);
+    if(leftDays>0){
+      var per=amt/leftDays, up=!fid;   /* берём из дневного → норма падает */
+      rows+='<div class="trprow trpday"><span>Дневная норма</span><span>'+
+        fmt(bb.dailyBudget)+' → <b style="color:'+(up?'var(--rd)':'var(--gd)')+'">'+
+        fmt(bb.dailyBudget+(up?-per:per))+'</b></span></div>';
+    }
+  }
   el.innerHTML='<div class="trpbox">'+rows+'</div>';
 }
 
@@ -1758,6 +2147,12 @@ function bindEmpty(){window.startWz=function(){tab='wizard';wizStep=0;wd=initWD(
 
 function bindMain(b){
   window.setTab    =function(t){tab=t;drop=false;render();};
+  /* Поиск перерисовывает список, но не должен ронять фокус и каретку */
+  window.setSearch =function(v){
+    qSearch=v;render();
+    var el=document.getElementById('srch-inp');
+    if(el&&v){el.focus();el.setSelectionRange(v.length,v.length);}
+  };
   window.togDrop   =function(){drop=!drop;archOpen=false;usrMenu=false;txMenu=null;incMenu=null;plnMenu=null;render();};
   window.togArch   =function(){archOpen=!archOpen;render();};
   window.moveRemToDaily=function(pid){
@@ -1797,8 +2192,12 @@ function bindMain(b){
   window.delBdg=function(id){
     if(S.budgets.length<=1){alert('Нельзя удалить единственный бюджет');return;}
     if(!confirm('Удалить этот бюджет и все его траты? Действие необратимо.'))return;
+    ripEnt('bdg',id);
     S.budgets=S.budgets.filter(function(x){return x.id!==id;});
-    S.txs=S.txs.filter(function(t){return t.budgetId!==id;});
+    S.txs=S.txs.filter(function(t){
+      if(t.budgetId===id){ripEnt('tx',t.id);return false;}
+      return true;
+    });
     if(S.activeBudgetId===id)S.activeBudgetId=S.budgets[S.budgets.length-1].id;
     drop=false;save();render();
   };
@@ -1840,9 +2239,19 @@ function bindMain(b){
       var fc=b.planned.filter(function(x){return x.id===pcid;});
       if(fc.length){cat=fc[0].name;cate=fc[0].emoji||'📌';}
     }
-    S.txs.push({id:uid(),seq:Date.now(),date:useDate,name:p.name,category:cat,categoryEmoji:cate,plannedCatId:pcid,amount:p.amount,budgetId:b.id});
+    var nid=uid();
+    S.txs.push(touch({id:nid,seq:Date.now(),date:useDate,name:p.name,category:cat,categoryEmoji:cate,plannedCatId:pcid,amount:p.amount,budgetId:b.id}));
     qaVal='';qaSelVal='';/* сброс на «Дневные расходы» — как в Sintra */
+    qSearch='';
+    /* Подтверждение, что трата записалась: короткая вибрация, зелёная
+       кнопка и подсветка строки. Без этого непонятно, сработало ли. */
+    freshTx=nid;
+    try{ if(navigator.vibrate)navigator.vibrate(12); }catch(e){}
     save();render();
+    var go=document.getElementById('qa-go');
+    if(go){go.classList.add('ok');go.textContent='✓';
+      setTimeout(function(){var g2=document.getElementById('qa-go');if(g2){g2.classList.remove('ok');g2.textContent='→';}},700);}
+    setTimeout(function(){ if(freshTx===nid){freshTx=null;} },1400);
   };
 
   window.om=function(type){
@@ -1928,7 +2337,7 @@ function bindMain(b){
   };
 
   window.editTx=function(id){var tx=S.txs.filter(function(t){return t.id===id;})[0];txMenu=null;if(tx){modal={type:'edit-tx',data:Object.assign({},tx)};render();}};
-  window.delTx =function(id){if(!confirm('Удалить трату?'))return;S.txs=S.txs.filter(function(t){return t.id!==id;});txMenu=null;save();modal=null;render();};
+  window.delTx =function(id){if(!confirm('Удалить трату?'))return;ripEnt('tx',id);S.txs=S.txs.filter(function(t){return t.id!==id;});txMenu=null;save();modal=null;render();};
   window.saveTx=function(id){
     var tx=S.txs.filter(function(t){return t.id===id;})[0];if(!tx)return;
     tx.name=((document.getElementById('mn')||{}).value||'').trim()||tx.name;
@@ -1943,6 +2352,7 @@ function bindMain(b){
       var c2=b.planned.filter(function(p){return p.id===tx.plannedCatId;})[0];
       if(c2){tx.category=c2.name;tx.categoryEmoji=c2.emoji||'📌';}
     }else{tx.plannedCatId=null;tx.category='';tx.categoryEmoji='';}
+    touch(tx);
     save();modal=null;render();
   };
 
@@ -1993,8 +2403,9 @@ function bindWiz(){
     var bdg={id:uid(),dateFrom:d.dateFrom,dateTo:d.dateTo,createdAt:today(),
       incomes:d.incomes.map(function(i){return Object.assign({},i,{amount:pf(i.amount)||0});}),
       planned:d.planned.map(function(p){return Object.assign({},p,{amount:pf(p.amount)||0});}),
-      dailyBudget:avail>0?avail/days:0};
-    S.budgets.push(bdg);S.activeBudgetId=bdg.id;save();tab='history';wd=null;render();
+      dailyBudget:avail>0?avail/days:0,
+      rates:[{from:d.dateFrom,v:avail>0?avail/days:0}]};
+    S.budgets.push(touch(bdg));S.activeBudgetId=bdg.id;save();tab='history';wd=null;render();
   };
 }
 
