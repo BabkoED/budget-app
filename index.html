@@ -144,50 +144,59 @@ select option{background:var(--card2);}
   border-radius:var(--r3);
   box-shadow:var(--sh2);
   border:1px solid var(--br2);
-  min-width:274px;overflow:hidden;
+  min-width:264px;overflow:hidden;
   transform-origin:top right;
   animation:pop .17s var(--ease);z-index:200;
 }
+.di{flex-shrink:0;opacity:.8;}
 /* Текущий период с галочкой — первая строка, как в Sintra */
 .drop-cur{
-  display:flex;align-items:center;gap:10px;
-  width:100%;padding:15px 18px 12px;text-align:left;
-  font-size:15px;font-weight:700;color:var(--t);
+  display:flex;align-items:center;gap:9px;
+  width:100%;padding:13px 16px 10px;text-align:left;
+  font-size:14.5px;font-weight:600;color:var(--t);
 }
-.drop-ck{color:var(--accent);font-size:15px;font-weight:900;}
+.drop-ck{color:var(--accent);font-size:14px;font-weight:900;}
 .drop-stats{
-  padding:6px 0;
+  padding:3px 0;
   border-top:1px solid var(--br2);border-bottom:1px solid var(--br2);
 }
 .drop-r{
   display:flex;justify-content:space-between;align-items:center;gap:12px;
-  padding:7px 18px;font-size:14px;font-weight:500;
+  padding:6px 16px;font-size:13.5px;font-weight:500;
 }
 .drop-r label{color:var(--mt);}
 .drop-r b{font-weight:800;white-space:nowrap;}
 .drop-acts{display:flex;flex-direction:column;}
+/* Пункт меню — иконка + текст в общей колонке. Ширина иконки (15px) + gap
+   (9px) фиксируют, где начинается текст: 16+15+9 = 40px — под это же
+   выравниваются вложенные строки архива, чтобы не городить второй отступ */
 .drop-act{
-  display:block;width:100%;padding:14px 18px;text-align:left;
-  font-size:15px;font-weight:600;color:var(--t);
+  display:flex;align-items:center;gap:9px;
+  width:100%;padding:11px 16px;text-align:left;
+  font-size:14.5px;font-weight:500;color:var(--t);
 }
 .drop-act:hover{background:rgba(255,255,255,.05);}
 .drop-act:active{background:rgba(255,255,255,.09);}
 .drop-act.acc{color:var(--accent);}
-.drop-act.del{color:var(--rd);border-top:1px solid var(--br2);}
 .drop-arch{
-  display:flex;align-items:center;justify-content:space-between;gap:10px;
-  width:100%;padding:14px 18px;text-align:left;
-  font-size:15px;font-weight:600;color:var(--t);
+  display:flex;align-items:center;gap:9px;
+  width:100%;padding:11px 16px;text-align:left;
+  font-size:14.5px;font-weight:500;color:var(--t);
 }
 .drop-arch:hover{background:rgba(255,255,255,.05);}
-.drop-cnt{font-size:13px;font-weight:700;color:var(--mt);}
+.drop-arch span:nth-child(2){flex:1;}
+.drop-cnt{font-size:12.5px;font-weight:700;color:var(--mt);}
+.drop-chev{display:flex;color:var(--mt);transition:transform .18s var(--ease);}
+.drop-chev.up{transform:rotate(180deg);}
 .drop-item{
-  display:flex;align-items:center;justify-content:space-between;gap:10px;
-  width:100%;padding:12px 18px 12px 30px;text-align:left;
-  font-size:14px;font-weight:600;color:var(--t2);
-  background:rgba(0,0,0,.18);
+  display:flex;align-items:center;gap:9px;
+  width:100%;padding:10px 16px 10px 40px;text-align:left;
+  font-size:13.5px;font-weight:500;color:var(--t2);
+  background:rgba(0,0,0,.16);
 }
+.drop-item span:first-child{flex:1;}
 .drop-item:hover{color:var(--t);}
+.drop-csv{padding-left:16px;color:var(--t);}
 .drop-now{font-size:11px;font-weight:800;color:var(--gd);}
 .newmo-banner{
   display:flex;align-items:center;justify-content:space-between;gap:12px;
@@ -202,7 +211,7 @@ select option{background:var(--card2);}
 .ts-row{margin-bottom:14px;}
 .ts-row:last-child{margin-bottom:0;}
 .ts-hd{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:6px;}
-.ts-nm{font-size:14px;font-weight:700;color:var(--t);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ts-nm{font-size:14px;font-weight:600;color:var(--t);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .ts-am{font-size:14px;font-weight:800;color:var(--t);white-space:nowrap;}
 .ts-bar{height:6px;border-radius:99px;background:var(--br);overflow:hidden;}
 .ts-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),#f0906a);}
@@ -222,7 +231,7 @@ select option{background:var(--card2);}
 .st-row:last-child{margin-bottom:0;}
 .st-hd{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
 .st-em{font-size:15px;line-height:1;flex-shrink:0;}
-.st-nm{flex:1;min-width:0;font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.st-nm{flex:1;min-width:0;font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .st-am{font-size:14px;font-weight:800;white-space:nowrap;flex-shrink:0;}
 .st-bar{height:6px;border-radius:99px;background:var(--br);overflow:hidden;}
 .st-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),#f0906a);}
@@ -234,12 +243,13 @@ select option{background:var(--card2);}
 .cmp.down{color:var(--gd);}
 
 /* ── ПОВТОРЯЮЩИЕСЯ КАТЕГОРИИ ───────────────── */
-/* Значок повтора стоит перед суммой в правой колонке: раньше он шёл сразу
-   за названием и «плавал» по строке в зависимости от длины слова */
-.recur-b{font-size:11px;opacity:.65;flex-shrink:0;line-height:1;}
-/* space-between, а не flex-end: значок прижат к левому краю колонки
-   фиксированной ширины, поэтому стоит на одном месте во всех строках */
-.t-amw{display:flex;align-items:center;justify-content:space-between;gap:6px;}
+/* Слот под значок — фиксированной ширины и рендерится ВСЕГДА, пустым,
+   если категория не повторяется. С space-between и одним ребёнком (когда
+   значка нет) сумма падала к левому краю — теперь выравнивание не зависит
+   от того, есть значок или нет. Gap вдвое меньше прежнего. */
+.recur-slot{width:12px;flex-shrink:0;display:flex;justify-content:center;}
+.recur-b{font-size:11px;opacity:.65;line-height:1;}
+.t-amw{display:flex;align-items:center;justify-content:flex-end;gap:3px;}
 .chkrow{display:flex;align-items:flex-start;gap:10px;cursor:pointer;
   padding:12px 14px;margin-top:10px;border-radius:12px;
   background:var(--card2);border:1px solid var(--br2);}
@@ -249,7 +259,6 @@ select option{background:var(--card2);}
 .chkrow i{font-size:12px;font-weight:500;color:var(--mt);font-style:normal;line-height:1.35;}
 .newmo-txt{font-size:13px;font-weight:700;color:var(--t);}
 .newmo-banner .btn{padding:9px 14px;font-size:13px;white-space:nowrap;}
-.drop-act.del:hover{background:rgba(255,79,71,.08);}
 
 /* ── PAGE ────────────────────────────────── */
 /* Нижний отступ с запасом под домашнюю полоску iPhone — без него
@@ -325,7 +334,7 @@ select option{background:var(--card2);}
 /* emoji inline */
 /* Название в одну строку с многоточием: перенос на вторую строку
    раздувал таблицу по высоте и ломал выравнивание правой колонки */
-.t-nm{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;line-height:1.3;min-width:0;}
+.t-nm{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;line-height:1.3;min-width:0;}
 .t-tx{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
 .t-em{font-size:18px;line-height:1;flex-shrink:0;}
 .t-am{font-size:14px;font-weight:800;text-align:right;white-space:nowrap;}
@@ -371,14 +380,14 @@ select option{background:var(--card2);}
 }
 .ctx button{
   display:block;width:100%;padding:15px 18px;
-  font-size:15px;font-weight:600;text-align:left;
+  font-size:15px;font-weight:500;text-align:left;
   color:var(--t);
 }
 /* Разделители только между смысловыми группами, а не после каждой строки —
    сплошная сетка линий и делала меню похожим на таблицу */
 .ctx button.ctx-sep{border-top:1px solid var(--br2);}
 .ctx button.ctx-lines{display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding-top:14px;padding-bottom:14px;}
-.ctx-t{font-size:15px;font-weight:600;color:var(--t);}
+.ctx-t{font-size:15px;font-weight:500;color:var(--t);}
 .ctx-s{font-size:12.5px;font-weight:500;color:var(--mt);line-height:1.35;}
 .ctx button:hover{background:rgba(255,255,255,.05);}
 .ctx button:active{background:rgba(255,255,255,.09);}
@@ -413,24 +422,19 @@ select option{background:var(--card2);}
   margin-bottom:10px;
   box-shadow:var(--sh);
 }
-.hero-top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;}
-.hero-l{min-width:0;}
-.hero-lbl{
+/* Заголовок и «N дней» — одна строка, один стиль: обе части читаются как
+   единая шапка блока, а не как подпись + случайно прибившееся число */
+.hero-top{
+  display:flex;align-items:baseline;justify-content:space-between;gap:10px;
   font-size:10.5px;font-weight:800;letter-spacing:.7px;
   text-transform:uppercase;color:var(--mt);
 }
 .hero-big{
   font-size:29px;font-weight:900;letter-spacing:-1px;
-  line-height:1.05;margin-top:2px;
+  line-height:1.05;margin-top:3px;
 }
 .hero-big.gd{color:var(--gd);}
 .hero-big.rd{color:var(--rd);}
-/* правая колонка — служебные цифры, намеренно мелкие */
-.hero-r{
-  text-align:right;flex-shrink:0;
-  font-size:11.5px;font-weight:500;color:var(--mt);line-height:1.5;
-}
-.hero-r b{color:var(--t2);font-weight:800;}
 .hero-bar{
   height:6px;border-radius:99px;background:#2A2A2A;
   overflow:hidden;margin-top:10px;
@@ -438,6 +442,13 @@ select option{background:var(--card2);}
 .hero-fill{height:100%;border-radius:99px;transition:width .4s cubic-bezier(.4,0,.2,1);}
 .hero-fill.gd{background:linear-gradient(90deg,var(--gd),#5FE0A0);}
 .hero-fill.rd{background:linear-gradient(90deg,var(--rd),#FF8A85);}
+/* Тонкая строка под полосой: слева сколько ушло сегодня, справа — что
+   добавится завтра. Симметрично и мельче большой цифры сверху. */
+.hero-sub{
+  display:flex;justify-content:space-between;gap:10px;margin-top:7px;
+  font-size:11.5px;font-weight:500;color:var(--mt);
+}
+.hero-sub b{color:var(--t2);font-weight:800;}
 
 /* ── HISTORY / QA ────────────────────────── */
 .qa{
@@ -496,7 +507,7 @@ select option{background:var(--card2);}
 .crow{
   display:flex;align-items:center;gap:11px;
   width:100%;padding:11px 12px;border-radius:14px;
-  font-size:14px;font-weight:600;color:var(--t);text-align:left;
+  font-size:14px;font-weight:500;color:var(--t);text-align:left;
 }
 .crow+.crow{margin-top:2px;}
 .crow:hover{background:rgba(255,255,255,.05);}
@@ -585,7 +596,7 @@ select option{background:var(--card2);}
 }
 .txe.day{background:rgba(232,106,59,.13);}
 .txi{flex:1;min-width:0;}
-.txn{font-size:14.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.txn{font-size:14.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .txc{font-size:12px;font-weight:500;color:var(--mt);margin-top:2px;}
 .txa{font-size:14.5px;font-weight:800;flex-shrink:0;color:var(--t);white-space:nowrap;}
 .txd{flex-shrink:0;}
@@ -639,7 +650,11 @@ select option{background:var(--card2);}
 .inp:focus{border-color:var(--accent);}
 .inp::placeholder{color:var(--mt);}
 .ir{display:flex;gap:10px;}
-.ir .f{flex:1;}
+/* min-width:0 обязателен: без него flex-элемент не сжимается меньше
+   собственного контента, а нативный input[type=date] на iOS достаточно
+   широкий — два поля рядом наезжали друг на друга */
+.ir .f{flex:1;min-width:0;}
+.ir .inp{width:100%;min-width:0;}
 .max{display:flex;gap:10px;margin-top:8px;}
 .max .btn{flex:1;}
 .sgs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:15px;}
@@ -1717,6 +1732,15 @@ function rHeader(b){
 /* Меню периода. Раньше сюда вываливался весь список бюджетов и панель
    вытягивалась на пол-экрана. Теперь как в Sintra: текущий период с галочкой,
    три цифры, остальное — за «Архивом». */
+/* Мелкие монохромные иконки для строк меню — тем же паттерном, что дни/поиск/точки */
+function DI(p){return '<svg class="di" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>';}
+var ICO_GEAR='<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 0 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 0 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1-1.55V3a2 2 0 0 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9a1.7 1.7 0 0 0 1.55 1H21a2 2 0 0 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1z"/>';
+var ICO_CHART='<path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-4"/>';
+var ICO_ARCH='<rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8"/><line x1="10" y1="12" x2="14" y2="12"/>';
+var ICO_PLUS='<rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/>';
+var ICO_DL='<path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 19h14"/>';
+var ICO_CHEV='<path d="M6 9l6 6 6-6"/>';
+
 function rDrop(b,bal){
   var total=calcTotalBal(b),aid=b.id,td=today();
   var sorted=S.budgets.slice().sort(function(a,c){return a.dateFrom.localeCompare(c.dateFrom);});
@@ -1725,14 +1749,19 @@ function rDrop(b,bal){
   var arch='';
   if(others.length){
     arch+='<button class="drop-arch" onclick="togArch()">'+
+      DI(ICO_ARCH)+
       '<span>Архив бюджетов</span>'+
-      '<span class="drop-cnt">'+others.length+(archOpen?' ▲':' ▼')+'</span>'+
+      '<span class="drop-cnt">'+others.length+'</span>'+
+      '<span class="drop-chev'+(archOpen?' up':'')+'">'+DI(ICO_CHEV)+'</span>'+
     '</button>';
     if(archOpen){
+      /* Выгрузка — редкая операция, поэтому не отдельным пунктом наверху,
+         а внутри развёрнутого архива, куда заглядывают уже целенаправленно */
+      arch+='<button class="drop-item drop-csv" onclick="exportCSV()">'+DI(ICO_DL)+'<span>Экспортировать в CSV</span></button>';
       for(var j=others.length-1;j>=0;j--){   /* новые сверху */
         var y=others[j];
         arch+='<button class="drop-item" onclick="swBdg(\''+y.id+'\')">'+
-          fmtSh(y.dateFrom)+' — '+fmtSh(y.dateTo)+
+          '<span>'+fmtSh(y.dateFrom)+' — '+fmtSh(y.dateTo)+'</span>'+
           (y.dateFrom<=td&&y.dateTo>=td?'<span class="drop-now">сейчас</span>':'')+
         '</button>';
       }
@@ -1744,20 +1773,20 @@ function rDrop(b,bal){
       '<span class="drop-ck">✓</span>'+
       '<span>'+fmtSh(b.dateFrom)+' — '+fmtSh(b.dateTo)+'</span>'+
     '</button>'+
-    '<button class="drop-act" onclick="openBdgEdit()">Настройки бюджета</button>'+
+    '<button class="drop-act" onclick="openBdgEdit()">'+DI(ICO_GEAR)+'<span>Настройки бюджета</span></button>'+
     '<div class="drop-stats">'+
       '<div class="drop-r"><label>Осталось на сегодня</label><b style="color:'+(bal>=0?'var(--gd)':'var(--rd)')+'">'+fmt(bal)+'</b></div>'+
       '<div class="drop-r"><label>Прибавится завтра</label><b>'+fmt(b.dailyBudget)+'</b></div>'+
       '<div class="drop-r"><label>Общий остаток</label><b style="color:'+(total>=0?'var(--gd)':'var(--rd)')+'">'+fmt(total)+'</b></div>'+
     '</div>'+
     '<div class="drop-acts">'+
+      '<button class="drop-act" onclick="openStats()">'+DI(ICO_CHART)+'<span>Сводка по категориям</span></button>'+
       arch+
-      '<button class="drop-act" onclick="openStats()">Сводка по категориям</button>'+
-      '<button class="drop-act" onclick="exportCSV()">Выгрузить в CSV</button>'+
-      '<button class="drop-act acc" onclick="newBdg()">Создать бюджет на будущее</button>'+
-      (S.budgets.length>1?'<button class="drop-act del" onclick="delBdg(\''+b.id+'\')">Удалить бюджет</button>':'')+
+      '<button class="drop-act acc" onclick="newBdg()">'+DI(ICO_PLUS)+'<span>Создать бюджет на будущее</span></button>'+
     '</div>'+
   '</div>';
+  /* Удаление бюджета намеренно не выводится в меню — функция delBdg()
+     осталась в коде нетронутой, но точку входа в UI убрали. */
 }
 
 function rUsrMenu(){
@@ -1999,22 +2028,22 @@ function rHero(b){
   var left=daysBw(td,b.dateTo);
   var ended=b.dateTo<td;
 
-  /* Всё в два ряда вместо пяти: цифра слева, подробности справа мелким.
-     Раньше блок занимал треть экрана ради трёх чисел. */
+  /* Заголовок и остаток дней — одной строкой сверху; крупная цифра;
+     полоса; под ней тонкая строка «сегодня / завтра». Четыре ряда вместо
+     прежних пяти, и ничего не смешано в одну колонку как попало. */
   return '<div class="hero">'+
     '<div class="hero-top">'+
-      '<div class="hero-l">'+
-        '<div class="hero-lbl">'+(ended?'Итог периода':'Осталось на сегодня')+'</div>'+
-        '<div class="hero-big '+(pos?'gd':'rd')+'">'+fmt(bal)+'</div>'+
-      '</div>'+
-      '<div class="hero-r">'+
-        '<div>сегодня <b>'+fmt(spentToday)+'</b></div>'+
-        '<div>'+(ended?'период закрыт'
-          : left>0?'<b>+'+fmt(b.dailyBudget)+'</b> · '+left+'&nbsp;'+plurDays(left)
-          : 'последний день')+'</div>'+
-      '</div>'+
+      '<span>'+(ended?'Итог периода':'Осталось на сегодня')+'</span>'+
+      '<span>'+(ended?'период закрыт'
+        : left>0?left+'&nbsp;'+plurDays(left)+' до конца'
+        : 'последний день')+'</span>'+
     '</div>'+
+    '<div class="hero-big '+(pos?'gd':'rd')+'">'+fmt(bal)+'</div>'+
     '<div class="hero-bar"><div class="hero-fill '+(pos?'gd':'rd')+'" style="width:'+(pos?pct:100)+'%"></div></div>'+
+    '<div class="hero-sub">'+
+      '<span>сегодня потрачено <b>'+fmt(spentToday)+'</b></span>'+
+      (ended?'':'<span>завтра <b>+'+fmt(b.dailyBudget)+'</b></span>')+
+    '</div>'+
   '</div>';
 }
 function plurDays(n){
@@ -2037,9 +2066,9 @@ function rIncomes(b){
     /* FIX #2: emoji inline with text using t-nm class */
     rows+='<tr>'+
       '<td><div class="t-nm"><span class="t-em">'+(inc.emoji||'💰')+'</span><span class="t-tx">'+esc(inc.name)+'</span></div></td>'+
-      '<td class="t-am"><span class="t-amw">'+
+      '<td class="t-am"><span class="t-amw"><span class="recur-slot">'+
         (inc.recur?'<span class="recur-b" title="Повторяющийся — сумма переносится в новый месяц">🔁</span>':'')+
-        fmt(inc.amount)+'</span></td>'+
+        '</span>'+fmt(inc.amount)+'</span></td>'+
       '<td class="t-ax"><div class="ctx-wrap">'+
         '<button type="button" class="dots'+(incMenu===inc.id?' on':'')+'" onclick="togMenu(\'inc\',\''+inc.id+'\',event)"><svg width=\'16\' height=\'4\' viewBox=\'0 0 16 4\'><circle cx=\'2\' cy=\'2\' r=\'1.7\'/><circle cx=\'8\' cy=\'2\' r=\'1.7\'/><circle cx=\'14\' cy=\'2\' r=\'1.7\'/></svg></button>'+
         (incMenu===inc.id?'<div class="ctx" onclick="event.stopPropagation()">'+
@@ -2079,9 +2108,9 @@ function rPlanned(b){
         /* FIX #4: inline overdraft badge per row */
         (neg?'<div class="ov-tag">⚠️ перерасход <button type="button" class="ov-btn" onclick="openTr(\''+p.id+'\')">Покрыть</button></div>':'')+
       '</td>'+
-      '<td class="t-am"><span class="t-amw">'+
+      '<td class="t-am"><span class="t-amw"><span class="recur-slot">'+
         (p.recur?'<span class="recur-b" title="Повторяющаяся — сумма переносится в новый месяц">🔁</span>':'')+
-        '<span class="'+(neg?'rd':'gd')+'">'+(neg?'−':'')+fmt(Math.abs(rem))+'</span></span>'+
+        '</span><span class="'+(neg?'rd':'gd')+'">'+(neg?'−':'')+fmt(Math.abs(rem))+'</span></span>'+
         '<div class="t-sub">из '+fmt(p.amount)+cmpPrev(b,p)+'</div>'+
       '</td>'+
       '<td class="t-ax"><div class="ctx-wrap">'+
