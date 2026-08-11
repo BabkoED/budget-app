@@ -271,6 +271,9 @@ select option{background:var(--card2);}
   font-size:14px;font-weight:600;text-align:left;
   color:var(--t);border-bottom:1px solid var(--br);
 }
+.ctx button.ctx-lines{display:flex;flex-direction:column;align-items:flex-start;gap:2px;}
+.ctx-t{font-size:14px;font-weight:700;color:var(--t);}
+.ctx-s{font-size:11.5px;font-weight:600;color:var(--gd);}
 .ctx button:last-child{border-bottom:none;}
 .ctx button:hover{background:rgba(255,255,255,.05);}
 .ctx button.del{color:var(--rd);}
@@ -1441,6 +1444,10 @@ function rPlanned(b){
         (plnMenu===p.id?'<div class="ctx" onclick="event.stopPropagation()">'+
           '<button onclick="editPln(\''+p.id+'\')">Редактировать</button>'+
           '<button onclick="openTr(\''+p.id+'\')">Перераспределить</button>'+
+          (rem>0?'<button class="ctx-lines" onclick="moveRemToDaily(\''+p.id+'\')">'+
+            '<span class="ctx-t">🔁 Перевести остаток в дневные</span>'+
+            '<span class="ctx-s">Бюджет на день увеличится на '+fmt(rem/getDays(b.dateFrom,b.dateTo))+'</span>'+
+          '</button>':'')+
           '<button class="del" onclick="delPln(\''+p.id+'\')">Удалить</button>'+
         '</div>':'')+
       '</div></td>'+
@@ -1753,6 +1760,18 @@ function bindMain(b){
   window.setTab    =function(t){tab=t;drop=false;render();};
   window.togDrop   =function(){drop=!drop;archOpen=false;usrMenu=false;txMenu=null;incMenu=null;plnMenu=null;render();};
   window.togArch   =function(){archOpen=!archOpen;render();};
+  window.moveRemToDaily=function(pid){
+    var p=b.planned.filter(function(x){return x.id===pid;})[0];if(!p)return;
+    var rem=calcCatRem(b,pid);
+    if(rem<=0)return; /* нечего переносить */
+    /* Лимит категории урезаем ровно до уже потраченного — остаток = 0.
+       Освободившаяся сумма из "планов" уходит в знаменатель recalcDaily,
+       поэтому дневная норма поднимается сама, без ручного пересчёта. */
+    p.amount-=rem;
+    recalcDaily(b);
+    plnMenu=null;
+    save();render();
+  };
   window.togUsr    =function(){usrMenu=!usrMenu;drop=false;txMenu=null;incMenu=null;plnMenu=null;render();};
   window.closeBk   =function(){drop=false;usrMenu=false;txMenu=null;incMenu=null;plnMenu=null;render();};
   window.closeModal=function(){modal=null;render();};
