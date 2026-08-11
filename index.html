@@ -249,7 +249,7 @@ select option{background:var(--card2);}
    от того, есть значок или нет. Gap вдвое меньше прежнего. */
 .recur-slot{width:12px;flex-shrink:0;display:flex;justify-content:center;}
 .recur-b{font-size:11px;opacity:.65;line-height:1;}
-.t-amw{display:flex;align-items:center;justify-content:flex-end;gap:3px;}
+.t-amw{display:flex;align-items:center;justify-content:flex-start;gap:3px;}
 .chkrow{display:flex;align-items:flex-start;gap:10px;cursor:pointer;
   padding:12px 14px;margin-top:10px;border-radius:12px;
   background:var(--card2);border:1px solid var(--br2);}
@@ -321,7 +321,7 @@ select option{background:var(--card2);}
   border-bottom:1px solid var(--br2);
 }
 .tbl tbody td{
-  padding:10px 12px;
+  padding:8px 12px;
   border-bottom:1px solid var(--br);
   font-size:14px;vertical-align:middle;
 }
@@ -337,8 +337,11 @@ select option{background:var(--card2);}
 .t-nm{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;line-height:1.3;min-width:0;}
 .t-tx{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
 .t-em{font-size:18px;line-height:1;flex-shrink:0;}
-.t-am{font-size:14px;font-weight:800;text-align:right;white-space:nowrap;}
-.t-sub{font-size:11.5px;font-weight:500;color:var(--mt);margin-top:2px;white-space:nowrap;}
+/* Левый край, а не правый: значок (если есть) и сумма всегда начинаются
+   в одной точке колонки — цифры разной длины продлеваются вправо, а не
+   «плавают» по горизонтали от строки к строке, как было при text-align:right */
+.t-am{font-size:14px;font-weight:800;text-align:left;white-space:nowrap;}
+.t-sub{font-size:11px;font-weight:500;color:var(--mt);margin-top:1px;white-space:nowrap;}
 /* Колонка действий: фиксированная ширина и нулевые боковые отступы —
    кнопка сама себе даёт площадь, поэтому стоит на одном месте во всех строках */
 .t-ax{width:46px;padding:0 8px 0 0!important;text-align:right;}
