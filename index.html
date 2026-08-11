@@ -1303,7 +1303,12 @@ async function signOut() {
    ═══════════════════════════════════════════════ */
 
 /* ── UTILS ───────────────────────────────────── */
-function fmt(n){return new Intl.NumberFormat('ru-RU',{minimumFractionDigits:0,maximumFractionDigits:0}).format(Math.round(n))+'\u00A0₽';}
+/* Форматтеры Intl создаются один раз: конструктор в разы дороже самого
+   .format(), а на списке в сотни строк это давало заметный лаг. */
+var _NF=new Intl.NumberFormat('ru-RU',{minimumFractionDigits:0,maximumFractionDigits:0});
+var _DF_SH=new Intl.DateTimeFormat('ru-RU',{day:'numeric',month:'short'});
+var _DF_LONG=new Intl.DateTimeFormat('ru-RU',{day:'numeric',month:'long'});
+function fmt(n){return _NF.format(Math.round(n))+'\u00A0₽';}
 function localISO(d){
   /* Локальная дата (не UTC!) — чтобы ночные траты не падали на вчера */
   return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
@@ -1320,12 +1325,12 @@ function monthNameNext(dateTo){
   var d=new Date(dateTo+'T00:00:00');d.setDate(d.getDate()+1);
   return d.toLocaleDateString('ru-RU',{month:'long',year:'numeric'});
 }
-function fmtSh(s){return new Date(s+'T00:00:00').toLocaleDateString('ru-RU',{day:'numeric',month:'short'});}
+function fmtSh(s){return _DF_SH.format(new Date(s+'T00:00:00'));}
 function fmtDay(s){
-  var d=new Date(s+'T00:00:00'),td=today(),yd=yesterday();
-  if(s===td)return 'Сегодня, '+d.toLocaleDateString('ru-RU',{day:'numeric',month:'long'});
-  if(s===yd)return 'Вчера, '+d.toLocaleDateString('ru-RU',{day:'numeric',month:'long'});
-  return d.toLocaleDateString('ru-RU',{day:'numeric',month:'long'});
+  var d=new Date(s+'T00:00:00'),txt=_DF_LONG.format(d);
+  if(s===today())return 'Сегодня, '+txt;
+  if(s===yesterday())return 'Вчера, '+txt;
+  return txt;
 }
 function pf(v){return parseFloat(String(v||'').replace(/[\u00A0\s]/g,'').replace(',','.'))||0;}
 function fmtInp(el){
@@ -1426,38 +1431,43 @@ function calcDayBal(b){
   if(t<start)return 0;
   /* период мог уже закончиться — начисляем только по dateTo */
   var upto=t>b.dateTo?b.dateTo:t;
-  var acc=accrued(b,start,upto),spent=0;
-  for(var i=0;i<S.txs.length;i++){
-    var tx=S.txs[i];
-    if(tx.budgetId===b.id&&tx.date<=t&&!tx.plannedCatId)spent+=tx.amount;
-  }
-  return acc-spent;
+  var acc=accrued(b,start,upto);
+  getSpentMap(b);                 /* дневные траты уже посчитаны в общем проходе */
+  return acc-(_spentCache.dailyUpto||0);
 }
 function calcTotalBal(b){
   if(!b)return 0;
   var ti=0;for(var i=0;i<b.incomes.length;i++)ti+=b.incomes[i].amount;
-  var spent=0,t=today();
-  for(var j=0;j<S.txs.length;j++){var tx=S.txs[j];if(tx.budgetId===b.id&&tx.date<=t)spent+=tx.amount;}
-  return ti-spent;
+  getSpentMap(b);                 /* один общий проход вместо своего */
+  return ti-(_spentCache.totalUpto||0);
 }
 /* Кэш расходов по категориям: один проход по S.txs вместо N проходов.
    Инвалидируется в save() — при любом изменении данных. */
 var _spentCache={bid:null,map:null};
 var _prevCache={bid:null,map:null};
-function invalidateSpentCache(){_spentCache.bid=null;_spentCache.map=null;_spentCache.daily=0;_spentCache.total=0;_prevCache.bid=null;_prevCache.map=null;}
+function invalidateSpentCache(){_spentCache.bid=null;_spentCache.day=null;_spentCache.map=null;_spentCache.daily=0;_spentCache.total=0;_spentCache.dailyUpto=0;_spentCache.totalUpto=0;_prevCache.bid=null;_prevCache.map=null;}
 function getSpentMap(b){
-  if(_spentCache.bid===b.id&&_spentCache.map)return _spentCache.map;
-  /* Один проход считает сразу три вещи: расход по категориям,
-     дневные (некатегорийные) и общий итог — вместо трёх отдельных обходов */
-  var map={},daily=0,total=0;
+  var td=today();
+  /* Кэш привязан и к дате: приложение может остаться открытым за полночь,
+     и тогда отсечка «до сегодня» сдвигается — старый кэш стал бы врать. */
+  if(_spentCache.bid===b.id&&_spentCache.day===td&&_spentCache.map)return _spentCache.map;
+  /* Один проход считает сразу всё: расход по категориям, дневные
+     (некатегорийные) и итог — вместо отдельных обходов на каждый показатель.
+     Отдельно копим суммы «по сегодня»: балансы не должны учитывать траты,
+     датированные будущим (такие могли остаться от старых версий). */
+  var map={},daily=0,total=0,dailyUpto=0,totalUpto=0;
   for(var i=0;i<S.txs.length;i++){
     var tx=S.txs[i];
     if(tx.budgetId!==b.id)continue;
+    var upto=tx.date<=td;
     total+=tx.amount;
+    if(upto)totalUpto+=tx.amount;
     if(tx.plannedCatId)map[tx.plannedCatId]=(map[tx.plannedCatId]||0)+tx.amount;
-    else daily+=tx.amount;
+    else{daily+=tx.amount;if(upto)dailyUpto+=tx.amount;}
   }
-  _spentCache.bid=b.id;_spentCache.map=map;_spentCache.daily=daily;_spentCache.total=total;
+  _spentCache.bid=b.id;_spentCache.day=td;_spentCache.map=map;
+  _spentCache.daily=daily;_spentCache.total=total;
+  _spentCache.dailyUpto=dailyUpto;_spentCache.totalUpto=totalUpto;
   return map;
 }
 function getSpentDaily(b){getSpentMap(b);return _spentCache.daily||0;}
