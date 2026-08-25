@@ -1332,7 +1332,21 @@ function fmtDay(s){
   if(s===yesterday())return 'Вчера, '+txt;
   return txt;
 }
-function pf(v){return parseFloat(String(v||'').replace(/[\u00A0\s]/g,'').replace(',','.'))||0;}
+/* \u0415\u0434\u0438\u043D\u0441\u0442\u0432\u0435\u043D\u043D\u0430\u044F \u0442\u043E\u0447\u043A\u0430 \u0432\u0445\u043E\u0434\u0430 \u0434\u043B\u044F \u0441\u0443\u043C\u043C, \u0432\u0432\u0435\u0434\u0451\u043D\u043D\u044B\u0445 \u0440\u0443\u043A\u0430\u043C\u0438: \u0442\u0440\u0430\u0442\u044B, \u0434\u043E\u0445\u043E\u0434\u044B, \u043F\u043B\u0430\u043D\u044B,
+   \u043F\u0435\u0440\u0435\u0432\u043E\u0434\u044B \u2014 \u0432\u0441\u0451 \u043F\u0430\u0440\u0441\u0438\u0442\u0441\u044F \u0437\u0434\u0435\u0441\u044C. \u041F\u043E\u044D\u0442\u043E\u043C\u0443 \u043F\u043E\u043B\u0438\u0442\u0438\u043A\u0430 \u043A\u043E\u043F\u0435\u0435\u043A \u0440\u0435\u0448\u0430\u0435\u0442\u0441\u044F \u0442\u043E\u0436\u0435 \u0437\u0434\u0435\u0441\u044C. */
+function pf(v){
+  var n=parseFloat(String(v||'').replace(/[\u00A0\s]/g,'').replace(',','.'))||0;
+  return normMoney(n);
+}
+
+/* \u2500\u2500 \u041F\u041E\u041B\u0418\u0422\u0418\u041A\u0410 \u041A\u041E\u041F\u0415\u0415\u041A \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+   \u0421\u0443\u043C\u043C\u044B \u0445\u0440\u0430\u043D\u044F\u0442\u0441\u044F \u043A\u0430\u043A float, \u0430 fmt() \u043F\u043E\u043A\u0430\u0437\u044B\u0432\u0430\u0435\u0442 \u0438\u0445 \u043E\u043A\u0440\u0443\u0433\u043B\u0451\u043D\u043D\u044B\u043C\u0438 \u0434\u043E \u0440\u0443\u0431\u043B\u044F.
+   \u0418\u0437-\u0437\u0430 \u044D\u0442\u043E\u0433\u043E \u043E\u0441\u0442\u0430\u0442\u043E\u043A \u22120.42 \u0432\u044B\u0433\u043B\u044F\u0434\u0438\u0442 \u043D\u0430 \u044D\u043A\u0440\u0430\u043D\u0435 \u043A\u0430\u043A \u00AB\u22120 \u20BD\u00BB: \u043F\u0435\u0440\u0435\u043A\u0440\u044B\u0442\u044C \u0435\u0433\u043E
+   \u043D\u0435\u043B\u044C\u0437\u044F, \u043F\u043E\u0442\u043E\u043C\u0443 \u0447\u0442\u043E \u043D\u0443\u0436\u043D\u043E\u0439 \u0446\u0438\u0444\u0440\u044B \u043D\u0435\u0442 \u043D\u0438 \u0432 \u043E\u0434\u043D\u043E\u0439 \u0441\u0442\u0440\u043E\u043A\u0435 \u0438\u043D\u0442\u0435\u0440\u0444\u0435\u0439\u0441\u0430.
+   TODO: \u0432\u044B\u0431\u0440\u0430\u0442\u044C \u043F\u043E\u043B\u0438\u0442\u0438\u043A\u0443 \u2014 \u0441\u0435\u0439\u0447\u0430\u0441 \u043F\u043E\u0432\u0435\u0434\u0435\u043D\u0438\u0435 \u043E\u0441\u0442\u0430\u0451\u0442\u0441\u044F \u043F\u0440\u0435\u0436\u043D\u0438\u043C. */
+function normMoney(n){
+  return n;
+}
 function fmtInp(el){
   var raw=el.value.replace(/[^\d.,]/g,'').replace(',','.');
   var p=raw.split('.');
@@ -1402,14 +1416,17 @@ function rateOn(b,d){
 }
 function nextDay(d){var x=new Date(d+'T00:00:00');x.setDate(x.getDate()+1);return localISO(x);}
 function prevDay(d){var x=new Date(d+'T00:00:00');x.setDate(x.getDate()-1);return localISO(x);}
-/* Сколько всего начислено за дни from..to включительно */
+/* Сколько всего начислено за дни from..to включительно.
+   Отрицательная ставка не начисляет долг: за день прибавляется либо норма,
+   либо ноль. Само отрицательное значение при этом хранится как есть — см.
+   комментарий про обрезку в recalcDaily. */
 function accrued(b,from,to){
   if(to<from)return 0;
   var segs=rateSegs(b),total=0,cur=from,guard=0;
   while(cur<=to&&guard++<800){
     var v=segs[0].v;
     for(var i=0;i<segs.length;i++)if(segs[i].from<=cur)v=segs[i].v;
-    total+=v;cur=nextDay(cur);
+    total+=Math.max(0,v);cur=nextDay(cur);
   }
   return total;
 }
@@ -1573,13 +1590,18 @@ function recalcDaily(b){
      дня периода, основания расходятся и «плюс 100 000, потом минус 100 000»
      не возвращает исходную цифру. */
   var delta=pot-prevPot;
-  if(delta===0){b.dailyBudget=rateOn(b,t);return;}
+  if(delta===0){b.dailyBudget=Math.max(0,rateOn(b,t));return;}
   var leftDays=getDays(t,b.dateTo);
-  var v=Math.max(0,rateOn(b,t)+delta/leftDays);
+  /* Обрезать по нулю ЗДЕСЬ нельзя: если правка загоняет норму в минус, клампом
+     теряется, насколько глубоко — и обратная правка возвращает не ту цифру
+     (правка +40 000 с последующей −40 000 давала 5 714 вместо 1 667).
+     Поэтому в rates кладём точное значение, а ноль применяем при начислении
+     (accrued) и при показе (dailyBudget). */
+  var v=rateOn(b,t)+delta/leftDays;
   var segs=rateSegs(b).filter(function(s){return s.from<t;});
   segs.push({from:t,v:v});
   b.rates=segs;
-  b.dailyBudget=v;
+  b.dailyBudget=Math.max(0,v);
 }
 function hasOv(b){
   for(var i=0;i<b.planned.length;i++){if(calcCatRem(b,b.planned[i].id)<0)return true;}
@@ -1684,6 +1706,10 @@ function render(){
     ((qaDrop||catPick)?'<div class="bk-cal" onclick="closeQaCal()"></div>':'');
   bindMain(b);
   fixMenus();
+  /* Модалка перевода открывается с уже подставленной суммой (кнопка «Покрыть»),
+     а updTrPrev висит только на onchange/oninput — без этого вызова расклад
+     «откуда → куда» появлялся лишь после того, как поле кто-то тронет. */
+  if(modal&&modal.type==='transfer')updTrPrev();
 }
 
 /* Разворачиваем открытое меню вверх, если снизу не помещается.
@@ -2287,7 +2313,10 @@ function rModal(b){
     body='<div class="mhd">Перераспределить<button type="button" class="mcl" onclick="closeModal()">×</button></div>'+
       '<div class="f"><label>Откуда</label><select class="inp" id="mf" onchange="updTrPrev()">'+fOpts+'</select></div>'+
       '<div class="f"><label>Куда</label><select class="inp" id="mt" onchange="updTrPrev()">'+tOpts+'</select></div>'+
-      '<div class="f"><label>Сумма ₽</label><input class="inp" id="ma" type="text" inputmode="decimal" oninput="fmtInp(this);updTrPrev()" value="'+(preAmt?Math.round(preAmt):'')+'" placeholder="0"></div>'+
+      /* Без округления: Math.round(preAmt) подставлял 2623 вместо 2623.42,
+         перевод закрывал перерасход не полностью, и в категории оставалось
+         «−0 ₽» — сумма, которую невозможно ввести с экрана. */
+      '<div class="f"><label>Сумма ₽</label><input class="inp" id="ma" type="text" inputmode="decimal" oninput="fmtInp(this);updTrPrev()" value="'+(preAmt?Math.round(preAmt*100)/100:'')+'" placeholder="0"></div>'+
       '<div id="tr-prev" class="trprev"></div>'+
       '<div id="tr-err" class="auth-err"></div>'+
       '<div class="max"><button type="button" class="btn bp" onclick="doTr()">Перевести</button></div>';

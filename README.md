@@ -7,7 +7,7 @@
 | Файл | Назначение |
 |---|---|
 | `index.html` | Всё приложение: HTML + CSS + JS в одном файле. Ключи Supabase вшиты. |
-| `sw.js` | Service Worker v15. Network-first с таймаутом 2.5с — открывается офлайн/в лифте. |
+| `sw.js` | Service Worker v16. Network-first с таймаутом 2.5с — открывается офлайн/в лифте. |
 | `manifest.json` | PWA-манифест, иконки PNG + SVG. |
 | `icon-192.png` / `icon-512.png` | Иконки для домашнего экрана iOS. |
 | `schema.sql` | Схема базы. Выполняется один раз при создании проекта Supabase. |
