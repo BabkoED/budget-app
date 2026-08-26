@@ -889,14 +889,51 @@ var currentUser = null;
 var saveTimer = null;
 
 /* ── AUTH STATE ───────────────────────────── */
+/* ── ОФЛАЙН-СТАРТ ──────────────────────────────
+   Холодный запуск в самолёте показывал форму входа. Виноват не кэш: страница
+   отдавалась воркером как надо. `sb.auth.getSession()` при истёкшем токене
+   идёт обновлять его по сети, без сети возвращает null — и приложение честно
+   рисовало логин. Данные при этом лежали рядом, в локальном бэкапе, но
+   достать их было нечем: ключ бэкапа собирается из id пользователя, а id
+   знает только сессия. Поэтому id последнего входа запоминаем отдельно.
+   Свёрнутый PWA работал именно потому, что сессию он получил раньше,
+   ещё при живой сети. */
+var LAST_UID = 'budget_last_uid';
+var offlineMode = false;
+function rememberUid(id) { try { localStorage.setItem(LAST_UID, id); } catch(e) {} }
+function lastUid()       { try { return localStorage.getItem(LAST_UID); } catch(e) { return null; } }
+
+function startOffline() {
+  var uid = lastUid();
+  if (!uid) return false;                  /* никто не входил — показывать нечего */
+  currentUser = { id: uid, email: '' };    /* нужен только чтобы собрать ключ бэкапа */
+  var local = stampLegacy(loadLocal());
+  if (!local || !local.budgets || !local.budgets.length) { currentUser = null; return false; }
+  offlineMode = true;                      /* запись в облако выключена до перезапуска */
+  S = roundAmounts(local);
+  invalidateSpentCache();
+  reconcileOnLoad();
+  setSync('offline');
+  render();
+  /* Сеть вернулась — перезагружаемся, чтобы подняться с настоящей сессией
+     и слить правки с облаком. Модалку не рвём: человек мог набирать сумму. */
+  window.addEventListener('online', function() { if (!modal) location.reload(); });
+  return true;
+}
+
 async function initApp() {
   showLoading();
-  var session = (await sb.auth.getSession()).data.session;
+  var session = null;
+  /* Без сети getSession умеет и бросить, не только вернуть null */
+  try { session = (await sb.auth.getSession()).data.session; } catch(e) {}
   if (session) {
     currentUser = session.user;
+    rememberUid(currentUser.id);
     await loadFromCloud();
     startRealtime();
     render();
+  } else if (startOffline()) {
+    /* подняли последний локальный бэкап — режим чтения-записи без облака */
   } else {
     renderAuth();
   }
@@ -911,6 +948,8 @@ async function initApp() {
       if (authReady) return;          /* уже вошли — это просто refresh, игнор */
       authReady = true;
       currentUser = sess.user;
+      offlineMode = false;
+      rememberUid(currentUser.id);
       await loadFromCloud();
       startRealtime();
       render();
@@ -918,6 +957,11 @@ async function initApp() {
     if (event === 'SIGNED_OUT') {
       authReady = false;
       stopRealtime();
+      /* Порядок важен: localKey() собирается из currentUser, поэтому
+         бэкап удаляем ДО обнуления — иначе он останется лежать и всплывёт
+         при следующем офлайн-старте. */
+      try { localStorage.removeItem(localKey()); localStorage.removeItem(LAST_UID); } catch(e) {}
+      offlineMode = false;
       currentUser = null;
       S = {budgets:[], txs:[], activeBudgetId:null, rip:{}, at:0};
       invalidateSpentCache();
@@ -1126,6 +1170,10 @@ function save() {
 }
 
 async function saveToCloud() {
+  /* Офлайн-старт: сессии нет, писать нечем. Просто выйти нельзя — индикатор
+     залипнет на «сохраняю» навсегда, и человек будет думать, что не сохранилось.
+     Локально всё уже записано в save(), поэтому честный статус — «офлайн». */
+  if (offlineMode) { pendingSave = false; setSync('offline'); return; }
   if (!currentUser) return;
   try {
     /* Читаем облако перед записью и сливаем: если со второго устройства

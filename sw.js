@@ -1,4 +1,4 @@
-/* Бюджет — Service Worker v20
+/* Бюджет — Service Worker v21
    Стратегии:
    - index.html / навигация: TIMEOUT-RACE — сеть против таймера 2.5с.
      Хороший интернет → грузим свежую версию (как раньше).
@@ -8,7 +8,7 @@
      Открытие сайта без интернета вообще — тоже отдаём кэш сразу.
    - Supabase API: не перехватываем вообще (живые данные)
    - Статика (шрифты, SDK): cache-first (не меняются) */
-var CACHE = 'budget-v20';
+var CACHE = 'budget-v21';
 var STATIC_ASSETS = [
   /* Сам app-shell. Комментарий в install обещал его с самого начала, но в
      списке его не было: офлайн работал только после хотя бы одного онлайн-
@@ -24,7 +24,11 @@ self.addEventListener('install', function(e){
   e.waitUntil(caches.open(CACHE).then(function(c){
     /* Кэшируем и сам app-shell при первой установке — чтобы кэш был
        доступен даже если человек ни разу не открывал сайт при плохой сети */
-    return c.addAll(STATIC_ASSETS).catch(function(){});
+    /* Не addAll: он атомарен — один недоступный CDN отклонял всю операцию,
+       и app-shell не попадал в кэш вместе с ним. Кладём по одному. */
+    return Promise.all(STATIC_ASSETS.map(function(u){
+      return c.add(u).catch(function(){});
+    }));
   }));
 });
 
