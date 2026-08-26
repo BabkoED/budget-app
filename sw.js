@@ -1,4 +1,4 @@
-/* Бюджет — Service Worker v19
+/* Бюджет — Service Worker v20
    Стратегии:
    - index.html / навигация: TIMEOUT-RACE — сеть против таймера 2.5с.
      Хороший интернет → грузим свежую версию (как раньше).
@@ -8,8 +8,12 @@
      Открытие сайта без интернета вообще — тоже отдаём кэш сразу.
    - Supabase API: не перехватываем вообще (живые данные)
    - Статика (шрифты, SDK): cache-first (не меняются) */
-var CACHE = 'budget-v19';
+var CACHE = 'budget-v20';
 var STATIC_ASSETS = [
+  /* Сам app-shell. Комментарий в install обещал его с самого начала, но в
+     списке его не было: офлайн работал только после хотя бы одного онлайн-
+     захода, когда навигация клала страницу в кэш сама. */
+  './',
   'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js',
   'https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&display=swap'
 ];

@@ -2906,5 +2906,45 @@ initApp();
 
 
 </script>
+<script>
+/* ── SERVICE WORKER ────────────────────────────
+   Раньше `sw.js` лежал в репозитории, но никто его не подключал: регистрации
+   не было ни в одном коммите с самого первого. Офлайн-режим и гонка
+   «сеть против 2.5 секунд», описанные в самом sw.js, никогда не исполнялись —
+   обновление приходило обычным HTTP-кэшем.
+
+   Регистрируем после `load`, чтобы установка воркера не отнимала канал
+   у первой отрисовки: на телефоне в метро это заметно.
+
+   `controllerchange` + перезагрузка — иначе новая версия применяется только
+   со второй перезагрузки: первая успевает отрисоваться из-под старого
+   воркера, а новый лишь встаёт на его место. Но на ПЕРВОЙ установке
+   `clients.claim()` тоже шлёт `controllerchange`, а страница в этот момент
+   уже актуальна — поэтому перезагружаемся, только если контроллер БЫЛ. */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    var hadController = !!navigator.serviceWorker.controller;
+    var reloading = false;
+
+    navigator.serviceWorker.addEventListener('controllerchange', function() {
+      if (!hadController || reloading) return;
+      reloading = true;
+      location.reload();
+    });
+
+    navigator.serviceWorker.register('sw.js').then(function(reg) {
+      /* Возврат на вкладку — повод проверить обновление: приложение с
+         домашнего экрана может неделями не перезагружаться целиком,
+         и без этого правка доедет неизвестно когда. */
+      document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) reg.update();
+      });
+    }).catch(function() {
+      /* Не установился — не беда: приложение работает и без него,
+         просто без офлайна. Молчим, чтобы не пугать. */
+    });
+  });
+}
+</script>
 </body>
 </html>
