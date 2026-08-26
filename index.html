@@ -898,6 +898,22 @@ var saveTimer = null;
    знает только сессия. Поэтому id последнего входа запоминаем отдельно.
    Свёрнутый PWA работал именно потому, что сессию он получил раньше,
    ещё при живой сети. */
+/* Обещание с крайним сроком. Без него холодный старт в самолёте висел на
+   вечной загрузке: `sb.auth.getSession()` при истёкшем токене уходит обновлять
+   его по сети и в офлайне НЕ отклоняется — SDK ретраит внутри себя и просто
+   не отвечает. try/catch тут бессилен: ловить нечего, ждать можно вечно.
+   Поэтому у каждого сетевого шага, от которого зависит первая отрисовка,
+   должен быть срок. */
+function withDeadline(p, ms, fallback) {
+  return Promise.race([
+    Promise.resolve(p).catch(function() { return fallback; }),
+    new Promise(function(res) { setTimeout(function() { res(fallback); }, ms); })
+  ]);
+}
+/* В самолёте ждать нечего — обрываем сразу. При живой сети даём время
+   медленному каналу: лучше подождать, чем зря свалиться в офлайн-режим. */
+function netDeadline() { return navigator.onLine ? 6000 : 1200; }
+
 var LAST_UID = 'budget_last_uid';
 var offlineMode = false;
 function rememberUid(id) { try { localStorage.setItem(LAST_UID, id); } catch(e) {} }
@@ -923,9 +939,10 @@ function startOffline() {
 
 async function initApp() {
   showLoading();
-  var session = null;
-  /* Без сети getSession умеет и бросить, не только вернуть null */
-  try { session = (await sb.auth.getSession()).data.session; } catch(e) {}
+  var sessP;
+  try { sessP = sb.auth.getSession(); } catch(e) { sessP = Promise.reject(e); }
+  var got = await withDeadline(sessP, netDeadline(), null);
+  var session = (got && got.data) ? got.data.session : null;
   if (session) {
     currentUser = session.user;
     rememberUid(currentUser.id);
@@ -933,7 +950,12 @@ async function initApp() {
     startRealtime();
     render();
   } else if (startOffline()) {
-    /* подняли последний локальный бэкап — режим чтения-записи без облака */
+    /* Подняли локальный бэкап. Но сессия могла просто не уложиться в срок на
+       медленном канале — досматриваем её в фоне и, если всё-таки пришла,
+       перезапускаемся уже с облаком. Модалку не рвём. */
+    Promise.resolve(sessP).then(function(r) {
+      if (offlineMode && r && r.data && r.data.session && !modal) location.reload();
+    }).catch(function() {});
   } else {
     renderAuth();
   }
@@ -1095,7 +1117,10 @@ async function loadFromCloud() {
   invalidateSpentCache();
   var local = stampLegacy(loadLocal());
   try {
-    var cloud = stampLegacy(await fetchCloud());
+    /* Тот же срок: без него «висящий» запрос к базе держал бы экран загрузки
+       так же, как getSession. null означает «не дождались» — и мы честно
+       уходим в локальный бэкап, как при обрыве. */
+    var cloud = stampLegacy(await withDeadline(fetchCloud(), netDeadline(), null));
     if (cloud && local) {
       /* Обе стороны живые — не выбираем одну, а сливаем.
          Трата, внесённая с телефона, больше не пропадает от того,
@@ -1178,7 +1203,7 @@ async function saveToCloud() {
   try {
     /* Читаем облако перед записью и сливаем: если со второго устройства
        что-то прилетело, пока мы редактировали, оно не будет затёрто. */
-    var cloud = stampLegacy(await fetchCloud());
+    var cloud = stampLegacy(await withDeadline(fetchCloud(), netDeadline(), null));
     if (cloud) {
       var sig0 = stateSig(S);
       S = mergeState(cloud, S);
