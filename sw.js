@@ -1,4 +1,4 @@
-/* Бюджет — Service Worker v17
+/* Бюджет — Service Worker v18
    Стратегии:
    - index.html / навигация: TIMEOUT-RACE — сеть против таймера 2.5с.
      Хороший интернет → грузим свежую версию (как раньше).
@@ -8,7 +8,7 @@
      Открытие сайта без интернета вообще — тоже отдаём кэш сразу.
    - Supabase API: не перехватываем вообще (живые данные)
    - Статика (шрифты, SDK): cache-first (не меняются) */
-var CACHE = 'budget-v17';
+var CACHE = 'budget-v18';
 var STATIC_ASSETS = [
   'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js',
   'https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&display=swap'

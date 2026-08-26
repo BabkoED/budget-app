@@ -1004,7 +1004,20 @@ function roundAmounts(st) {
     if (typeof b.pot === 'number') {
       ti = 0; tp = 0;
       for (j = 0; j < (b.incomes||[]).length; j++) ti += b.incomes[j].amount;
-      for (j = 0; j < (b.planned||[]).length; j++) tp += b.planned[j].amount;
+      /* Пока бюджет не переведён на новое основание (potV), снимок остаётся
+         от лимитов — иначе migratePot увидел бы delta=0 и не списал перерасход.
+         После перевода считаем по факту, как potOf, иначе каждая загрузка
+         возвращала бы старое основание и перерасход списывался бы повторно. */
+      for (j = 0; j < (b.planned||[]).length; j++) {
+        var lim = b.planned[j].amount, sp = 0;
+        if (b.potV === 2) {
+          for (var k = 0; k < (st.txs||[]).length; k++) {
+            var tx = st.txs[k];
+            if (tx.budgetId === b.id && tx.plannedCatId === b.planned[j].id) sp += tx.amount;
+          }
+        }
+        tp += sp > lim ? sp : lim;
+      }
       b.pot = ti - tp;
     }
   }
@@ -1061,6 +1074,7 @@ async function loadFromCloud() {
     S = (local && local.budgets) ? local : {budgets:[], txs:[], activeBudgetId:null, rip:{}, at:0};
   }
   invalidateSpentCache();
+  migratePot();
 }
 
 /* Отпечаток состояния. Считать только количество записей мало: правка суммы
@@ -1103,6 +1117,7 @@ function setSync(st) {
 /* debounced — не долбим базу на каждый символ */
 function save() {
   invalidateSpentCache();     /* данные изменились — сбрасываем кэш расчётов */
+  syncPot(getCurrentBudget());/* трата могла увести категорию за лимит */
   saveLocal();                /* мгновенный локальный бэкап — не зависит от сети */
   pendingSave = true;
   setSync('saving');
@@ -1477,7 +1492,13 @@ function calcDayBal(b){
   var upto=t>b.dateTo?b.dateTo:t;
   var acc=accrued(b,start,upto);
   getSpentMap(b);                 /* дневные траты уже посчитаны в общем проходе */
-  return acc-(_spentCache.dailyUpto||0);
+  var v=acc-(_spentCache.dailyUpto||0);
+  /* Начисленное за прошлые дни назад не отберёшь — история ставок неприкосновенна.
+     Но деньги на дневные и деньги на планы это один кошелёк, поэтому остаток на
+     сегодня не может быть больше общего: иначе на экране опять два числа из
+     разных оснований, и большее из них врёт. */
+  var tot=calcTotalBal(b);
+  return v>tot?tot:v;
 }
 function calcTotalBal(b){
   if(!b)return 0;
@@ -1582,13 +1603,54 @@ function calcCatRem(b,cid){
   var spent=getSpentMap(b)[cid]||0;
   return c[0].amount-spent;
 }
-function recalcDaily(b){
-  var ti=0,tp=0;
+/* ── КОТЁЛ НА ДНЕВНЫЕ РАСХОДЫ ──────────────────
+   Категория «стоит» столько, сколько по ней реально ушло: перерасход берётся
+   из тех же денег, что и дневные траты, другого кошелька нет. Пока в формуле
+   стоял лимит, норма продолжала обещать деньги, которых уже нет — в августе
+   2026 при перерасходе 15 655 на оставшиеся 5 дней обещалось 15 620,
+   а общий остаток был 7 055. Общий остаток вычитал всё потраченное,
+   норма — только лимиты, и два числа на одном экране не сходились. */
+function potOf(b){
+  var ti=0,tp=0,map=getSpentMap(b);
   for(var i=0;i<b.incomes.length;i++)ti+=b.incomes[i].amount;
-  for(var j=0;j<b.planned.length;j++)tp+=b.planned[j].amount;
-  touch(b);   /* доходы или планы изменились — помечаем бюджет для слияния */
+  for(var j=0;j<b.planned.length;j++){
+    var p=b.planned[j],sp=map[p.id]||0;
+    tp+=sp>p.amount?sp:p.amount;
+  }
+  return ti-tp;
+}
+/* Правка трат идёт мимо recalcDaily — он висит на доходах и планах. Поэтому
+   после каждого сохранения сверяем снимок котла: ушёл за лимит — норма падает
+   в тот же момент, удалил трату — возвращается тем же приращением.
+   Только текущий бюджет: у закрытого периода recalcDaily идёт по ветке
+   «период завершён» и переписал бы всю историю ставок одной средней. */
+function syncPot(b){
+  if(!b||typeof b.pot!=='number')return;
+  if(Math.abs(potOf(b)-b.pot)<0.005)return;
+  recalcDaily(b);
+}
+/* Разовый переход на новое основание котла. Снимок b.pot у старых бюджетов
+   посчитан от лимитов, поэтому просто подменить формулу мало: recalcDaily
+   увидел бы delta=0 и оставил завышенную норму. Вместо этого помечаем бюджет
+   и даём recalcDaily отработать один раз — накопленный перерасход размажется
+   по оставшимся дням как обычная правка. Метка едет вместе с бюджетом при
+   слиянии, поэтому второе устройство не спишет перерасход повторно. */
+function migratePot(){
+  if(!S||!S.budgets)return;
+  var cur=getCurrentBudget(),changed=false;
+  for(var i=0;i<S.budgets.length;i++){
+    var b=S.budgets[i];
+    if(b.potV===2)continue;
+    b.potV=2;
+    if(cur&&b.id===cur.id&&typeof b.pot==='number'){recalcDaily(b);}
+    changed=true;
+  }
+  if(changed)saveLocal();
+}
+function recalcDaily(b){
+  touch(b);   /* доходы, планы или перерасход изменились — помечаем для слияния */
 
-  var pot=ti-tp;                       /* весь котёл на дневные расходы */
+  var pot=potOf(b);                    /* весь котёл на дневные расходы */
   var prevPot=(typeof b.pot==='number')?b.pot:null;
   b.pot=pot;
   var t=today(), start=accrualStart(b);
@@ -1629,6 +1691,17 @@ function recalcDaily(b){
   segs.push({from:t,v:v});
   b.rates=segs;
   b.dailyBudget=Math.max(0,v);
+}
+/* Сколько всего ушло сверх лимитов. Ровно на эту сумму перерасход придавил
+   дневную норму, поэтому число выносится на экран: без него падение нормы
+   выглядит как поломка приложения. */
+function ovTotal(b){
+  var map=getSpentMap(b),t=0;
+  for(var i=0;i<b.planned.length;i++){
+    var p=b.planned[i],sp=map[p.id]||0;
+    if(sp>p.amount)t+=sp-p.amount;
+  }
+  return t;
 }
 function hasOv(b){
   for(var i=0;i<b.planned.length;i++){if(calcCatRem(b,b.planned[i].id)<0)return true;}
@@ -1808,7 +1881,7 @@ var ICO_DL='<path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 19h14"/>';
 var ICO_CHEV='<path d="M6 9l6 6 6-6"/>';
 
 function rDrop(b,bal){
-  var total=calcTotalBal(b),aid=b.id,td=today();
+  var total=calcTotalBal(b),aid=b.id,td=today(),ovT=ovTotal(b);
   var sorted=S.budgets.slice().sort(function(a,c){return a.dateFrom.localeCompare(c.dateFrom);});
   var others=sorted.filter(function(x){return x.id!==aid;});
 
@@ -1843,6 +1916,7 @@ function rDrop(b,bal){
     '<div class="drop-stats">'+
       '<div class="drop-r"><label>Осталось на сегодня</label><b style="color:'+(bal>=0?'var(--gd)':'var(--rd)')+'">'+fmt(bal)+'</b></div>'+
       '<div class="drop-r"><label>Прибавится завтра</label><b>'+fmt(b.dailyBudget)+'</b></div>'+
+      (ovT>0?'<div class="drop-r"><label>Съел перерасход</label><b style="color:var(--rd)">−'+fmt(ovT)+'</b></div>':'')+
       '<div class="drop-r"><label>Общий остаток</label><b style="color:'+(total>=0?'var(--gd)':'var(--rd)')+'">'+fmt(total)+'</b></div>'+
     '</div>'+
     '<div class="drop-acts">'+
@@ -2212,7 +2286,9 @@ function rPlanned(b){
   (function(){
     var ti=0,tp=0;
     for(var q=0;q<b.incomes.length;q++)ti+=b.incomes[q].amount;
-    for(var w=0;w<b.planned.length;w++)tp+=b.planned[w].amount;
+    /* По факту, а не по лимитам: перерасход тоже съедает дневные,
+       и молчать о нём нельзя — норма из-за него и обнулилась. */
+    tp=ti-potOf(b);
     if(tp<=ti)return '';
     return '<div class="warn">'+
       '<div class="warn-t">⚠️ Планы превышают доход на '+fmt(tp-ti)+'</div>'+
@@ -2777,7 +2853,7 @@ function bindWiz(){
       incomes:d.incomes.map(function(i){return Object.assign({},i,{amount:pf(i.amount)||0});}),
       planned:d.planned.map(function(p){return Object.assign({},p,{amount:pf(p.amount)||0});}),
       dailyBudget:avail>0?avail/days:0,
-      pot:avail,
+      pot:avail,potV:2,
       rates:[{from:d.dateFrom,v:avail>0?avail/days:0}]};
     S.budgets.push(touch(bdg));S.activeBudgetId=bdg.id;save();tab='history';wd=null;render();
   };
