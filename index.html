@@ -1074,7 +1074,7 @@ async function loadFromCloud() {
     S = (local && local.budgets) ? local : {budgets:[], txs:[], activeBudgetId:null, rip:{}, at:0};
   }
   invalidateSpentCache();
-  migratePot();
+  reconcileOnLoad();
 }
 
 /* Отпечаток состояния. Считать только количество записей мало: правка суммы
@@ -1629,23 +1629,60 @@ function syncPot(b){
   if(Math.abs(potOf(b)-b.pot)<0.005)return;
   recalcDaily(b);
 }
+/* ── СВЕДЕНИЕ НАЧИСЛЕНИЙ С КОТЛОМ ──────────────
+   Инвариант, которого в модели не было: сумма начислений за весь период
+   должна равняться котлу. `recalcDaily` держит его приращениями — но только
+   пока основание верное. А разъехаться оно может двумя путями: бюджет создан
+   не с первого числа (ставка размазана на все 31 день, а начисление идёт с
+   даты создания), либо старая версия записала `pot`, не тронув ставки. Дальше
+   разница остаётся навсегда: каждая следующая правка честно добавляет свою
+   дельту к кривому основанию, и никто её не сводит.
+   У августа 2026 накопилось 15 654 ₽ перебора — начислений на 64 358 при
+   котле 48 704. Отсюда и обещание 3 124 ₽ в день при общем остатке 7 055 ₽:
+   котёл был выбран целиком ещё 26-го, а норма продолжала его раздавать.
+   Прожитые дни не переписываем — деньги за них человек уже потратил или
+   отложил. Выравниваем ставку начиная с сегодняшнего дня. */
+function reconcileRates(b){
+  if(!b||typeof b.pot!=='number')return false;
+  var t=today(),start=accrualStart(b);
+  if(t<start||t>b.dateTo)return false;      /* период не начался или закрыт */
+  var past=accrued(b,start,prevDay(t));     /* прожитое до сегодня — как есть */
+  var left=getDays(t,b.dateTo);
+  var want=(b.pot-past)/left;
+  if(Math.abs(want-rateOn(b,t))<0.005)return false;   /* уже сведено */
+  var segs=rateSegs(b).filter(function(s){return s.from<t;});
+  segs.push({from:t,v:want});
+  b.rates=segs;
+  b.dailyBudget=Math.max(0,want);
+  touch(b);
+  return true;
+}
 /* Разовый переход на новое основание котла. Снимок b.pot у старых бюджетов
    посчитан от лимитов, поэтому просто подменить формулу мало: recalcDaily
    увидел бы delta=0 и оставил завышенную норму. Вместо этого помечаем бюджет
    и даём recalcDaily отработать один раз — накопленный перерасход размажется
    по оставшимся дням как обычная правка. Метка едет вместе с бюджетом при
    слиянии, поэтому второе устройство не спишет перерасход повторно. */
-function migratePot(){
+function reconcileOnLoad(){
   if(!S||!S.budgets)return;
   var cur=getCurrentBudget(),changed=false;
   for(var i=0;i<S.budgets.length;i++){
     var b=S.budgets[i];
     if(b.potV===2)continue;
     b.potV=2;
-    if(cur&&b.id===cur.id&&typeof b.pot==='number'){recalcDaily(b);}
+    /* снимок в новом основании: с этого момента перерасход считается котлом */
+    if(typeof b.pot==='number')b.pot=potOf(b);
     changed=true;
   }
-  if(changed)saveLocal();
+  /* Сводим только текущий бюджет: у закрытого периода ставку менять нечего,
+     а у будущего начисление ещё не началось. Если всё сходится — молча выходит. */
+  if(reconcileRates(cur))changed=true;
+  if(changed){
+    saveLocal();
+    /* Результат должен уехать в облако, иначе второе устройство сведёт
+       по-своему в другой день и получит другую цифру. */
+    if(currentUser)saveToCloud();
+  }
 }
 function recalcDaily(b){
   touch(b);   /* доходы, планы или перерасход изменились — помечаем для слияния */
@@ -1882,6 +1919,10 @@ var ICO_CHEV='<path d="M6 9l6 6 6-6"/>';
 
 function rDrop(b,bal){
   var total=calcTotalBal(b),aid=b.id,td=today(),ovT=ovTotal(b);
+  /* Сумма будущих начислений нигде не показывалась — а именно она разъехалась
+     с котлом. На экране «осталось сегодня» + «ещё начислят» должно давать
+     общий остаток, и теперь это видно глазами, без консоли. */
+  var futAcc=accrued(b,nextDay(td),b.dateTo);
   var sorted=S.budgets.slice().sort(function(a,c){return a.dateFrom.localeCompare(c.dateFrom);});
   var others=sorted.filter(function(x){return x.id!==aid;});
 
@@ -1917,6 +1958,7 @@ function rDrop(b,bal){
       '<div class="drop-r"><label>Осталось на сегодня</label><b style="color:'+(bal>=0?'var(--gd)':'var(--rd)')+'">'+fmt(bal)+'</b></div>'+
       '<div class="drop-r"><label>Прибавится завтра</label><b>'+fmt(b.dailyBudget)+'</b></div>'+
       (ovT>0?'<div class="drop-r"><label>Съел перерасход</label><b style="color:var(--rd)">−'+fmt(ovT)+'</b></div>':'')+
+      (futAcc>0?'<div class="drop-r"><label>Ещё начислят до '+fmtSh(b.dateTo)+'</label><b>'+fmt(futAcc)+'</b></div>':'')+
       '<div class="drop-r"><label>Общий остаток</label><b style="color:'+(total>=0?'var(--gd)':'var(--rd)')+'">'+fmt(total)+'</b></div>'+
     '</div>'+
     '<div class="drop-acts">'+
