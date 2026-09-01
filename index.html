@@ -198,6 +198,10 @@ select option{background:var(--card2);}
 .drop-item:hover{color:var(--t);}
 .drop-csv{padding-left:16px;color:var(--t);}
 .drop-now{font-size:11px;font-weight:800;color:var(--gd);}
+/* Периоды, которые ещё не закончились, стоят отдельными строками над архивом:
+   архив — это прошедшее. Метка уходит вправо, поэтому название тянется */
+.drop-per span:nth-child(2){flex:1;}
+.drop-soon{font-size:11px;font-weight:800;color:var(--mt);}
 .newmo-banner{
   display:flex;align-items:center;justify-content:space-between;gap:12px;
   background:rgba(232,106,59,.12);border:1px solid rgba(232,106,59,.3);
@@ -1032,11 +1036,22 @@ function mergeState(A, B) {
     return out;
   }
 
-  var newer = (B.at||0) > (A.at||0) ? B : A;
   return {
     budgets: mergeList('bdg', A.budgets, B.budgets),
     txs:     mergeList('tx',  A.txs,     B.txs),
-    activeBudgetId: newer.activeBudgetId || A.activeBudgetId || B.activeBudgetId || null,
+    /* ВАЖЕН ПОРЯДОК АРГУМЕНТОВ: A — облако, B — эта машина. Так вызывается
+       во всех трёх местах (loadFromCloud, pullAndMerge, saveToCloud).
+       activeBudgetId — не данные, а выбор периода на ЭТОМ устройстве, и
+       поэтому местный выбор всегда сильнее облачного. Раньше побеждала
+       сторона со свежим `at`, то есть почти всегда облако: saveToCloud
+       читает облако перед записью, `at` в этот момент ещё равны, и newer
+       оказывалось облаком. Итог 1 сентября 2026: переключение на сентябрь
+       откатывалось на август через 600 мс после нажатия, молча — stateSig
+       это поле не считает, перерисовки нет. Экран оставался сентябрьским,
+       а следующее же нажатие вкладки показывало доходы августа.
+       Второе следствие: на телефоне жены больше не уводит период туда,
+       куда переключились на ноутбуке. */
+    activeBudgetId: B.activeBudgetId || A.activeBudgetId || null,
     rip: rip,
     at: Math.max(A.at||0, B.at||0)
   };
@@ -1502,7 +1517,13 @@ function getAB(){
   if(S.activeBudgetId){var f=S.budgets.filter(function(x){return x.id===S.activeBudgetId;});if(f.length)return f[0];}
   var t=today(),cur=S.budgets.filter(function(b){return b.dateFrom<=t&&b.dateTo>=t;});
   if(cur.length)return cur[0];
-  return S.budgets.length?S.budgets[S.budgets.length-1]:null;
+  if(!S.budgets.length)return null;
+  /* Последний по ДАТЕ, а не по месту в массиве: mergeState собирает список
+     заново из карты по id, и порядок там не хронологический. Брать
+     S.budgets[length-1] значило открывать произвольный период. */
+  var last=S.budgets[0];
+  for(var i=1;i<S.budgets.length;i++)if(S.budgets[i].dateFrom>last.dateFrom)last=S.budgets[i];
+  return last;
 }
 
 function getCurrentBudget(){
@@ -1750,6 +1771,18 @@ function reconcileOnLoad(){
   /* Сводим только текущий бюджет: у закрытого периода ставку менять нечего,
      а у будущего начисление ещё не началось. Если всё сходится — молча выходит. */
   if(reconcileRates(cur))changed=true;
+  /* Календарь ушёл вперёд, а выбор периода остался с прошлого запуска:
+     1 сентября 2026 приложение открывалось на августе, и вкладки честно
+     показывали августовские доходы. Выбор «смотреть август» делался, когда
+     август был текущим, — читать его как просьбу разбирать историю вечно
+     нельзя. Поправляем ОДИН раз, при загрузке: внутри сессии переключение
+     руками сильнее, иначе прошлый период было бы не открыть вообще. */
+  var t0=today();
+  var act=S.activeBudgetId?S.budgets.filter(function(x){return x.id===S.activeBudgetId;})[0]:null;
+  if(cur&&act&&act.id!==cur.id&&(act.dateTo<t0||act.dateFrom>t0)){
+    S.activeBudgetId=cur.id;
+    changed=true;
+  }
   if(changed){
     saveLocal();
     /* Результат должен уехать в облако, иначе второе устройство сведёт
@@ -1939,6 +1972,7 @@ function fixMenus(){
 /* ── HEADER ──────────────────────────────────── */
 function rHeader(b){
   var bal=calcDayBal(b),pos=bal>=0,ov=hasOv(b);
+  var td=today(),notYet=b.dateFrom>td;
   var initials=currentUser&&currentUser.email?currentUser.email[0].toUpperCase():'?';
   return '<div class="hdr">'+
     '<div class="hdr-r1">'+
@@ -1950,8 +1984,10 @@ function rHeader(b){
         '<div style="position:relative">'+
           /* На «Выписке» остаток уже крупно в карточке дня — дублировать его
              в шапке незачем, там полезнее видеть период бюджета */
-          '<button class="balbtn '+(tab==='history'?'nt':(pos?'gd':'rd'))+'" onclick="togDrop()">'+
-            (tab==='history'?fmtSh(b.dateFrom)+' — '+fmtSh(b.dateTo):fmt(bal)+' / день')+
+          /* Период ещё не начался — дневного остатка нет, и «0 ₽ / день»
+             читается как поломка. Показываем период, как на «Выписке». */
+          '<button class="balbtn '+((tab==='history'||notYet)?'nt':(pos?'gd':'rd'))+'" onclick="togDrop()">'+
+            ((tab==='history'||notYet)?fmtSh(b.dateFrom)+' — '+fmtSh(b.dateTo):fmt(bal)+' / день')+
             '<span class="cv"> ▾</span>'+
           '</button>'+
           (drop?rDrop(b,bal):'')+
@@ -1972,7 +2008,9 @@ function rHeader(b){
        на точку синхронизации и сталкивала «Бюджет» на вторую строку */
     (!isViewingCurrent(b)&&getCurrentBudget()
       ? '<button type="button" class="cur-bar" onclick="goCurrent()">'+
-          '<span>Смотрите прошлый период</span>'+
+          /* Заранее созданный бюджет — не «прошлый». Полоса врала на нём
+             ровно наоборот, а именно она и объясняет, почему цифры чужие. */
+          '<span>'+(notYet?'Смотрите будущий период':'Смотрите прошлый период')+'</span>'+
           '<span class="cur-go">К текущему →</span>'+
         '</button>'
       : '')+
@@ -1987,6 +2025,7 @@ var ICO_GEAR='<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34
 var ICO_CHART='<path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-4"/>';
 var ICO_ARCH='<rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8"/><line x1="10" y1="12" x2="14" y2="12"/>';
 var ICO_PLUS='<rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/>';
+var ICO_CAL='<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>';
 var ICO_DL='<path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 19h14"/>';
 var ICO_CHEV='<path d="M6 9l6 6 6-6"/>';
 
@@ -1999,26 +2038,47 @@ function rDrop(b,bal){
   var sorted=S.budgets.slice().sort(function(a,c){return a.dateFrom.localeCompare(c.dateFrom);});
   var others=sorted.filter(function(x){return x.id!==aid;});
 
+  /* Архив — это прошедшее. Бюджет, который ещё не кончился (текущий, пока
+     смотрим другой период, и заранее созданный будущий), туда прятать нельзя:
+     созданный в августе октябрь лежал за свёрнутым «Архивом», и о нём просто
+     не знали. Такие периоды идут отдельными строками сразу под «Сводкой» —
+     по практике Антона их один, меню не разрастается. */
+  var ahead=others.filter(function(x){return x.dateTo>=td;});   /* по возрастанию: сначала текущий */
+  var past =others.filter(function(x){return x.dateTo< td;});
+  var lead='';
+  for(var ai=0;ai<ahead.length;ai++){
+    var a=ahead[ai];
+    lead+='<button class="drop-act drop-per" onclick="swBdg(\''+a.id+'\')">'+
+      DI(ICO_CAL)+
+      '<span>'+fmtSh(a.dateFrom)+' — '+fmtSh(a.dateTo)+'</span>'+
+      (a.dateFrom<=td?'<span class="drop-now">сейчас</span>'
+                     :'<span class="drop-soon">будущий</span>')+
+    '</button>';
+  }
+
   var arch='';
-  if(others.length){
+  if(past.length){
     arch+='<button class="drop-arch" onclick="togArch()">'+
       DI(ICO_ARCH)+
       '<span>Архив бюджетов</span>'+
-      '<span class="drop-cnt">'+others.length+'</span>'+
+      '<span class="drop-cnt">'+past.length+'</span>'+
       '<span class="drop-chev'+(archOpen?' up':'')+'">'+DI(ICO_CHEV)+'</span>'+
     '</button>';
     if(archOpen){
       /* Выгрузка — редкая операция, поэтому не отдельным пунктом наверху,
          а внутри развёрнутого архива, куда заглядывают уже целенаправленно */
       arch+='<button class="drop-item drop-csv" onclick="exportCSV()">'+DI(ICO_DL)+'<span>Экспортировать в CSV</span></button>';
-      for(var j=others.length-1;j>=0;j--){   /* новые сверху */
-        var y=others[j];
+      for(var j=past.length-1;j>=0;j--){   /* новые сверху */
+        var y=past[j];
         arch+='<button class="drop-item" onclick="swBdg(\''+y.id+'\')">'+
           '<span>'+fmtSh(y.dateFrom)+' — '+fmtSh(y.dateTo)+'</span>'+
-          (y.dateFrom<=td&&y.dateTo>=td?'<span class="drop-now">сейчас</span>':'')+
         '</button>';
       }
     }
+  } else {
+    /* Прошедших периодов нет — архива тоже. Выгрузка живёт внутри него,
+       поэтому в первый месяц она была недоступна вообще; выносим строкой. */
+    arch+='<button class="drop-act" onclick="exportCSV()">'+DI(ICO_DL)+'<span>Экспортировать в CSV</span></button>';
   }
 
   return '<div class="drop">'+
@@ -2028,14 +2088,21 @@ function rDrop(b,bal){
     '</button>'+
     '<button class="drop-act" onclick="openBdgEdit()">'+DI(ICO_GEAR)+'<span>Настройки бюджета</span></button>'+
     '<div class="drop-stats">'+
-      '<div class="drop-r"><label>Осталось на сегодня</label><b style="color:'+(bal>=0?'var(--gd)':'var(--rd)')+'">'+fmt(bal)+'</b></div>'+
-      '<div class="drop-r"><label>Прибавится завтра</label><b>'+fmt(b.dailyBudget)+'</b></div>'+
-      (ovT>0?'<div class="drop-r"><label>Съел перерасход</label><b style="color:var(--rd)">−'+fmt(ovT)+'</b></div>':'')+
-      (futAcc>0?'<div class="drop-r"><label>Ещё начислят до '+fmtSh(b.dateTo)+'</label><b>'+fmt(futAcc)+'</b></div>':'')+
-      '<div class="drop-r"><label>Общий остаток</label><b style="color:'+(total>=0?'var(--gd)':'var(--rd)')+'">'+fmt(total)+'</b></div>'+
+      /* Период не начался — «осталось на сегодня» тут ноль по определению, и
+         показывать его значит показывать ноль там, где всё в порядке. */
+      (b.dateFrom>td
+        ? '<div class="drop-r"><label>Начнётся</label><b>'+fmtSh(b.dateFrom)+'</b></div>'+
+          '<div class="drop-r"><label>Будет в день</label><b>'+fmt(b.dailyBudget)+'</b></div>'+
+          '<div class="drop-r"><label>Всего в бюджете</label><b style="color:'+(total>=0?'var(--gd)':'var(--rd)')+'">'+fmt(total)+'</b></div>'
+        : '<div class="drop-r"><label>Осталось на сегодня</label><b style="color:'+(bal>=0?'var(--gd)':'var(--rd)')+'">'+fmt(bal)+'</b></div>'+
+          '<div class="drop-r"><label>Прибавится завтра</label><b>'+fmt(b.dailyBudget)+'</b></div>'+
+          (ovT>0?'<div class="drop-r"><label>Съел перерасход</label><b style="color:var(--rd)">−'+fmt(ovT)+'</b></div>':'')+
+          (futAcc>0?'<div class="drop-r"><label>Ещё начислят до '+fmtSh(b.dateTo)+'</label><b>'+fmt(futAcc)+'</b></div>':'')+
+          '<div class="drop-r"><label>Общий остаток</label><b style="color:'+(total>=0?'var(--gd)':'var(--rd)')+'">'+fmt(total)+'</b></div>')+
     '</div>'+
     '<div class="drop-acts">'+
       '<button class="drop-act" onclick="openStats()">'+DI(ICO_CHART)+'<span>Сводка по категориям</span></button>'+
+      lead+
       arch+
       '<button class="drop-act acc" onclick="newBdg()">'+DI(ICO_PLUS)+'<span>Создать бюджет на будущее</span></button>'+
     '</div>'+
@@ -2285,6 +2352,25 @@ function rHero(b){
   var remPct=!pos?0:(startOfDay>0?Math.max(0,Math.min(100,Math.round(bal/startOfDay*100))):100);
   var left=daysBw(td,b.dateTo);
   var ended=b.dateTo<td;
+
+  /* Период ещё не начался: начислений нет, поэтому «осталось на сегодня 0 ₽»,
+     пустая полоса и «завтра +норма» — три неверных утверждения подряд.
+     У такого бюджета другой вопрос: сколько в нём всего и когда он включится. */
+  if(b.dateFrom>td){
+    var till=daysBw(td,b.dateFrom), days=getDays(b.dateFrom,b.dateTo);
+    return '<div class="hero">'+
+      '<div class="hero-top">'+
+        '<span>Всего в бюджете</span>'+
+        '<span>'+(till>1?'начнётся через '+till+'\u00a0'+plurDays(till):'начнётся завтра')+'</span>'+
+      '</div>'+
+      '<div class="hero-big gd">'+fmt(calcTotalBal(b))+'</div>'+
+      '<div class="hero-bar"><div class="hero-fill gd" style="width:100%"></div></div>'+
+      '<div class="hero-sub">'+
+        '<span>в день <b>'+fmt(b.dailyBudget)+'</b></span>'+
+        '<span>'+days+'\u00a0'+plurDays(days)+' в периоде</span>'+
+      '</div>'+
+    '</div>';
+  }
 
   /* Заголовок и остаток дней — одной строкой сверху; крупная цифра;
      полоса; под ней тонкая строка «сегодня / завтра». Четыре ряда вместо
