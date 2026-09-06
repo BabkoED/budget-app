@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Бюджет</title>
 <meta name="theme-color" content="#141414">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -32,10 +32,12 @@
   --card2:  #252525;
   --t:      #F0F0F0;
   --t2:     #B0B0B0;
-  --mt:     #6B6B6B;
+  --mt:     #919191;  /* было #6B6B6B: 2.69:1 на всплывающем меню при норме 4.5 */
   --br:     #2E2E2E;
   --br2:    #383838;
   --accent: #E86A3B;
+  --on-accent: #1A0E07;  /* текст НА оранжевом: белый давал 3.2:1, этот даёт 5.91:1 */
+  --accent-tx: #EA6B3B;  /* оранжевый КАК текст на тёмном: 4.55:1 на всплывающем меню */
   --gd:     #30C97C;
   --rd:     #FF4F47;
   --rl:     rgba(255,79,71,.12);
@@ -64,6 +66,7 @@
 }
 
 /* ── RESET ───────────────────────────────── */
+html{font-size:100%;}  /* якорь для rem: даёт системной настройке размера текста подействовать */
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 /* height:100% обрезало всё, что не влезло в один экран, и страница
    переставала скроллиться — поэтому только минимальная высота */
@@ -92,7 +95,7 @@ select option{background:var(--card2);}
 .hdr-r1{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 8px;}
 .hdr-r2{display:flex;gap:2px;padding:0 12px 10px;}
 
-.logo{font-size:18px;font-weight:900;letter-spacing:-.4px;}
+.logo{font-size:1.125rem;font-weight:900;letter-spacing:-.4px;margin:0;}  /* margin:0 — логотип стал h1 */
 .logo span{color:var(--accent);}
 
 
@@ -104,26 +107,27 @@ select option{background:var(--card2);}
 .cur-bar{
   display:flex;align-items:center;justify-content:space-between;gap:10px;
   width:100%;padding:8px 16px;
-  font-size:12.5px;font-weight:700;
+  font-size:0.7812rem;font-weight:700;
   background:rgba(232,106,59,.13);color:var(--accent);
   border-top:1px solid rgba(232,106,59,.22);
 }
 .cur-bar span:first-child{color:var(--t2);font-weight:600;}
 .cur-go{white-space:nowrap;}
 .balbtn{
-  font-size:13px;font-weight:800;
-  padding:7px 13px;border-radius:99px;
+  font-size:0.8125rem;font-weight:800;
+  padding:7px 13px;border-radius:99px;min-height:44px;   /* было 32-34px */
   display:flex;align-items:center;gap:5px;
   max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 .balbtn.gd{color:var(--gd);background:rgba(48,201,124,.13);}
 .balbtn.rd{color:var(--rd);background:rgba(255,79,71,.13);}
 .balbtn.nt{color:var(--t2);background:var(--card);border:1px solid var(--br2);}
-.balbtn .cv{font-size:9px;opacity:.5;}
+.balbtn .cv{font-size:0.6875rem;opacity:.5;}
 
 .nb{
-  font-size:13px;font-weight:700;
+  font-size:0.8125rem;font-weight:700;
   padding:7px 14px;border-radius:99px;
+  min-height:44px;display:inline-flex;align-items:center;   /* было 32px по высоте */
   color:var(--mt);transition:all .15s;
   position:relative;
 }
@@ -152,17 +156,17 @@ select option{background:var(--card2);}
 /* Текущий период с галочкой — первая строка, как в Sintra */
 .drop-cur{
   display:flex;align-items:center;gap:9px;
-  width:100%;padding:13px 16px 10px;text-align:left;
-  font-size:14.5px;font-weight:600;color:var(--t);
+  width:100%;padding:13px 16px 10px;text-align:left;min-height:44px;   /* было 42px */
+  font-size:0.9062rem;font-weight:600;color:var(--t);
 }
-.drop-ck{color:var(--accent);font-size:14px;font-weight:900;}
+.drop-ck{color:var(--accent-tx);font-size:0.875rem;font-weight:900;}
 .drop-stats{
   padding:3px 0;
   border-top:1px solid var(--br2);border-bottom:1px solid var(--br2);
 }
 .drop-r{
   display:flex;justify-content:space-between;align-items:center;gap:12px;
-  padding:6px 16px;font-size:13.5px;font-weight:500;
+  padding:6px 16px;font-size:0.8438rem;font-weight:500;
 }
 .drop-r label{color:var(--mt);}
 .drop-r b{font-weight:800;white-space:nowrap;}
@@ -172,36 +176,36 @@ select option{background:var(--card2);}
    выравниваются вложенные строки архива, чтобы не городить второй отступ */
 .drop-act{
   display:flex;align-items:center;gap:9px;
-  width:100%;padding:11px 16px;text-align:left;
-  font-size:14.5px;font-weight:500;color:var(--t);
+  width:100%;padding:11px 16px;text-align:left;min-height:44px;   /* было 41px */
+  font-size:0.9062rem;font-weight:500;color:var(--t);
 }
 .drop-act:hover{background:rgba(255,255,255,.05);}
 .drop-act:active{background:rgba(255,255,255,.09);}
-.drop-act.acc{color:var(--accent);}
+.drop-act.acc{color:var(--accent-tx);}
 .drop-arch{
   display:flex;align-items:center;gap:9px;
-  width:100%;padding:11px 16px;text-align:left;
-  font-size:14.5px;font-weight:500;color:var(--t);
+  width:100%;padding:11px 16px;text-align:left;min-height:44px;   /* было 41px */
+  font-size:0.9062rem;font-weight:500;color:var(--t);
 }
 .drop-arch:hover{background:rgba(255,255,255,.05);}
 .drop-arch span:nth-child(2){flex:1;}
-.drop-cnt{font-size:12.5px;font-weight:700;color:var(--mt);}
+.drop-cnt{font-size:0.7812rem;font-weight:700;color:var(--mt);}
 .drop-chev{display:flex;color:var(--mt);transition:transform .18s var(--ease);}
 .drop-chev.up{transform:rotate(180deg);}
 .drop-item{
   display:flex;align-items:center;gap:9px;
   width:100%;padding:10px 16px 10px 40px;text-align:left;
-  font-size:13.5px;font-weight:500;color:var(--t2);
+  font-size:0.8438rem;font-weight:500;color:var(--t2);
   background:rgba(0,0,0,.16);
 }
 .drop-item span:first-child{flex:1;}
 .drop-item:hover{color:var(--t);}
 .drop-csv{padding-left:16px;color:var(--t);}
-.drop-now{font-size:11px;font-weight:800;color:var(--gd);}
+.drop-now{font-size:0.6875rem;font-weight:800;color:var(--gd);}
 /* Периоды, которые ещё не закончились, стоят отдельными строками над архивом:
    архив — это прошедшее. Метка уходит вправо, поэтому название тянется */
 .drop-per span:nth-child(2){flex:1;}
-.drop-soon{font-size:11px;font-weight:800;color:var(--mt);}
+.drop-soon{font-size:0.6875rem;font-weight:800;color:var(--mt);}
 .newmo-banner{
   display:flex;align-items:center;justify-content:space-between;gap:12px;
   background:rgba(232,106,59,.12);border:1px solid rgba(232,106,59,.3);
@@ -210,39 +214,40 @@ select option{background:var(--card2);}
 /* ── ТОП ТРАТ ──────────────────────────────── */
 .ts-card{margin-top:12px;padding:16px;}
 .ts-ttl{display:flex;align-items:baseline;justify-content:space-between;gap:10px;
-  font-size:14px;font-weight:800;color:var(--t);margin-bottom:14px;}
-.ts-tot{font-size:13px;font-weight:700;color:var(--mt);white-space:nowrap;}
+  font-size:0.875rem;font-weight:800;color:var(--t);margin-bottom:14px;}
+.ts-tot{font-size:0.8125rem;font-weight:700;color:var(--mt);white-space:nowrap;}
 .ts-row{margin-bottom:14px;}
 .ts-row:last-child{margin-bottom:0;}
 .ts-hd{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:6px;}
-.ts-nm{font-size:14px;font-weight:600;color:var(--t);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.ts-am{font-size:14px;font-weight:800;color:var(--t);white-space:nowrap;}
+.ts-nm{font-size:0.875rem;font-weight:600;color:var(--t);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ts-am{font-size:0.875rem;font-weight:800;color:var(--t);white-space:nowrap;}
 .ts-bar{height:6px;border-radius:99px;background:var(--br);overflow:hidden;}
 .ts-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),#f0906a);}
-.ts-sub{font-size:11px;font-weight:600;color:var(--mt);margin-top:5px;}
+.ts-sub{font-size:0.6875rem;font-weight:600;color:var(--mt);margin-top:5px;}
 
 /* ── СВОДКА ЗА ПЕРИОД ──────────────────────── */
 .rchips{display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
 .rchips::-webkit-scrollbar{display:none;}
 .rchip{
   flex-shrink:0;padding:7px 13px;border-radius:99px;
-  font-size:13px;font-weight:700;white-space:nowrap;
+  min-height:44px;display:inline-flex;align-items:center;   /* было 34px */
+  font-size:0.8125rem;font-weight:700;white-space:nowrap;
   background:var(--card);color:var(--t2);border:1px solid var(--br2);
   transition:background .15s,color .15s;
 }
-.rchip.on{background:var(--accent);color:#fff;border-color:var(--accent);}
+.rchip.on{background:var(--accent);color:var(--on-accent);border-color:var(--accent);}
 .st-row{margin-bottom:13px;}
 .st-row:last-child{margin-bottom:0;}
 .st-hd{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
-.st-em{font-size:15px;line-height:1;flex-shrink:0;}
-.st-nm{flex:1;min-width:0;font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.st-am{font-size:14px;font-weight:800;white-space:nowrap;flex-shrink:0;}
+.st-em{font-size:0.9375rem;line-height:1;flex-shrink:0;}
+.st-nm{flex:1;min-width:0;font-size:0.875rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.st-am{font-size:0.875rem;font-weight:800;white-space:nowrap;flex-shrink:0;}
 .st-bar{height:6px;border-radius:99px;background:var(--br);overflow:hidden;}
 .st-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),#f0906a);}
-.st-sub{font-size:11px;font-weight:600;color:var(--mt);margin-top:5px;}
+.st-sub{font-size:0.6875rem;font-weight:600;color:var(--mt);margin-top:5px;}
 
 /* ── СРАВНЕНИЕ С ПРОШЛЫМ МЕСЯЦЕМ ───────────── */
-.cmp{margin-left:6px;font-size:11px;font-weight:800;}
+.cmp{margin-left:6px;font-size:0.6875rem;font-weight:800;}
 .cmp.up{color:var(--rd);}
 .cmp.down{color:var(--gd);}
 
@@ -252,17 +257,17 @@ select option{background:var(--card2);}
    значка нет) сумма падала к левому краю — теперь выравнивание не зависит
    от того, есть значок или нет. Gap вдвое меньше прежнего. */
 .recur-slot{width:12px;flex-shrink:0;display:flex;justify-content:center;}
-.recur-b{font-size:11px;opacity:.65;line-height:1;}
+.recur-b{font-size:0.6875rem;opacity:.65;line-height:1;}
 .t-amw{display:flex;align-items:center;justify-content:flex-start;gap:3px;}
-.chkrow{display:flex;align-items:flex-start;gap:10px;cursor:pointer;
+.chkrow{display:flex;align-items:flex-start;gap:10px;cursor:pointer;min-height:44px;
   padding:12px 14px;margin-top:10px;border-radius:12px;
   background:var(--card2);border:1px solid var(--br2);}
-.chkrow input{width:20px;height:20px;flex-shrink:0;margin:0;accent-color:var(--accent);cursor:pointer;}
+.chkrow input{width:28px;height:28px;   /* было 20px; вся строка тоже нажимаема */flex-shrink:0;margin:0;accent-color:var(--accent);cursor:pointer;}
 .chkrow span{display:flex;flex-direction:column;gap:2px;}
-.chkrow b{font-size:14px;font-weight:700;color:var(--t);}
-.chkrow i{font-size:12px;font-weight:500;color:var(--mt);font-style:normal;line-height:1.35;}
-.newmo-txt{font-size:13px;font-weight:700;color:var(--t);}
-.newmo-banner .btn{padding:9px 14px;font-size:13px;white-space:nowrap;}
+.chkrow b{font-size:0.875rem;font-weight:700;color:var(--t);}
+.chkrow i{font-size:0.75rem;font-weight:500;color:var(--mt);font-style:normal;line-height:1.35;}
+.newmo-txt{font-size:0.8125rem;font-weight:700;color:var(--t);}
+.newmo-banner .btn{padding:9px 14px;font-size:0.8125rem;white-space:nowrap;}
 
 /* ── PAGE ────────────────────────────────── */
 /* Нижний отступ с запасом под домашнюю полоску iPhone — без него
@@ -275,12 +280,12 @@ select option{background:var(--card2);}
 .ph-acts{display:flex;gap:6px;flex-shrink:0;}
 /* Заголовок держим в одну строку: перенос «Плановые / расходы» раздувал
    блок по высоте и выталкивал кнопки */
-.ptl{font-size:19px;font-weight:900;letter-spacing:-.3px;white-space:nowrap;}
+.ptl{font-size:1.1875rem;font-weight:900;letter-spacing:-.3px;white-space:nowrap;}
 /* Кнопка-иконка: подпись «Перевести» съедала ширину, значка достаточно */
 .ib{
-  width:38px;height:38px;flex-shrink:0;
+  width:44px;height:44px;flex-shrink:0;   /* было 38px */
   display:flex;align-items:center;justify-content:center;
-  border-radius:var(--r1);font-size:16px;
+  border-radius:var(--r1);font-size:1rem;
   background:var(--card2);color:var(--t);border:1.5px solid var(--br2);
   transition:transform .12s;
 }
@@ -296,10 +301,10 @@ select option{background:var(--card2);}
   box-shadow:var(--sh);
   border:1px solid var(--br);
 }
-.srow-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--mt);margin-bottom:6px;}
-.srow-big{font-size:30px;font-weight:900;letter-spacing:-.7px;margin-bottom:2px;}
+.srow-lbl{font-size:0.6875rem;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--mt);margin-bottom:6px;}
+.srow-big{font-size:1.875rem;font-weight:900;letter-spacing:-.7px;margin-bottom:2px;}
 .srow-divider{height:1px;background:var(--br2);margin:10px 0 6px;}
-.srow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:5px 0;font-size:13.5px;font-weight:600;border-bottom:1px solid var(--br);}
+.srow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:5px 0;font-size:0.8438rem;font-weight:600;border-bottom:1px solid var(--br);}
 .srow b{white-space:nowrap;}
 .srow:last-child{border-bottom:none;}
 .srow span{color:var(--t2);}
@@ -319,7 +324,7 @@ select option{background:var(--card2);}
 .tbl{width:100%;border-collapse:collapse;table-layout:fixed;}
 .tbl thead th{
   padding:8px 12px;
-  font-size:10px;font-weight:700;
+  font-size:0.6875rem;font-weight:700;
   text-transform:uppercase;letter-spacing:.6px;
   color:var(--mt);text-align:left;
   border-bottom:1px solid var(--br2);
@@ -327,25 +332,25 @@ select option{background:var(--card2);}
 .tbl tbody td{
   padding:8px 12px;
   border-bottom:1px solid var(--br);
-  font-size:14px;vertical-align:middle;
+  font-size:0.875rem;vertical-align:middle;
 }
 .tbl tbody tr:last-child td{border-bottom:none;}
 .tbl tfoot .tft td{
-  padding:11px 14px;font-size:13px;font-weight:700;
+  padding:11px 14px;font-size:0.8125rem;font-weight:700;
   color:var(--mt);border-top:1px solid var(--br2);
 }
 
 /* emoji inline */
 /* Название в одну строку с многоточием: перенос на вторую строку
    раздувал таблицу по высоте и ломал выравнивание правой колонки */
-.t-nm{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;line-height:1.3;min-width:0;}
+.t-nm{display:flex;align-items:center;gap:8px;font-weight:600;font-size:0.875rem;line-height:1.3;min-width:0;}
 .t-tx{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
-.t-em{font-size:18px;line-height:1;flex-shrink:0;}
+.t-em{font-size:1.125rem;line-height:1;flex-shrink:0;}
 /* Левый край, а не правый: значок (если есть) и сумма всегда начинаются
    в одной точке колонки — цифры разной длины продлеваются вправо, а не
    «плавают» по горизонтали от строки к строке, как было при text-align:right */
-.t-am{font-size:14px;font-weight:800;text-align:left;white-space:nowrap;}
-.t-sub{font-size:11px;font-weight:500;color:var(--mt);margin-top:1px;white-space:nowrap;}
+.t-am{font-size:0.875rem;font-weight:800;text-align:left;white-space:nowrap;}
+.t-sub{font-size:0.6875rem;font-weight:500;color:var(--mt);margin-top:1px;white-space:nowrap;}
 /* Колонка действий: фиксированная ширина и нулевые боковые отступы —
    кнопка сама себе даёт площадь, поэтому стоит на одном месте во всех строках */
 .t-ax{width:46px;padding:0 8px 0 0!important;text-align:right;}
@@ -358,14 +363,14 @@ select option{background:var(--card2);}
 /* overdraft row */
 .row-ov{background:var(--rl);}
 .row-ov td{border-bottom-color:rgba(255,79,71,.2);}
-.ov-tag{display:flex;align-items:center;gap:7px;margin-top:5px;font-size:12px;font-weight:700;color:var(--rd);}
-.ov-btn{font-size:11px;font-weight:800;color:var(--accent);background:rgba(232,106,59,.15);border-radius:8px;padding:3px 9px;}
+.ov-tag{display:flex;align-items:center;gap:7px;margin-top:5px;font-size:0.75rem;font-weight:700;color:var(--rd);}
+.ov-btn{font-size:0.6875rem;font-weight:800;color:var(--accent);background:rgba(232,106,59,.15);border-radius:8px;padding:3px 9px;}
 
 /* ── DOTS MENU ───────────────────────────────
    Кнопка с фиксированным квадратом 32×32: текстовые «•••» разъезжались
    от строки к строке, потому что ширина зависела от шрифта и трекинга. */
 .dots{
-  width:32px;height:32px;flex-shrink:0;
+  width:44px;height:44px;flex-shrink:0;   /* было 32px */
   display:flex;align-items:center;justify-content:center;
   border-radius:10px;color:var(--mt);
   transition:background .16s,color .16s;
@@ -387,15 +392,15 @@ select option{background:var(--card2);}
 }
 .ctx button{
   display:block;width:100%;padding:15px 18px;
-  font-size:15px;font-weight:500;text-align:left;
+  font-size:0.9375rem;font-weight:500;text-align:left;
   color:var(--t);
 }
 /* Разделители только между смысловыми группами, а не после каждой строки —
    сплошная сетка линий и делала меню похожим на таблицу */
 .ctx button.ctx-sep{border-top:1px solid var(--br2);}
 .ctx button.ctx-lines{display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding-top:14px;padding-bottom:14px;}
-.ctx-t{font-size:15px;font-weight:500;color:var(--t);}
-.ctx-s{font-size:12.5px;font-weight:500;color:var(--mt);line-height:1.35;}
+.ctx-t{font-size:0.9375rem;font-weight:500;color:var(--t);}
+.ctx-s{font-size:0.7812rem;font-weight:500;color:var(--mt);line-height:1.35;}
 .ctx button:hover{background:rgba(255,255,255,.05);}
 .ctx button:active{background:rgba(255,255,255,.09);}
 .ctx button.del{color:var(--rd);}
@@ -417,8 +422,8 @@ select option{background:var(--card2);}
   border:1px solid var(--wbr);
   border-radius:16px;padding:13px 15px;margin-bottom:12px;
 }
-.warn-t{font-size:14px;font-weight:800;color:#D4A800;margin-bottom:3px;}
-.warn-s{font-size:13px;font-weight:500;color:#9A8030;}
+.warn-t{font-size:0.875rem;font-weight:800;color:#D4A800;margin-bottom:3px;}
+.warn-s{font-size:0.8125rem;font-weight:500;color:#9A8030;}
 
 /* ── КАРТОЧКА ДНЯ ────────────────────────── */
 .hero{
@@ -433,11 +438,11 @@ select option{background:var(--card2);}
    единая шапка блока, а не как подпись + случайно прибившееся число */
 .hero-top{
   display:flex;align-items:baseline;justify-content:space-between;gap:10px;
-  font-size:10.5px;font-weight:800;letter-spacing:.7px;
+  font-size:0.7188rem;font-weight:800;letter-spacing:.7px;
   text-transform:uppercase;color:var(--mt);
 }
 .hero-big{
-  font-size:29px;font-weight:900;letter-spacing:-1px;
+  font-size:1.8125rem;font-weight:900;letter-spacing:-1px;
   line-height:1.05;margin-top:3px;
 }
 .hero-big.gd{color:var(--gd);}
@@ -453,7 +458,7 @@ select option{background:var(--card2);}
    добавится завтра. Симметрично и мельче большой цифры сверху. */
 .hero-sub{
   display:flex;justify-content:space-between;gap:10px;margin-top:7px;
-  font-size:11.5px;font-weight:500;color:var(--mt);
+  font-size:0.7188rem;font-weight:500;color:var(--mt);
 }
 .hero-sub b{color:var(--t2);font-weight:800;}
 
@@ -469,18 +474,18 @@ select option{background:var(--card2);}
 .qa-row{display:flex;align-items:center;gap:8px;}
 .qa-in{
   flex:1;border:1.5px solid var(--br2);border-radius:var(--r2);
-  padding:12px 14px;font-size:16px;font-weight:700;
+  padding:12px 14px;font-size:1rem;font-weight:700;
   background:var(--card2);color:var(--t);outline:none;min-width:0;
   transition:border-color .15s;
 }
 .qa-in:focus{border-color:var(--accent);}
-.qa-in::placeholder{color:var(--mt);font-weight:600;font-size:15px;}
+.qa-in::placeholder{color:var(--mt);font-weight:600;font-size:0.9375rem;}
 .qa-go{
-  background:var(--accent);color:#fff;
+  background:var(--accent);color:var(--on-accent);
   border-radius:var(--r2);
   width:48px;height:48px;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
-  font-size:20px;font-weight:900;
+  font-size:1.25rem;font-weight:900;
   transition:transform .12s,opacity .12s;
 }
 .qa-go:active{transform:scale(.92);}
@@ -492,20 +497,20 @@ select option{background:var(--card2);}
   flex:1;min-width:0;
   display:flex;align-items:center;gap:7px;
   border:1.5px solid var(--br2);border-radius:var(--r1);
-  padding:9px 11px;font-size:13px;font-weight:700;
+  padding:9px 11px;min-height:44px;   /* было 38px */font-size:0.8125rem;font-weight:700;
   background:var(--card2);color:var(--t2);
   transition:border-color .16s,color .16s;
 }
-.qa-chip-em{font-size:14px;line-height:1;flex-shrink:0;}
+.qa-chip-em{font-size:0.875rem;line-height:1;flex-shrink:0;}
 .qa-chip-tx{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left;}
-.qa-chip-ar{font-size:9px;color:var(--mt);flex-shrink:0;}
-.qa-chip.pick{color:var(--accent);border-color:rgba(232,106,59,.45);}
+.qa-chip-ar{font-size:0.6875rem;color:var(--mt);flex-shrink:0;}
+.qa-chip.pick{color:var(--accent-tx);border-color:rgba(232,106,59,.45);}
 .qa-chip.on{border-color:var(--accent);}
 .qa-cal{
   border:1.5px solid var(--br2);border-radius:var(--r1);
-  padding:9px 12px;background:var(--card2);color:var(--t2);
+  padding:9px 12px;min-height:44px;   /* было 38px */background:var(--card2);color:var(--t2);
   display:flex;align-items:center;gap:6px;
-  font-size:13px;font-weight:700;flex-shrink:0;
+  font-size:0.8125rem;font-weight:700;flex-shrink:0;
   transition:border-color .16s,color .16s;
 }
 .qa-cal.on{border-color:var(--accent);color:var(--accent);}
@@ -514,14 +519,14 @@ select option{background:var(--card2);}
 .crow{
   display:flex;align-items:center;gap:11px;
   width:100%;padding:11px 12px;border-radius:14px;
-  font-size:14px;font-weight:500;color:var(--t);text-align:left;
+  font-size:0.875rem;font-weight:500;color:var(--t);text-align:left;
 }
 .crow+.crow{margin-top:2px;}
 .crow:hover{background:rgba(255,255,255,.05);}
 .crow.sel{background:rgba(232,106,59,.14);}
-.crow-em{font-size:17px;line-height:1;flex-shrink:0;width:22px;text-align:center;}
+.crow-em{font-size:1.0625rem;line-height:1;flex-shrink:0;width:22px;text-align:center;}
 .crow-nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.crow-am{font-size:13px;font-weight:800;color:var(--t2);white-space:nowrap;flex-shrink:0;}
+.crow-am{font-size:0.8125rem;font-weight:800;color:var(--t2);white-space:nowrap;flex-shrink:0;}
 .crow-am.gd{color:var(--gd);}
 .crow-am.rd{color:var(--rd);}
 
@@ -544,32 +549,32 @@ select option{background:var(--card2);}
   flex:1;display:flex;align-items:center;gap:8px;
   padding:9px 11px;border-radius:14px;
   border:1.5px solid var(--br2);background:var(--bg);
-  cursor:pointer;font-size:13px;font-weight:700;color:var(--t);
+  cursor:pointer;font-size:0.8125rem;font-weight:700;color:var(--t);
 }
 .copt.sel{border-color:var(--accent);background:rgba(232,106,59,.1);}
 .cic{
   width:30px;height:30px;border-radius:9px;
   display:flex;align-items:center;justify-content:center;
-  font-size:13px;font-weight:900;color:#fff;flex-shrink:0;
+  font-size:0.8125rem;font-weight:900;color:var(--on-accent);flex-shrink:0;
 }
 .ctd{background:var(--accent);}
 .cyd{background:var(--mt);}
-.cck{margin-left:auto;color:var(--accent);font-size:14px;font-weight:900;}
-.cmonth{font-size:12px;font-weight:700;color:var(--mt);margin:4px 2px 8px;text-transform:capitalize;}
+.cck{margin-left:auto;color:var(--accent);font-size:0.875rem;font-weight:900;}
+.cmonth{font-size:0.75rem;font-weight:700;color:var(--mt);margin:4px 2px 8px;text-transform:capitalize;}
 .cgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
-.cdh{font-size:10px;font-weight:700;text-align:center;color:var(--mt);padding:3px 0;}
+.cdh{font-size:0.6875rem;font-weight:700;text-align:center;color:var(--mt);padding:3px 0;}
 .cday{
   width:100%;aspect-ratio:1;border-radius:9px;
-  font-size:13px;font-weight:700;
+  font-size:0.8125rem;font-weight:700;
   background:none;border:none;cursor:pointer;color:var(--t);
 }
 .cday:hover:not(.cfut){background:var(--br2);}
 .cday.ctd{background:rgba(232,106,59,.18);color:var(--accent);}
-.cday.csel{background:var(--accent);color:#fff;}
+.cday.csel{background:var(--accent);color:var(--on-accent);}
 .cday.cfut{color:var(--mt);cursor:default;pointer-events:none;opacity:.35;}
 
 /* ── TX LIST ─────────────────────────────── */
-.no-tx{text-align:center;padding:48px 20px;color:var(--mt);font-size:14px;font-weight:600;}
+.no-tx{text-align:center;padding:48px 20px;color:var(--mt);font-size:0.875rem;font-weight:600;}
 .dg{
   background:var(--card);
   border-radius:var(--r3);margin-bottom:8px;
@@ -583,8 +588,8 @@ select option{background:var(--card2);}
   border-bottom:1px solid var(--br2);
 }
 /* Без capitalize: он ломает русскую дату — «11 Августа» вместо «11 августа» */
-.dt{font-size:12px;font-weight:700;color:var(--mt);}
-.ds{font-size:13px;font-weight:800;color:var(--t2);}
+.dt{font-size:0.75rem;font-weight:700;color:var(--mt);}
+.ds{font-size:0.8125rem;font-weight:800;color:var(--t2);}
 .txr{
   display:flex;align-items:center;gap:11px;
   padding:9px 13px;
@@ -598,28 +603,28 @@ select option{background:var(--card2);}
 .txe{
   width:34px;height:34px;border-radius:50%;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
-  font-size:15px;line-height:1;
+  font-size:0.9375rem;line-height:1;
   background:rgba(255,255,255,.055);
 }
 .txe.day{background:rgba(232,106,59,.13);}
 .txi{flex:1;min-width:0;}
-.txn{font-size:14.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.txc{font-size:12px;font-weight:500;color:var(--mt);margin-top:2px;}
-.txa{font-size:14.5px;font-weight:800;flex-shrink:0;color:var(--t);white-space:nowrap;}
+.txn{font-size:0.9062rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.txc{font-size:0.75rem;font-weight:500;color:var(--mt);margin-top:2px;}
+.txa{font-size:0.9062rem;font-weight:800;flex-shrink:0;color:var(--t);white-space:nowrap;}
 .txd{flex-shrink:0;}
 /* подсветка только что добавленной траты — глазу нужно подтверждение */
 @keyframes flash{0%{background:rgba(48,201,124,.22);}100%{background:transparent;}}
 .txr.fresh{animation:flash 1.1s ease-out;}
 
 /* ── BUTTONS ─────────────────────────────── */
-.btn{border-radius:var(--r2);padding:13px 22px;font-size:15px;font-weight:800;cursor:pointer;transition:opacity .12s,transform .12s;}
+.btn{border-radius:var(--r2);padding:13px 22px;min-height:44px;font-size:0.9375rem;font-weight:800;cursor:pointer;transition:opacity .12s,transform .12s;}
 .btn:active{transform:scale(.97);}
 .btn:hover{opacity:.85;}
 .btn:active{opacity:.65;}
-.bp{background:var(--accent);color:#fff;}
+.bp{background:var(--accent);color:var(--on-accent);}
 .bs{background:var(--card2);color:var(--t);border:1.5px solid var(--br2);}
 .bd{background:rgba(255,79,71,.12);color:var(--rd);}
-.sm{font-size:13px;padding:9px 15px;border-radius:var(--r1);}
+.sm{font-size:0.8125rem;padding:9px 15px;border-radius:var(--r1);}
 
 /* ── MODAL ───────────────────────────────── */
 .overlay{
@@ -643,15 +648,17 @@ select option{background:var(--card2);}
 .mdrag{width:38px;height:4px;background:var(--br2);border-radius:2px;margin:10px auto 0;}
 .mbody{padding:18px 18px;}
 .mhd{
-  font-size:18px;font-weight:900;margin-bottom:16px;
+  font-size:1.125rem;font-weight:900;margin-bottom:16px;
   display:flex;align-items:center;justify-content:space-between;
 }
-.mcl{font-size:24px;font-weight:300;color:var(--mt);line-height:1;padding:0 4px;}
+.mcl{font-size:1.5rem;font-weight:300;color:var(--mt);line-height:1;
+  min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;}
+  /* было 20x24 — самая мелкая цель в приложении, и это «закрыть» */
 .f{display:flex;flex-direction:column;gap:5px;margin-bottom:13px;}
-.f label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--mt);}
+.f label{font-size:0.6875rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--mt);}
 .inp{
   border:1.5px solid var(--br2);border-radius:12px;
-  padding:12px 14px;font-size:16px;font-weight:600;
+  padding:12px 14px;font-size:1rem;font-weight:600;
   color:var(--t);background:var(--card2);outline:none;width:100%;
 }
 .inp:focus{border-color:var(--accent);}
@@ -666,20 +673,21 @@ select option{background:var(--card2);}
 .max .btn{flex:1;}
 .sgs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:15px;}
 .sg{
-  font-size:13px;font-weight:600;padding:7px 12px;border-radius:12px;
+  font-size:0.8125rem;font-weight:600;padding:7px 12px;border-radius:12px;
+  min-height:44px;display:inline-flex;align-items:center;   /* было 34px */
   background:var(--card2);border:1.5px solid var(--br2);color:var(--t2);
 }
 .sg:hover{border-color:var(--accent);color:var(--t);}
 
 /* ── PLANNED PREVIEW ─────────────────────── */
-.pprev{font-size:13px;font-weight:600;color:var(--mt);padding:5px 2px;min-height:22px;margin-bottom:4px;}
+.pprev{font-size:0.8125rem;font-weight:600;color:var(--mt);padding:5px 2px;min-height:22px;margin-bottom:4px;}
 
 /* ── TRANSFER PREVIEW ────────────────────── */
 .trprev{margin-bottom:12px;}
 .trpbox{background:var(--card2);border-radius:13px;padding:11px 14px;border:1px solid var(--br2);}
 .trprow{
   display:flex;justify-content:space-between;align-items:center;
-  font-size:13px;font-weight:600;padding:6px 0;gap:8px;
+  font-size:0.8125rem;font-weight:600;padding:6px 0;gap:8px;
   border-bottom:1px solid var(--br);
 }
 .trprow:last-child{border-bottom:none;}
@@ -703,39 +711,39 @@ select option{background:var(--card2);}
 
 /* ── WIZARD ──────────────────────────────── */
 .wz{max-width:520px;margin:0 auto;padding:20px 14px 48px;}
-.wzstar{font-size:34px;text-align:center;color:var(--accent);margin-bottom:8px;}
-.wztt{font-size:25px;font-weight:900;text-align:center;margin-bottom:10px;}
+.wzstar{font-size:2.125rem;text-align:center;color:var(--accent);margin-bottom:8px;}
+.wztt{font-size:1.5625rem;font-weight:900;text-align:center;margin-bottom:10px;}
 .wzdc{list-style:none;margin-bottom:16px;}
-.wzdc li{display:flex;align-items:flex-start;gap:8px;font-size:14px;font-weight:600;padding:4px 0;color:var(--t2);}
+.wzdc li{display:flex;align-items:flex-start;gap:8px;font-size:0.875rem;font-weight:600;padding:4px 0;color:var(--t2);}
 .wzdc span{flex-shrink:0;}
 .wzcard{background:var(--card);border-radius:20px;padding:16px;box-shadow:var(--sh);margin-bottom:14px;border:1px solid var(--br);}
-.wzper{font-size:13px;font-weight:700;padding:8px 0;border-bottom:1px solid var(--br2);margin-bottom:12px;color:var(--t2);}
-.wzpb{font-size:12px;font-weight:700;color:var(--accent);}
-.wzinfo{font-size:14px;font-weight:600;color:var(--t2);margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--br2);}
-.wznum{font-size:46px;font-weight:900;color:var(--accent);margin-bottom:4px;}
-.wzlbl{font-size:15px;font-weight:600;color:var(--mt);margin-bottom:16px;}
-.wzadd{font-size:13px;font-weight:700;color:var(--accent);padding:10px 0;display:block;}
-.wztot{display:flex;justify-content:space-between;font-size:14px;font-weight:700;padding-top:10px;border-top:1px solid var(--br2);margin-top:8px;color:var(--t2);}
+.wzper{font-size:0.8125rem;font-weight:700;padding:8px 0;border-bottom:1px solid var(--br2);margin-bottom:12px;color:var(--t2);}
+.wzpb{font-size:0.75rem;font-weight:700;color:var(--accent);}
+.wzinfo{font-size:0.875rem;font-weight:600;color:var(--t2);margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--br2);}
+.wznum{font-size:2.875rem;font-weight:900;color:var(--accent);margin-bottom:4px;}
+.wzlbl{font-size:0.9375rem;font-weight:600;color:var(--mt);margin-bottom:16px;}
+.wzadd{font-size:0.8125rem;font-weight:700;color:var(--accent);padding:10px 0;display:block;}
+.wztot{display:flex;justify-content:space-between;font-size:0.875rem;font-weight:700;padding-top:10px;border-top:1px solid var(--br2);margin-top:8px;color:var(--t2);}
 .wztot .am{color:var(--accent);font-weight:900;}
 .wznav{display:flex;justify-content:space-between;align-items:center;}
-.wzbk{font-size:14px;font-weight:700;color:var(--mt);}
+.wzbk{font-size:0.875rem;font-weight:700;color:var(--mt);}
 .mb12{margin-bottom:12px;}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
-.chip{font-size:13px;font-weight:600;padding:7px 12px;border-radius:12px;background:var(--card2);border:1.5px solid var(--br2);color:var(--t2);}
+.chip{font-size:0.8125rem;font-weight:600;padding:7px 12px;border-radius:12px;background:var(--card2);border:1.5px solid var(--br2);color:var(--t2);}
 .chip.pkd{border-color:var(--accent);background:rgba(232,106,59,.1);color:var(--accent);}
 .cl{list-style:none;margin-top:14px;}
-.cl li{font-size:13px;font-weight:600;color:var(--mt);padding:4px 0 4px 14px;position:relative;}
+.cl li{font-size:0.8125rem;font-weight:600;color:var(--mt);padding:4px 0 4px 14px;position:relative;}
 .cl li::before{content:'·';position:absolute;left:4px;}
 /* Wizard table */
 .wt{width:100%;border-collapse:collapse;}
-.wt th{font-size:11px;font-weight:700;text-transform:uppercase;color:var(--mt);padding:7px 4px;border-bottom:1px solid var(--br2);}
+.wt th{font-size:0.6875rem;font-weight:700;text-transform:uppercase;color:var(--mt);padding:7px 4px;border-bottom:1px solid var(--br2);}
 .wt td{padding:7px 4px;border-bottom:1px solid var(--br);}
 .wt tr:last-child td{border-bottom:none;}
 .wri{display:flex;align-items:center;gap:6px;}
-.wem{width:38px;border:1.5px solid var(--br2);border-radius:10px;padding:7px 4px;font-size:18px;text-align:center;background:var(--bg);}
-.wnm{flex:1;border:1.5px solid var(--br2);border-radius:10px;padding:8px 10px;font-size:14px;font-weight:600;background:var(--bg);outline:none;}
-.wam{width:90px;border:1.5px solid var(--br2);border-radius:10px;padding:8px 10px;font-size:14px;font-weight:600;background:var(--bg);text-align:right;outline:none;}
-.wdl{color:var(--rd);font-size:20px;font-weight:300;padding:4px 8px;}
+.wem{width:38px;border:1.5px solid var(--br2);border-radius:10px;padding:7px 4px;font-size:1.125rem;text-align:center;background:var(--bg);}
+.wnm{flex:1;border:1.5px solid var(--br2);border-radius:10px;padding:8px 10px;font-size:0.875rem;font-weight:600;background:var(--bg);outline:none;}
+.wam{width:90px;border:1.5px solid var(--br2);border-radius:10px;padding:8px 10px;font-size:0.875rem;font-weight:600;background:var(--bg);text-align:right;outline:none;}
+.wdl{color:var(--rd);font-size:1.25rem;font-weight:300;padding:4px 8px;}
 
 /* ── EMPTY ───────────────────────────────── */
 .empty{text-align:center;padding:70px 20px;}
@@ -751,11 +759,11 @@ select option{background:var(--card2);}
   padding:24px 20px;background:var(--bg);
 }
 .auth-logo{
-  font-size:28px;font-weight:900;letter-spacing:-.5px;
+  font-size:1.75rem;font-weight:900;letter-spacing:-.5px;
   color:var(--t);margin-bottom:6px;
 }
 .auth-logo span{color:var(--accent);}
-.auth-sub{font-size:14px;font-weight:600;color:var(--mt);margin-bottom:28px;}
+.auth-sub{font-size:0.875rem;font-weight:600;color:var(--mt);margin-bottom:28px;}
 .auth-card{
   background:var(--card);border:1px solid var(--br);
   border-radius:22px;padding:24px 22px;
@@ -764,12 +772,12 @@ select option{background:var(--card2);}
 }
 
 .auth-err{
-  font-size:13px;font-weight:600;color:var(--rd);
+  font-size:0.8125rem;font-weight:600;color:var(--rd);
   min-height:18px;margin-bottom:8px;
 }
 .auth-link{
   display:block;width:100%;text-align:center;
-  font-size:13px;font-weight:700;color:var(--mt);
+  font-size:0.8125rem;font-weight:700;color:var(--mt);
   padding:10px 0;margin-top:6px;
   cursor:pointer;
 }
@@ -790,21 +798,21 @@ select option{background:var(--card2);}
   padding:5px 10px 5px 5px;
   border-radius:99px;
   background:var(--card2);border:1px solid var(--br2);
-  font-size:12px;font-weight:700;color:var(--mt);
+  font-size:0.75rem;font-weight:700;color:var(--mt);
   cursor:pointer;
 }
 .usr-av{
-  width:28px;height:28px;border-radius:50%;
-  background:var(--accent);color:#fff;
+  width:44px;height:44px;border-radius:50%;   /* было 28px — нижний предел, не норма */
+  background:var(--accent);color:var(--on-accent);
   display:flex;align-items:center;justify-content:center;
-  font-size:12px;font-weight:900;flex-shrink:0;
+  font-size:0.75rem;font-weight:900;flex-shrink:0;
   cursor:pointer;border:none;
   transition:opacity .15s;
 }
 .usr-av:hover{opacity:.8;}
 .usr-menu{position:absolute;top:calc(100% + 6px);right:0;background:var(--card2);border-radius:14px;box-shadow:var(--sh2);border:1px solid var(--br2);min-width:200px;overflow:hidden;z-index:200;animation:fi .12s ease;}
-.usr-menu-email{padding:11px 14px;font-size:12px;font-weight:600;color:var(--mt);border-bottom:1px solid var(--br);word-break:break-all;}
-.usr-menu-item{display:block;width:100%;padding:12px 14px;text-align:left;font-size:14px;font-weight:700;color:var(--rd);}
+.usr-menu-email{padding:11px 14px;font-size:0.75rem;font-weight:600;color:var(--mt);border-bottom:1px solid var(--br);word-break:break-all;}
+.usr-menu-item{display:block;width:100%;padding:12px 14px;text-align:left;font-size:0.875rem;font-weight:700;color:var(--rd);}
 .usr-menu-item:hover{background:rgba(255,79,71,.08);}
 .usr-bar:hover{border-color:var(--br);}
 
@@ -834,7 +842,7 @@ select option{background:var(--card2);}
 /* ── iOS PWA FIXES ───────────────────────── */
 /* Запрет зума при фокусе на input (iOS) */
 input, select, textarea {
-  font-size:16px !important;
+  font-size:1rem !important;
   -webkit-text-size-adjust:100%;
 }
 /* Запрет выделения текста при долгом тапе */
@@ -1411,9 +1419,9 @@ async function doRegister() {
     document.getElementById('app').innerHTML =
       '<div class="auth-wrap"><div class="auth-logo">✦ <span>Б</span>юджет</div>' +
       '<div class="auth-card" style="text-align:center">' +
-        '<div style="font-size:40px;margin-bottom:12px">📬</div>' +
-        '<div style="font-size:17px;font-weight:800;margin-bottom:8px">Проверь почту</div>' +
-        '<div style="font-size:14px;color:var(--t2)">Мы отправили письмо на <b>'+esc(email)+'</b>.<br>Перейди по ссылке — и можно начинать.</div>' +
+        '<div style="font-size:2.5rem;margin-bottom:12px">📬</div>' +
+        '<div style="font-size:1.0625rem;font-weight:800;margin-bottom:8px">Проверь почту</div>' +
+        '<div style="font-size:0.875rem;color:var(--t2)">Мы отправили письмо на <b>'+esc(email)+'</b>.<br>Перейди по ссылке — и можно начинать.</div>' +
         '<button type="button" class="auth-link" style="margin-top:20px" onclick="renderAuth()">← Войти</button>' +
       '</div></div>';
   }
@@ -1941,9 +1949,9 @@ function render(){
      modal    z:500 */
   var showMenuBk = (txMenu||incMenu||plnMenu)&&!qaDrop&&!catPick;
   app.innerHTML=
-    ((drop||usrMenu)?'<div class="bk-drop" onclick="closeBk()"></div>':'')+
+    ((drop||usrMenu)?'<div class="bk-drop" onclick="closeBk()" aria-hidden="true"></div>':'')+
     rHeader(b)+
-    '<div class="pg">'+pg+'</div>'+
+    '<main class="pg" role="main">'+pg+'</main>'+
     (modal?rModal(b):'')+
     (showMenuBk?'<div class="bk-menu" onclick="closeBk()"></div>':'')+
     ((qaDrop||catPick)?'<div class="bk-cal" onclick="closeQaCal()"></div>':'');
@@ -1974,10 +1982,10 @@ function rHeader(b){
   var bal=calcDayBal(b),pos=bal>=0,ov=hasOv(b);
   var td=today(),notYet=b.dateFrom>td;
   var initials=currentUser&&currentUser.email?currentUser.email[0].toUpperCase():'?';
-  return '<div class="hdr">'+
+  return '<div class="hdr" role="banner">'+
     '<div class="hdr-r1">'+
       '<div class="hdr-left">'+
-        '<div class="logo">✦ <span>Б</span>юджет</div>'+
+        '<h1 class="logo">✦ <span>Б</span>юджет</h1>'+
       '</div>'+
       '<div class="hdr-right">'+
         '<span id="sync-dot" class="sync-dot s-'+syncState+'" title="Синхронизация"></span>'+
@@ -2320,7 +2328,7 @@ function rHistory(b){
         '</div>'+
         '<div class="txa">'+fmt(t2.amount)+'</div>'+
         '<div class="txd"><div class="ctx-wrap">'+
-          '<button type="button" class="dots'+(txMenu===t2.id?' on':'')+'" onclick="togMenu(\'tx\',\''+t2.id+'\',event)"><svg width=\'16\' height=\'4\' viewBox=\'0 0 16 4\'><circle cx=\'2\' cy=\'2\' r=\'1.7\'/><circle cx=\'8\' cy=\'2\' r=\'1.7\'/><circle cx=\'14\' cy=\'2\' r=\'1.7\'/></svg></button>'+
+          '<button type="button" aria-label="Действия с тратой" class="dots'+(txMenu===t2.id?' on':'')+'" onclick="togMenu(\'tx\',\''+t2.id+'\',event)"><svg width=\'16\' height=\'4\' viewBox=\'0 0 16 4\'><circle cx=\'2\' cy=\'2\' r=\'1.7\'/><circle cx=\'8\' cy=\'2\' r=\'1.7\'/><circle cx=\'14\' cy=\'2\' r=\'1.7\'/></svg></button>'+
           (txMenu===t2.id?'<div class="ctx" onclick="event.stopPropagation()">'+
             '<button onclick="editTx(\''+t2.id+'\')">Редактировать</button>'+
             '<button class="del ctx-sep" onclick="delTx(\''+t2.id+'\')">Удалить</button>'+
@@ -2414,7 +2422,7 @@ function rIncomes(b){
         (inc.recur?'<span class="recur-b" title="Повторяющийся — сумма переносится в новый месяц">🔁</span>':'')+
         '</span>'+fmt(inc.amount)+'</span></td>'+
       '<td class="t-ax"><div class="ctx-wrap">'+
-        '<button type="button" class="dots'+(incMenu===inc.id?' on':'')+'" onclick="togMenu(\'inc\',\''+inc.id+'\',event)"><svg width=\'16\' height=\'4\' viewBox=\'0 0 16 4\'><circle cx=\'2\' cy=\'2\' r=\'1.7\'/><circle cx=\'8\' cy=\'2\' r=\'1.7\'/><circle cx=\'14\' cy=\'2\' r=\'1.7\'/></svg></button>'+
+        '<button type="button" aria-label="Действия с доходом" class="dots'+(incMenu===inc.id?' on':'')+'" onclick="togMenu(\'inc\',\''+inc.id+'\',event)"><svg width=\'16\' height=\'4\' viewBox=\'0 0 16 4\'><circle cx=\'2\' cy=\'2\' r=\'1.7\'/><circle cx=\'8\' cy=\'2\' r=\'1.7\'/><circle cx=\'14\' cy=\'2\' r=\'1.7\'/></svg></button>'+
         (incMenu===inc.id?'<div class="ctx" onclick="event.stopPropagation()">'+
           '<button onclick="editInc(\''+inc.id+'\')">Редактировать</button>'+
           '<button class="del ctx-sep" onclick="delInc(\''+inc.id+'\')">Удалить</button>'+
@@ -2458,7 +2466,7 @@ function rPlanned(b){
         '<div class="t-sub">из '+fmt(p.amount)+cmpPrev(b,p)+'</div>'+
       '</td>'+
       '<td class="t-ax"><div class="ctx-wrap">'+
-        '<button type="button" class="dots'+(plnMenu===p.id?' on':'')+'" onclick="togMenu(\'pln\',\''+p.id+'\',event)"><svg width=\'16\' height=\'4\' viewBox=\'0 0 16 4\'><circle cx=\'2\' cy=\'2\' r=\'1.7\'/><circle cx=\'8\' cy=\'2\' r=\'1.7\'/><circle cx=\'14\' cy=\'2\' r=\'1.7\'/></svg></button>'+
+        '<button type="button" aria-label="Действия с категорией" class="dots'+(plnMenu===p.id?' on':'')+'" onclick="togMenu(\'pln\',\''+p.id+'\',event)"><svg width=\'16\' height=\'4\' viewBox=\'0 0 16 4\'><circle cx=\'2\' cy=\'2\' r=\'1.7\'/><circle cx=\'8\' cy=\'2\' r=\'1.7\'/><circle cx=\'14\' cy=\'2\' r=\'1.7\'/></svg></button>'+
         (plnMenu===p.id?'<div class="ctx" onclick="event.stopPropagation()">'+
           '<button onclick="editPln(\''+p.id+'\')">Редактировать</button>'+
           '<button onclick="openTr(\''+p.id+'\')">Перераспределить</button>'+
@@ -2540,7 +2548,7 @@ function rModal(b){
     var sg='';for(var i=0;i<IC.length;i++)sg+='<button type="button" class="sg" onclick="fillSg(\'me\',\''+esc(IC[i].e)+'\',\'mn\',\''+esc(IC[i].n)+'\')">'+IC[i].e+' '+IC[i].n+'</button>';
     body='<div class="mhd">'+(m.type==='add-income'?'Добавить доход':'Изменить доход')+'<button type="button" class="mcl" onclick="closeModal()">×</button></div>'+
       '<div class="sgs">'+sg+'</div>'+
-      '<div class="ir"><div class="f" style="flex:0 0 68px"><label>Иконка</label><input class="inp" id="me" value="'+esc(d.emoji||'💰')+'" style="text-align:center;font-size:22px" maxlength="4"></div>'+
+      '<div class="ir"><div class="f" style="flex:0 0 68px"><label for="me">Иконка</label><input class="inp" id="me" value="'+esc(d.emoji||'💰')+'" style="text-align:center;font-size:1.375rem" maxlength="4"></div>'+
       '<div class="f"><label>Название</label><input class="inp" id="mn" value="'+esc(d.name)+'" placeholder="Зарплата"></div></div>'+
       '<div class="f"><label>Сумма ₽</label><input class="inp" id="ma" type="text" inputmode="decimal" oninput="fmtInp(this)" value="'+(d.amount||'')+'" placeholder="0"></div>'+
       '<label class="chkrow"><input type="checkbox" id="mr"'+(d.recur?' checked':'')+'>'+
@@ -2556,7 +2564,7 @@ function rModal(b){
     var sgp='';for(var ei=0;ei<EC.length;ei++)sgp+='<button type="button" class="sg" onclick="fillSg(\'me\',\''+esc(EC[ei].e)+'\',\'mn\',\''+esc(EC[ei].n)+'\')">'+EC[ei].e+' '+EC[ei].n+'</button>';
     body='<div class="mhd">'+(m.type==='add-planned'?'Добавить категорию':'Изменить категорию')+'<button type="button" class="mcl" onclick="closeModal()">×</button></div>'+
       '<div class="sgs">'+sgp+'</div>'+
-      '<div class="ir"><div class="f" style="flex:0 0 68px"><label>Иконка</label><input class="inp" id="me" value="'+esc(dp.emoji||'✨')+'" style="text-align:center;font-size:22px" maxlength="4"></div>'+
+      '<div class="ir"><div class="f" style="flex:0 0 68px"><label for="me">Иконка</label><input class="inp" id="me" value="'+esc(dp.emoji||'✨')+'" style="text-align:center;font-size:1.375rem" maxlength="4"></div>'+
       '<div class="f"><label>Категория</label><input class="inp" id="mn" value="'+esc(dp.name)+'" placeholder="Коммуналка"></div></div>'+
       '<div class="f"><label>Сумма ₽</label><input class="inp" id="ma" type="text" inputmode="decimal" oninput="fmtInp(this);updPlnPrev(this.value)" value="'+(dp.amount||'')+'" placeholder="0"></div>'+
       '<div id="pln-prev" class="pprev"></div>'+
@@ -2593,8 +2601,8 @@ function rModal(b){
     var bd=m.data||{};
     body='<div class="mhd">Даты бюджета<button type="button" class="mcl" onclick="closeModal()">×</button></div>'+
       '<div class="ir">'+
-        '<div class="f"><label>С</label><input class="inp" type="date" id="be-from" value="'+bd.dateFrom+'"></div>'+
-        '<div class="f"><label>По</label><input class="inp" type="date" id="be-to" value="'+bd.dateTo+'"></div>'+
+        '<div class="f"><label for="be-from">С</label><input class="inp" type="date" id="be-from" value="'+bd.dateFrom+'"></div>'+
+        '<div class="f"><label for="be-to">По</label><input class="inp" type="date" id="be-to" value="'+bd.dateTo+'"></div>'+
       '</div>'+
       '<div class="pprev">Дневной бюджет пересчитается автоматически</div>'+
       '<div class="max"><button type="button" class="btn bp" onclick="saveBdgDates()">Сохранить</button></div>';
@@ -2731,7 +2739,7 @@ function rWz0(){
     '<td><input class="wam" type="text" inputmode="decimal" value="'+(r.amount||'')+'" placeholder="0" oninput="fmtInp(this);wf(\'inc\','+ri+',\'amount\',pf(this.value));updIT()"></td>'+
     '<td><button type="button" class="wdl" onclick="wzDI('+ri+')">×</button></td></tr>';
   }
-  return '<div class="hdr"><div class="hdr-r1"><div class="logo">✦ <span>Б</span>юджет</div></div></div>'+
+  return '<div class="hdr" role="banner"><div class="hdr-r1"><h1 class="logo">✦ <span>Б</span>юджет</h1></div></div>'+
   '<div class="wz"><div class="wzstar">✦</div><div class="wztt">Деньги</div>'+
   '<ul class="wzdc"><li><span style="color:var(--gd)">✓</span>Зарплата, авансы, остатки на картах.</li><li><span style="color:var(--rd)">✗</span>Депозиты и резервные счета.</li></ul>'+
   '<div class="wzcard">'+
@@ -2759,7 +2767,7 @@ function rWz1(){
     '<td><input class="wam" type="text" inputmode="decimal" value="'+(r.amount||'')+'" placeholder="0" oninput="fmtInp(this);wf(\'pln\','+ri+',\'amount\',pf(this.value));updPT()"></td>'+
     '<td><button type="button" class="wdl" onclick="wzDP('+ri+')">×</button></td></tr>';
   }
-  return '<div class="hdr"><div class="hdr-r1"><div class="logo">✦ <span>Б</span>юджет</div></div></div>'+
+  return '<div class="hdr" role="banner"><div class="hdr-r1"><h1 class="logo">✦ <span>Б</span>юджет</h1></div></div>'+
   '<div class="wz"><div class="wzstar">✦</div><div class="wztt">Плановые расходы</div>'+
   '<ul class="wzdc"><li><span style="color:var(--gd)">✓</span>Аренда, счета, долги.</li><li><span style="color:var(--gd)">✓</span>10–15% дохода на непредвиденные.</li><li><span style="color:var(--rd)">✗</span>Кафе, такси — дневной бюджет.</li></ul>'+
   '<div class="wzcard">'+
@@ -2774,7 +2782,7 @@ function rWz1(){
 
 function rWz2(){
   var d=wd,ti=wdTI(),tp=wdTP(),avail=ti-tp,days=getDays(d.dateFrom,d.dateTo),daily=avail>0?avail/days:0;
-  return '<div class="hdr"><div class="hdr-r1"><div class="logo">✦ <span>Б</span>юджет</div></div></div>'+
+  return '<div class="hdr" role="banner"><div class="hdr-r1"><h1 class="logo">✦ <span>Б</span>юджет</h1></div></div>'+
   '<div class="wz"><div class="wzstar">✦</div><div class="wztt">Ваш дневной бюджет</div>'+
   '<div class="wzcard" style="text-align:center;padding:28px 16px">'+
     '<div class="wznum">'+fmt(daily)+'</div>'+
@@ -2785,11 +2793,11 @@ function rWz2(){
 }
 
 function rEmpty(){
-  return '<div class="hdr"><div class="hdr-r1"><div class="logo">✦ <span>Б</span>юджет</div></div></div>'+
+  return '<div class="hdr" role="banner"><div class="hdr-r1"><h1 class="logo">✦ <span>Б</span>юджет</h1></div></div>'+
   '<div class="pg"><div class="empty">'+
-    '<div style="font-size:46px;margin-bottom:12px">✦</div>'+
-    '<div style="font-size:21px;font-weight:800;margin-bottom:8px">Нет бюджета</div>'+
-    '<div style="font-size:14px;color:var(--mt);font-weight:500;margin-bottom:20px">Создай бюджет на месяц — и начни контролировать деньги</div>'+
+    '<div style="font-size:2.875rem;margin-bottom:12px">✦</div>'+
+    '<div style="font-size:1.3125rem;font-weight:800;margin-bottom:8px">Нет бюджета</div>'+
+    '<div style="font-size:0.875rem;color:var(--mt);font-weight:500;margin-bottom:20px">Создай бюджет на месяц — и начни контролировать деньги</div>'+
     '<button type="button" class="btn bp" onclick="startWz()">+ Создать бюджет</button>'+
   '</div></div>';
 }
