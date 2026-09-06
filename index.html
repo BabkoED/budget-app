@@ -27,17 +27,25 @@
 
 /* ── TOKENS ─────────────────────────────── */
 :root{
-  --bg:     #141414;
-  --card:   #1E1E1E;
+  /* Фоны уведены в тон акцента (тиловый 197°), светлота сохранена
+     до десятых — подтон меняет характер, но не трогает контрасты.
+     Проверено: все пары текст-фон изменились не больше чем на 0.03. */
+  --bg:     #131515;
+  --card:   #182020;
   --card2:  #252525;
-  --t:      #F0F0F0;
+  --t:      #EFF5F9;  /* холодный белый из палитры Mercedes, был #F0F0F0 */
   --t2:     #B0B0B0;
-  --mt:     #919191;  /* было #6B6B6B: 2.69:1 на всплывающем меню при норме 4.5 */
-  --br:     #2E2E2E;
+  --mt:     #949398;  /* серый из палитры Mercedes; был #919191, контрасты выше */
+  --br:     #273030;
   --br2:    #383838;
-  --accent: #E86A3B;
-  --on-accent: #1A0E07;  /* текст НА оранжевом: белый давал 3.2:1, этот даёт 5.91:1 */
-  --accent-tx: #EA6B3B;  /* оранжевый КАК текст на тёмном: 4.55:1 на всплывающем меню */
+  /* Акцент — Petronas teal из ливреи Mercedes AMG F1 2022 (решение Антона
+     06.09.2026). Заменил оранжевый #E86A3B. Зелёный и красный НЕ трогаем:
+     они несут смысл «в плюсе» и «перерасход», а не оформление.
+     Из палитры Mercedes в акцент годится только этот тон: #03BFB5 пришлось
+     отбросить — при дальтонизме он сливается с зелёным (ΔE 6.9). */
+  --accent: #00A19C;     /* заливка кнопок; контраст 5.22 к карточке */
+  --on-accent: #01201F;  /* текст НА заливке: 5.36:1, белый дал бы 3.19 */
+  --accent-tx: #05A6A0;  /* тил КАК текст на тёмном: 4.75:1 на всех четырёх фонах */
   --gd:     #30C97C;
   --rd:     #FF4F47;
   --rl:     rgba(255,79,71,.12);
@@ -48,7 +56,7 @@
 
   /* Всплывающие панели чуть светлее карточек — так они «лежат сверху»,
      а не сливаются с фоном. Дальше от глубины зависит вся читаемость меню. */
-  --pop:    #2A2A2C;
+  --pop:    #252C2C;
 
   /* Единая шкала скруглений. Раньше радиусы гуляли от 8 до 24 без системы,
      и интерфейс выглядел собранным из разных наборов. */
@@ -145,8 +153,8 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
   display:flex;align-items:center;justify-content:space-between;gap:8px;
   width:100%;padding:8px 16px;
   font-size:0.8125rem;font-weight:700;
-  background:rgba(232,106,59,.13);color:var(--accent);
-  border-top:1px solid rgba(232,106,59,.22);
+  background:rgba(0,161,156,.13);color:var(--accent);
+  border-top:1px solid rgba(0,161,156,.22);
 }
 .cur-bar span:first-child{color:var(--t2);font-weight:700;}
 .cur-go{white-space:nowrap;}
@@ -245,7 +253,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
 .drop-soon{font-size:0.6875rem;font-weight:700;color:var(--mt);}
 .newmo-banner{
   display:flex;align-items:center;justify-content:space-between;gap:12px;
-  background:rgba(232,106,59,.12);border:1px solid rgba(232,106,59,.3);
+  background:rgba(0,161,156,.12);border:1px solid rgba(0,161,156,.3);
   border-radius:var(--r2);padding:12px 16px;margin:12px 16px 0;
 }
 /* ── ТОП ТРАТ ──────────────────────────────── */
@@ -401,7 +409,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
 .row-ov{background:var(--rl);}
 .row-ov td{border-bottom-color:rgba(255,79,71,.2);}
 .ov-tag{display:flex;align-items:center;gap:8px;margin-top:4px;font-size:0.8125rem;font-weight:700;color:var(--rd);}
-.ov-btn{font-size:0.6875rem;font-weight:700;color:var(--accent);background:rgba(232,106,59,.15);border-radius:var(--r1);padding:2px 8px;}
+.ov-btn{font-size:0.6875rem;font-weight:700;color:var(--accent);background:rgba(0,161,156,.15);border-radius:var(--r1);padding:2px 8px;}
 
 /* ── DOTS MENU ───────────────────────────────
    Кнопка с фиксированным квадратом 32×32: текстовые «•••» разъезжались
@@ -541,7 +549,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
 .qa-chip-em{font-size:0.9375rem;line-height:1;flex-shrink:0;}
 .qa-chip-tx{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left;}
 .qa-chip-ar{font-size:0.6875rem;color:var(--mt);flex-shrink:0;}
-.qa-chip.pick{color:var(--accent-tx);border-color:rgba(232,106,59,.45);}
+.qa-chip.pick{color:var(--accent-tx);border-color:rgba(0,161,156,.45);}
 .qa-chip.on{border-color:var(--accent);}
 .qa-cal{
   border:1.5px solid var(--br2);border-radius:var(--r1);
@@ -560,7 +568,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
 }
 .crow+.crow{margin-top:2px;}
 .crow:hover{background:rgba(255,255,255,.05);}
-.crow.sel{background:rgba(232,106,59,.14);}
+.crow.sel{background:rgba(0,161,156,.14);}
 .crow-em{font-size:1.125rem;line-height:1;flex-shrink:0;width:22px;text-align:center;}
 .crow-nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .crow-am{font-size:0.8125rem;font-weight:700;color:var(--t2);white-space:nowrap;flex-shrink:0;}
@@ -588,7 +596,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
   border:1.5px solid var(--br2);background:var(--bg);
   cursor:pointer;font-size:0.8125rem;font-weight:700;color:var(--t);
 }
-.copt.sel{border-color:var(--accent);background:rgba(232,106,59,.1);}
+.copt.sel{border-color:var(--accent);background:rgba(0,161,156,.1);}
 .cic{
   width:30px;height:30px;border-radius:var(--r1);
   display:flex;align-items:center;justify-content:center;
@@ -606,7 +614,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
   background:none;border:none;cursor:pointer;color:var(--t);
 }
 .cday:hover:not(.cfut){background:var(--br2);}
-.cday.ctd{background:rgba(232,106,59,.18);color:var(--accent);}
+.cday.ctd{background:rgba(0,161,156,.18);color:var(--accent);}
 .cday.csel{background:var(--accent);color:var(--on-accent);}
 .cday.cfut{color:var(--mt);cursor:default;pointer-events:none;opacity:.35;}
 
@@ -643,7 +651,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
   font-size:0.9375rem;line-height:1;
   background:rgba(255,255,255,.055);
 }
-.txe.day{background:rgba(232,106,59,.13);}
+.txe.day{background:rgba(0,161,156,.13);}
 .txi{flex:1;min-width:0;}
 .txn{font-size:0.9375rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .txc{font-size:0.8125rem;font-weight:500;color:var(--mt);margin-top:2px;}
@@ -767,7 +775,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
 .mb12{margin-bottom:12px;}
 .chips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;}
 .chip{font-size:0.8125rem;font-weight:700;padding:8px 12px;border-radius:var(--r1);background:var(--card2);border:1.5px solid var(--br2);color:var(--t2);}
-.chip.pkd{border-color:var(--accent);background:rgba(232,106,59,.1);color:var(--accent);}
+.chip.pkd{border-color:var(--accent);background:rgba(0,161,156,.1);color:var(--accent);}
 .cl{list-style:none;margin-top:12px;}
 .cl li{font-size:0.8125rem;font-weight:700;color:var(--mt);padding:4px 0 4px 12px;position:relative;}
 .cl li::before{content:'·';position:absolute;left:4px;}
