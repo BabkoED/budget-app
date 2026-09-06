@@ -2055,7 +2055,7 @@ function rHeader(b){
       ? '<button type="button" class="cur-bar" onclick="goCurrent()">'+
           /* Заранее созданный бюджет — не «прошлый». Полоса врала на нём
              ровно наоборот, а именно она и объясняет, почему цифры чужие. */
-          '<span>'+(notYet?'Смотрите будущий период':'Смотрите прошлый период')+'</span>'+
+          '<span>'+(notYet?'Смотришь будущий период':'Смотришь прошлый период')+'</span>'+
           '<span class="cur-go">К текущему →</span>'+
         '</button>'
       : '')+
@@ -2302,7 +2302,17 @@ function rStats(){
     '</div>'+
     '<div class="card ts-card">'+rows+'</div>';
 }
-function plurOps(n){var a=n%100,b=n%10;if(a>4&&a<21)return 'операций';if(b===1)return 'операция';if(b>1&&b<5)return 'операции';return 'операций';}
+/* Русское склонение в одном месте. Раньше эта же логика была написана
+   дважды — для операций и для дней; третий вызов (для трат) заставил бы
+   написать её в третий раз. */
+function plural(n,one,few,many){
+  var a=n%100,b=n%10;
+  if(a>4&&a<21)return many;
+  if(b===1)return one;
+  if(b>1&&b<5)return few;
+  return many;
+}
+function plurOps(n){return plural(n,'операция','операции','операций');}
 function plurPeriods(n){var a=n%100,b=n%10;if(a>4&&a<21)return 'периодов';if(b===1)return 'период';if(b>1&&b<5)return 'периода';return 'периодов';}
 
 /* ── HISTORY TAB ─────────────────────────────── */
@@ -2435,13 +2445,7 @@ function rHero(b){
     '</div>'+
   '</div>';
 }
-function plurDays(n){
-  var a=n%100,b2=n%10;
-  if(a>4&&a<21)return 'дней';
-  if(b2===1)return 'день';
-  if(b2>1&&b2<5)return 'дня';
-  return 'дней';
-}
+function plurDays(n){return plural(n,'день','дня','дней');}
 
 /* ── INCOMES TAB ─────────────────────────────── */
 function rIncomes(b){
@@ -2525,7 +2529,7 @@ function rPlanned(b){
     '</div></div>'+
   (ov?'<div class="warn">'+
     '<div class="warn-t">⚠️ Есть категории с перерасходом</div>'+
-    '<div class="warn-s">Покройте перерасход из дневного бюджета или другой категории.</div>'+
+    '<div class="warn-s">Покрой перерасход из дневного бюджета или другой категории.</div>'+
   '</div>':'')+
   /* Планы съели весь доход — dailyBudget обнулился. Без пояснения это
      выглядит как поломка, поэтому говорим прямо что произошло. */
@@ -2820,11 +2824,11 @@ function rWz1(){
 function rWz2(){
   var d=wd,ti=wdTI(),tp=wdTP(),avail=ti-tp,days=getDays(d.dateFrom,d.dateTo),daily=avail>0?avail/days:0;
   return '<div class="hdr" role="banner"><div class="hdr-r1"><h1 class="logo">✦ <span>Б</span>юджет</h1></div></div>'+
-  '<div class="wz"><div class="wzstar">✦</div><div class="wztt">Ваш дневной бюджет</div>'+
+  '<div class="wz"><div class="wzstar">✦</div><div class="wztt">Твой дневной бюджет</div>'+
   '<div class="wzcard" style="text-align:center;padding:24px 16px">'+
     '<div class="wznum">'+fmt(daily)+'</div>'+
     '<div class="wzlbl">можно тратить каждый день</div>'+
-    '<ul class="cl"><li>Тратьте на что угодно из дневного бюджета.</li><li>Накопилось — добавится завтра.</li><li>Ушли в минус — завтра меньше.</li></ul>'+
+    '<ul class="cl"><li>Трать на что угодно из дневного бюджета.</li><li>Накопилось — добавится завтра.</li><li>Ушли в минус — завтра меньше.</li></ul>'+
   '</div>'+
   '<div class="wznav"><button type="button" class="wzbk" onclick="wizStep=1;render()">← Назад</button><button type="button" class="btn bp" onclick="wzCr()">Запустить →</button></div></div>';
 }
@@ -2978,7 +2982,8 @@ function bindMain(b){
     /* Считаем привязанные траты — они станут дневными, иначе сломается баланс */
     var linked=S.txs.filter(function(t){return t.budgetId===b.id&&t.plannedCatId===id;});
     var msg=linked.length
-      ?'Удалить категорию? '+linked.length+' трат(ы) перейдут в «Дневные расходы».'
+      ?'Удалить категорию? '+linked.length+' '+plural(linked.length,'трата','траты','трат')
+        +' '+(linked.length===1?'перейдёт':'перейдут')+' в «Дневные расходы».'
       :'Удалить категорию?';
     if(!confirm(msg))return;
     plnMenu=null;

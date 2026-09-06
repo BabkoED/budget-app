@@ -411,6 +411,41 @@ const uniq = (arr, key) => {
     console.log('  %s %s  (%s)', String(n).padEnd(2), what.padEnd(26), how));
   console.log('  [оценка по разметке, не замер поведения — считать ориентиром]');
 
+  /* --- скорость ---
+     Ни разу не мерили. index.html идёт одним файлом почти на 200 КБ,
+     и что в нём тяжёлое — было неизвестно. Считаем то, что человек ждёт:
+     от запроса до первой отрисовки и до готовности интерфейса. */
+  console.log('\n══ СКОРОСТЬ ══');
+  const perf = await pg.evaluate(() => {
+    const n = performance.getEntriesByType('navigation')[0] || {};
+    const paints = {};
+    performance.getEntriesByType('paint').forEach(p => paints[p.name] = Math.round(p.startTime));
+    const res = performance.getEntriesByType('resource').map(r => ({
+      name: r.name.replace(/^https?:\/\/[^/]+/, '').slice(0, 46),
+      ms: Math.round(r.duration),
+      kb: Math.round((r.transferSize || r.encodedBodySize || 0) / 1024)
+    })).sort((a, b) => b.ms - a.ms);
+    return {
+      dom: Math.round(n.domContentLoadedEventEnd || 0),
+      load: Math.round(n.loadEventEnd || 0),
+      firstPaint: paints['first-paint'],
+      firstContentful: paints['first-contentful-paint'],
+      resources: res.slice(0, 6),
+      totalKb: Math.round(res.reduce((s, r) => s + r.kb, 0))
+    };
+  });
+  console.log('  первая отрисовка       : %s мс', perf.firstContentful ?? '—');
+  console.log('  DOM готов              : %d мс', perf.dom);
+  console.log('  загрузка завершена     : %d мс', perf.load);
+  console.log('  внешних ресурсов       : %d КБ', perf.totalKb);
+  /* console.log в Node не понимает ширину поля (%5d) — выравниваем сами */
+  perf.resources.forEach(r => console.log('      ' + String(r.ms).padStart(5) + ' мс  ' +
+    String(r.kb).padStart(4) + ' КБ  ' + r.name));
+  const html = require('fs').statSync(require('path').join(__dirname, '..', 'index.html')).size;
+  console.log('  сам index.html         : %d КБ одним файлом', Math.round(html / 1024));
+  if (perf.firstContentful > 1500)
+    console.log('  ← первая отрисовка дольше 1,5 с — человек видит пустой экран');
+
   /* --- разные экраны ---
      Все замеры выше сняты на 430x932 (iPhone Pro Max). Правки от 06.09
      подняли зоны нажатия до 44px и переложили отступы — на узком экране

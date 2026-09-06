@@ -58,6 +58,31 @@ function checkMerge(ok){
      fn(st,st).activeBudgetId==='a'&&fn(st,st).txs.length===1);
 }
 
+/* ── Склонение: чистый node, без браузера ────
+   Логика русского склонения жила в двух почти одинаковых функциях, третий
+   случай (траты при удалении категории) заставил бы написать её в третий
+   раз. Свели в plural(); проверка держит все три формы, включая 11-14,
+   где «11 операций», а не «11 операция». */
+function checkPlural(ok){
+  const src=fs.readFileSync(path.join(ROOT,'index.html'),'utf8');
+  const cut=n=>{const i=src.indexOf('function '+n+'(');if(i<0)throw new Error('нет '+n);
+    let d=0;for(let k=src.indexOf('{',i);k<src.length;k++){
+      if(src[k]==='{')d++;else if(src[k]==='}'){d--;if(!d)return src.slice(i,k+1);}}};
+  const f=new Function(cut('plural')+'\n'+cut('plurOps')+'\n'+cut('plurDays')+
+    '\nreturn {plural,plurOps,plurDays};')();
+  const cases=[
+    ['операций',{1:'операция',2:'операции',5:'операций',11:'операций',21:'операция',111:'операций'},f.plurOps],
+    ['дней',    {1:'день',2:'дня',5:'дней',11:'дней',21:'день',25:'дней'},               f.plurDays],
+  ];
+  for(const [what,exp,fn] of cases){
+    const bad=Object.entries(exp).filter(([n,v])=>fn(+n)!==v);
+    ok('склонение: '+what, bad.length===0, bad);
+  }
+  const tr={1:'трата',2:'траты',5:'трат',11:'трат',21:'трата'};
+  ok('склонение: траты при удалении категории',
+     Object.entries(tr).every(([n,v])=>f.plural(+n,'трата','траты','трат')===v), tr);
+}
+
 /* ── 3. Проверки в браузере ─────────────────── */
 (async()=>{
   let fails=0;
@@ -181,6 +206,9 @@ function checkMerge(ok){
 
   console.log('\n9. Слияние отдельно от интерфейса');
   checkMerge(ok);
+
+  console.log('\n10. Склонение числительных');
+  checkPlural(ok);
 
   const shot=path.join(os.tmpdir(),'budget-check.png');
   await pg.evaluate(()=>{drop=true;render();});await wait(150);
