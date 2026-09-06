@@ -411,6 +411,50 @@ const uniq = (arr, key) => {
     console.log('  %s %s  (%s)', String(n).padEnd(2), what.padEnd(26), how));
   console.log('  [оценка по разметке, не замер поведения — считать ориентиром]');
 
+  /* --- разные экраны ---
+     Все замеры выше сняты на 430x932 (iPhone Pro Max). Правки от 06.09
+     подняли зоны нажатия до 44px и переложили отступы — на узком экране
+     это может вытолкнуть содержимое за край. Проверяем то, на чём люди
+     реально сидят, а не только эталон. */
+  console.log('\n══ РАЗНЫЕ ЭКРАНЫ ══');
+  const SIZES = [
+    [320, 568, 'SE 1-го поколения'],
+    [375, 667, 'SE 2/3, iPhone 8'],
+    [390, 844, 'iPhone 13/14'],
+    [430, 932, 'Pro Max (эталон)'],
+    [932, 430, 'поворот набок'],
+    [768, 1024, 'планшет']
+  ];
+  for (const [w, h, name] of SIZES) {
+    await pg.setViewportSize({width: w, height: h});
+    await pg.evaluate(() => { swBdg('b-sep'); setTab('history'); });
+    await pg.waitForTimeout(300);
+    const r = await pg.evaluate(OVERFLOW);
+    const tap = await pg.evaluate(() => {
+      let bad = 0;
+      document.querySelectorAll('button, a[href], input, select').forEach(el => {
+        const s = getComputedStyle(el);
+        if (s.display === 'none' || s.visibility === 'hidden') return;
+        const b = el.getBoundingClientRect();
+        if (b.width < 1 || b.height < 1) return;
+        if (b.width < 28 || b.height < 28) bad++;
+      });
+      return bad;
+    });
+    const scroll = await pg.evaluate(() => ({
+      w: document.documentElement.scrollWidth, win: window.innerWidth}));
+    const sideways = scroll.w > scroll.win + 1;
+    console.log('  %s %s  выходов за край: %d, целей меньше 28px: %d%s%s',
+      (w + '×' + h).padEnd(9), name.padEnd(20), r.length, tap,
+      sideways ? ', ГОРИЗОНТАЛЬНАЯ ПРОКРУТКА' : '',
+      (r.length || tap || sideways) ? '  ←' : '');
+    if (r.length) r.slice(0, 3).forEach(x =>
+      console.log('      %s  край %d при окне %d  «%s»', x.el, x.right, x.win, x.text));
+  }
+  await pg.setViewportSize({width: 430, height: 932});
+  await pg.evaluate(() => { swBdg('b-sep'); setTab('history'); });
+  await pg.waitForTimeout(200);
+
   /* --- заявленные настройки --- */
   const meta = await pg.evaluate(() => {
     const v = document.querySelector('meta[name=viewport]');
