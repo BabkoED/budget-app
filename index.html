@@ -50,7 +50,10 @@
   --accent: #CC785C;     /* book cloth; тёмный текст на заливке 5.28 */
   --on-accent: #241812;  /* тёплый тёмный, а не белый: белый дал бы 3.28 */
   --accent-tx: #D4A27F;  /* Anthropic tan КАК текст на тёмном: 6.38-8.11 */
-  --gd:     #30C97C;
+  --gd:     #4EC187;  /* приглушён 06.09: был #30C97C, насыщенность 16.7 —
+                         громче акцента (11.3). Тон сохранён, в нём смысл.
+                         Красный НЕ трогаем: гашение сближает его с терракотой,
+                         его яркость и отличает тревогу от кнопки. */
   --rd:     #FF4F47;
   --rl:     rgba(255,79,71,.12);
   --wbg:    rgba(245,200,66,.07);
@@ -501,7 +504,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
   overflow:hidden;margin-top:8px;
 }
 .hero-fill{height:100%;border-radius:99px;transition:width .4s cubic-bezier(.4,0,.2,1);}
-.hero-fill.gd{background:linear-gradient(90deg,var(--gd),#5FE0A0);}
+.hero-fill.gd{background:linear-gradient(90deg,var(--gd),#74D9A4);}
 .hero-fill.rd{background:linear-gradient(90deg,var(--rd),#FF8A85);}
 /* Тонкая строка под полосой: слева сколько ушло сегодня, справа — что
    добавится завтра. Симметрично и мельче большой цифры сверху. */
