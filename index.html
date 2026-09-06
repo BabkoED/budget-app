@@ -52,7 +52,7 @@
 
   /* Единая шкала скруглений. Раньше радиусы гуляли от 8 до 24 без системы,
      и интерфейс выглядел собранным из разных наборов. */
-  --r1: 12px;   /* мелкое: кнопки в строке, чипы */
+  --r1: 10px;   /* мелкое: кнопки в строке, чипы. Было 12: сведено с 8/9/10 */
   --r2: 16px;   /* среднее: поля ввода, кнопки */
   --r3: 22px;   /* крупное: карточки, меню */
   --ease: cubic-bezier(.2,.9,.3,1.15);
@@ -66,7 +66,13 @@
 }
 
 /* ── RESET ───────────────────────────────── */
-html{font-size:100%;}  /* якорь для rem: даёт системной настройке размера текста подействовать */
+html{font-size:100%;}
+/* ШКАЛА. Кегли только из ряда 11 13 15 18 22 28 34 46 (в rem: делить на 16).
+   Начертания только 500 / 700 / 900. Радиусы только --r1 --r2 --r3, плюс
+   99px для капсул и 50% для кругов. Отступы кратны 4.
+   Было 24 кегля и 6 начертаний — вес перестал означать важность.
+   Спорные случаи округляются ВВЕРХ: шкала не должна мельчить текст.
+   Проверяет `pw tools/audit-ui.js`, раздел «разнобой оформления». */  /* якорь для rem: даёт системной настройке размера текста подействовать */
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 /* height:100% обрезало всё, что не влезло в один экран, и страница
    переставала скроллиться — поэтому только минимальная высота */
@@ -82,6 +88,37 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 input,select{font-family:inherit;color:var(--t);}
 select option{background:var(--card2);}
 
+/* ── ФОКУС КЛАВИАТУРЫ ────────────────────────
+   Раньше в четырёх местах стояло outline:none, а :focus-visible не было
+   вовсе — с внешней клавиатуры было не видно, где ты находишься. Обводка
+   показывается ТОЛЬКО при ходе с клавиатуры: :focus-visible не срабатывает
+   на касание пальцем, поэтому на телефоне ничего не меняется. */
+:focus-visible{
+  outline:2px solid var(--accent-tx);
+  outline-offset:2px;
+  border-radius:var(--r1);
+}
+/* поля ввода гасят системную обводку ради своего вида — возвращаем её
+   именно для клавиатуры, иначе ввод сумм становится слепым */
+input:focus-visible,select:focus-visible,textarea:focus-visible{
+  outline:2px solid var(--accent-tx);
+  outline-offset:1px;
+}
+
+/* ── УМЕНЬШИТЬ ДВИЖЕНИЕ ──────────────────────
+   Системная настройка «Reduce Motion» ставится людьми с укачиванием и
+   чувствительностью к анимации. 13 переходов и 7 анимаций её не замечали.
+   Не убираем эффекты совсем — сводим к мгновенным, чтобы не сломать
+   логику, завязанную на окончание перехода. */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{
+    animation-duration:0.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:0.01ms !important;
+    scroll-behavior:auto !important;
+  }
+}
+
 /* ── APP ─────────────────────────────────── */
 #app{min-height:100vh;padding-bottom:env(safe-area-inset-bottom,24px);}
 
@@ -93,7 +130,7 @@ select option{background:var(--card2);}
   padding-top:env(safe-area-inset-top,0px);
 }
 .hdr-r1{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 8px;}
-.hdr-r2{display:flex;gap:2px;padding:0 12px 10px;}
+.hdr-r2{display:flex;gap:2px;padding:0 12px 8px;}
 
 .logo{font-size:1.125rem;font-weight:900;letter-spacing:-.4px;margin:0;}  /* margin:0 — логотип стал h1 */
 .logo span{color:var(--accent);}
@@ -101,22 +138,22 @@ select option{background:var(--card2);}
 
 /* ── HEADER RIGHT GROUP ──────────────────── */
 .hdr-right{display:flex;align-items:center;gap:8px;}
-.hdr-left{display:flex;align-items:center;gap:10px;min-width:0;}
+.hdr-left{display:flex;align-items:center;gap:8px;min-width:0;}
 /* Полоса «вы смотрите прошлый период» — своей строкой во всю ширину,
    поэтому ни на что не наезжает и не ломает первый ряд шапки */
 .cur-bar{
-  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
   width:100%;padding:8px 16px;
-  font-size:0.7812rem;font-weight:700;
+  font-size:0.8125rem;font-weight:700;
   background:rgba(232,106,59,.13);color:var(--accent);
   border-top:1px solid rgba(232,106,59,.22);
 }
-.cur-bar span:first-child{color:var(--t2);font-weight:600;}
+.cur-bar span:first-child{color:var(--t2);font-weight:700;}
 .cur-go{white-space:nowrap;}
 .balbtn{
-  font-size:0.8125rem;font-weight:800;
-  padding:7px 13px;border-radius:99px;min-height:44px;   /* было 32-34px */
-  display:flex;align-items:center;gap:5px;
+  font-size:0.8125rem;font-weight:700;
+  padding:8px 12px;border-radius:99px;min-height:44px;   /* было 32-34px */
+  display:flex;align-items:center;gap:4px;
   max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 .balbtn.gd{color:var(--gd);background:rgba(48,201,124,.13);}
@@ -126,7 +163,7 @@ select option{background:var(--card2);}
 
 .nb{
   font-size:0.8125rem;font-weight:700;
-  padding:7px 14px;border-radius:99px;
+  padding:8px 12px;border-radius:99px;
   min-height:44px;display:inline-flex;align-items:center;   /* было 32px по высоте */
   color:var(--mt);transition:all .15s;
   position:relative;
@@ -155,99 +192,99 @@ select option{background:var(--card2);}
 .di{flex-shrink:0;opacity:.8;}
 /* Текущий период с галочкой — первая строка, как в Sintra */
 .drop-cur{
-  display:flex;align-items:center;gap:9px;
-  width:100%;padding:13px 16px 10px;text-align:left;min-height:44px;   /* было 42px */
-  font-size:0.9062rem;font-weight:600;color:var(--t);
+  display:flex;align-items:center;gap:8px;
+  width:100%;padding:12px 16px 8px;text-align:left;min-height:44px;   /* было 42px */
+  font-size:0.9375rem;font-weight:700;color:var(--t);
 }
-.drop-ck{color:var(--accent-tx);font-size:0.875rem;font-weight:900;}
+.drop-ck{color:var(--accent-tx);font-size:0.9375rem;font-weight:900;}
 .drop-stats{
-  padding:3px 0;
+  padding:2px 0;
   border-top:1px solid var(--br2);border-bottom:1px solid var(--br2);
 }
 .drop-r{
   display:flex;justify-content:space-between;align-items:center;gap:12px;
-  padding:6px 16px;font-size:0.8438rem;font-weight:500;
+  padding:4px 16px;font-size:0.8125rem;font-weight:500;
 }
 .drop-r label{color:var(--mt);}
-.drop-r b{font-weight:800;white-space:nowrap;}
+.drop-r b{font-weight:700;white-space:nowrap;}
 .drop-acts{display:flex;flex-direction:column;}
 /* Пункт меню — иконка + текст в общей колонке. Ширина иконки (15px) + gap
    (9px) фиксируют, где начинается текст: 16+15+9 = 40px — под это же
    выравниваются вложенные строки архива, чтобы не городить второй отступ */
 .drop-act{
-  display:flex;align-items:center;gap:9px;
-  width:100%;padding:11px 16px;text-align:left;min-height:44px;   /* было 41px */
-  font-size:0.9062rem;font-weight:500;color:var(--t);
+  display:flex;align-items:center;gap:8px;
+  width:100%;padding:12px 16px;text-align:left;min-height:44px;   /* было 41px */
+  font-size:0.9375rem;font-weight:500;color:var(--t);
 }
 .drop-act:hover{background:rgba(255,255,255,.05);}
 .drop-act:active{background:rgba(255,255,255,.09);}
 .drop-act.acc{color:var(--accent-tx);}
 .drop-arch{
-  display:flex;align-items:center;gap:9px;
-  width:100%;padding:11px 16px;text-align:left;min-height:44px;   /* было 41px */
-  font-size:0.9062rem;font-weight:500;color:var(--t);
+  display:flex;align-items:center;gap:8px;
+  width:100%;padding:12px 16px;text-align:left;min-height:44px;   /* было 41px */
+  font-size:0.9375rem;font-weight:500;color:var(--t);
 }
 .drop-arch:hover{background:rgba(255,255,255,.05);}
 .drop-arch span:nth-child(2){flex:1;}
-.drop-cnt{font-size:0.7812rem;font-weight:700;color:var(--mt);}
+.drop-cnt{font-size:0.8125rem;font-weight:700;color:var(--mt);}
 .drop-chev{display:flex;color:var(--mt);transition:transform .18s var(--ease);}
 .drop-chev.up{transform:rotate(180deg);}
 .drop-item{
-  display:flex;align-items:center;gap:9px;
-  width:100%;padding:10px 16px 10px 40px;text-align:left;
-  font-size:0.8438rem;font-weight:500;color:var(--t2);
+  display:flex;align-items:center;gap:8px;
+  width:100%;padding:8px 16px 8px 40px;text-align:left;
+  font-size:0.8125rem;font-weight:500;color:var(--t2);
   background:rgba(0,0,0,.16);
 }
 .drop-item span:first-child{flex:1;}
 .drop-item:hover{color:var(--t);}
 .drop-csv{padding-left:16px;color:var(--t);}
-.drop-now{font-size:0.6875rem;font-weight:800;color:var(--gd);}
+.drop-now{font-size:0.6875rem;font-weight:700;color:var(--gd);}
 /* Периоды, которые ещё не закончились, стоят отдельными строками над архивом:
    архив — это прошедшее. Метка уходит вправо, поэтому название тянется */
 .drop-per span:nth-child(2){flex:1;}
-.drop-soon{font-size:0.6875rem;font-weight:800;color:var(--mt);}
+.drop-soon{font-size:0.6875rem;font-weight:700;color:var(--mt);}
 .newmo-banner{
   display:flex;align-items:center;justify-content:space-between;gap:12px;
   background:rgba(232,106,59,.12);border:1px solid rgba(232,106,59,.3);
-  border-radius:16px;padding:14px 16px;margin:12px 16px 0;
+  border-radius:var(--r2);padding:12px 16px;margin:12px 16px 0;
 }
 /* ── ТОП ТРАТ ──────────────────────────────── */
 .ts-card{margin-top:12px;padding:16px;}
-.ts-ttl{display:flex;align-items:baseline;justify-content:space-between;gap:10px;
-  font-size:0.875rem;font-weight:800;color:var(--t);margin-bottom:14px;}
+.ts-ttl{display:flex;align-items:baseline;justify-content:space-between;gap:8px;
+  font-size:0.9375rem;font-weight:700;color:var(--t);margin-bottom:12px;}
 .ts-tot{font-size:0.8125rem;font-weight:700;color:var(--mt);white-space:nowrap;}
-.ts-row{margin-bottom:14px;}
+.ts-row{margin-bottom:12px;}
 .ts-row:last-child{margin-bottom:0;}
-.ts-hd{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:6px;}
-.ts-nm{font-size:0.875rem;font-weight:600;color:var(--t);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.ts-am{font-size:0.875rem;font-weight:800;color:var(--t);white-space:nowrap;}
+.ts-hd{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:4px;}
+.ts-nm{font-size:0.9375rem;font-weight:700;color:var(--t);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ts-am{font-size:0.9375rem;font-weight:700;color:var(--t);white-space:nowrap;}
 .ts-bar{height:6px;border-radius:99px;background:var(--br);overflow:hidden;}
 .ts-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),#f0906a);}
-.ts-sub{font-size:0.6875rem;font-weight:600;color:var(--mt);margin-top:5px;}
+.ts-sub{font-size:0.6875rem;font-weight:700;color:var(--mt);margin-top:4px;}
 
 /* ── СВОДКА ЗА ПЕРИОД ──────────────────────── */
-.rchips{display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.rchips{display:flex;gap:4px;margin-bottom:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
 .rchips::-webkit-scrollbar{display:none;}
 .rchip{
-  flex-shrink:0;padding:7px 13px;border-radius:99px;
+  flex-shrink:0;padding:8px 12px;border-radius:99px;
   min-height:44px;display:inline-flex;align-items:center;   /* было 34px */
   font-size:0.8125rem;font-weight:700;white-space:nowrap;
   background:var(--card);color:var(--t2);border:1px solid var(--br2);
   transition:background .15s,color .15s;
 }
 .rchip.on{background:var(--accent);color:var(--on-accent);border-color:var(--accent);}
-.st-row{margin-bottom:13px;}
+.st-row{margin-bottom:12px;}
 .st-row:last-child{margin-bottom:0;}
-.st-hd{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.st-hd{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
 .st-em{font-size:0.9375rem;line-height:1;flex-shrink:0;}
-.st-nm{flex:1;min-width:0;font-size:0.875rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.st-am{font-size:0.875rem;font-weight:800;white-space:nowrap;flex-shrink:0;}
+.st-nm{flex:1;min-width:0;font-size:0.9375rem;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.st-am{font-size:0.9375rem;font-weight:700;white-space:nowrap;flex-shrink:0;}
 .st-bar{height:6px;border-radius:99px;background:var(--br);overflow:hidden;}
 .st-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),#f0906a);}
-.st-sub{font-size:0.6875rem;font-weight:600;color:var(--mt);margin-top:5px;}
+.st-sub{font-size:0.6875rem;font-weight:700;color:var(--mt);margin-top:4px;}
 
 /* ── СРАВНЕНИЕ С ПРОШЛЫМ МЕСЯЦЕМ ───────────── */
-.cmp{margin-left:6px;font-size:0.6875rem;font-weight:800;}
+.cmp{margin-left:4px;font-size:0.6875rem;font-weight:700;}
 .cmp.up{color:var(--rd);}
 .cmp.down{color:var(--gd);}
 
@@ -258,16 +295,16 @@ select option{background:var(--card2);}
    от того, есть значок или нет. Gap вдвое меньше прежнего. */
 .recur-slot{width:12px;flex-shrink:0;display:flex;justify-content:center;}
 .recur-b{font-size:0.6875rem;opacity:.65;line-height:1;}
-.t-amw{display:flex;align-items:center;justify-content:flex-start;gap:3px;}
-.chkrow{display:flex;align-items:flex-start;gap:10px;cursor:pointer;min-height:44px;
-  padding:12px 14px;margin-top:10px;border-radius:12px;
+.t-amw{display:flex;align-items:center;justify-content:flex-start;gap:2px;}
+.chkrow{display:flex;align-items:flex-start;gap:8px;cursor:pointer;min-height:44px;
+  padding:12px 12px;margin-top:8px;border-radius:var(--r1);
   background:var(--card2);border:1px solid var(--br2);}
 .chkrow input{width:28px;height:28px;   /* было 20px; вся строка тоже нажимаема */flex-shrink:0;margin:0;accent-color:var(--accent);cursor:pointer;}
 .chkrow span{display:flex;flex-direction:column;gap:2px;}
-.chkrow b{font-size:0.875rem;font-weight:700;color:var(--t);}
-.chkrow i{font-size:0.75rem;font-weight:500;color:var(--mt);font-style:normal;line-height:1.35;}
+.chkrow b{font-size:0.9375rem;font-weight:700;color:var(--t);}
+.chkrow i{font-size:0.8125rem;font-weight:500;color:var(--mt);font-style:normal;line-height:1.35;}
 .newmo-txt{font-size:0.8125rem;font-weight:700;color:var(--t);}
-.newmo-banner .btn{padding:9px 14px;font-size:0.8125rem;white-space:nowrap;}
+.newmo-banner .btn{padding:8px 12px;font-size:0.8125rem;white-space:nowrap;}
 
 /* ── PAGE ────────────────────────────────── */
 /* Нижний отступ с запасом под домашнюю полоску iPhone — без него
@@ -276,35 +313,35 @@ select option{background:var(--card2);}
   padding:12px 12px calc(28px + env(safe-area-inset-bottom,0px));
   max-width:520px;margin:0 auto;
 }
-.ph{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:11px;}
-.ph-acts{display:flex;gap:6px;flex-shrink:0;}
+.ph{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px;}
+.ph-acts{display:flex;gap:4px;flex-shrink:0;}
 /* Заголовок держим в одну строку: перенос «Плановые / расходы» раздувал
    блок по высоте и выталкивал кнопки */
-.ptl{font-size:1.1875rem;font-weight:900;letter-spacing:-.3px;white-space:nowrap;}
+.ptl{font-size:1.125rem;font-weight:900;letter-spacing:-.3px;white-space:nowrap;}
 /* Кнопка-иконка: подпись «Перевести» съедала ширину, значка достаточно */
 .ib{
   width:44px;height:44px;flex-shrink:0;   /* было 38px */
   display:flex;align-items:center;justify-content:center;
-  border-radius:var(--r1);font-size:1rem;
+  border-radius:var(--r1);font-size:0.9375rem;
   background:var(--card2);color:var(--t);border:1.5px solid var(--br2);
   transition:transform .12s;
 }
 .ib:active{transform:scale(.94);}
-.mt10{margin-top:10px;}
+.mt10{margin-top:8px;}
 
 /* ── STAT CARD (Incomes tab) ─────────────── */
 .stat-card{
   background:var(--card);
   border-radius:var(--r3);
-  padding:14px 14px 11px;
-  margin-bottom:10px;
+  padding:12px 12px 12px;
+  margin-bottom:8px;
   box-shadow:var(--sh);
   border:1px solid var(--br);
 }
-.srow-lbl{font-size:0.6875rem;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--mt);margin-bottom:6px;}
-.srow-big{font-size:1.875rem;font-weight:900;letter-spacing:-.7px;margin-bottom:2px;}
-.srow-divider{height:1px;background:var(--br2);margin:10px 0 6px;}
-.srow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:5px 0;font-size:0.8438rem;font-weight:600;border-bottom:1px solid var(--br);}
+.srow-lbl{font-size:0.6875rem;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--mt);margin-bottom:4px;}
+.srow-big{font-size:1.75rem;font-weight:900;letter-spacing:-.7px;margin-bottom:2px;}
+.srow-divider{height:1px;background:var(--br2);margin:8px 0 4px;}
+.srow{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:4px 0;font-size:0.8125rem;font-weight:700;border-bottom:1px solid var(--br);}
 .srow b{white-space:nowrap;}
 .srow:last-child{border-bottom:none;}
 .srow span{color:var(--t2);}
@@ -332,25 +369,25 @@ select option{background:var(--card2);}
 .tbl tbody td{
   padding:8px 12px;
   border-bottom:1px solid var(--br);
-  font-size:0.875rem;vertical-align:middle;
+  font-size:0.9375rem;vertical-align:middle;
 }
 .tbl tbody tr:last-child td{border-bottom:none;}
 .tbl tfoot .tft td{
-  padding:11px 14px;font-size:0.8125rem;font-weight:700;
+  padding:12px 12px;font-size:0.8125rem;font-weight:700;
   color:var(--mt);border-top:1px solid var(--br2);
 }
 
 /* emoji inline */
 /* Название в одну строку с многоточием: перенос на вторую строку
    раздувал таблицу по высоте и ломал выравнивание правой колонки */
-.t-nm{display:flex;align-items:center;gap:8px;font-weight:600;font-size:0.875rem;line-height:1.3;min-width:0;}
+.t-nm{display:flex;align-items:center;gap:8px;font-weight:700;font-size:0.9375rem;line-height:1.3;min-width:0;}
 .t-tx{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
 .t-em{font-size:1.125rem;line-height:1;flex-shrink:0;}
 /* Левый край, а не правый: значок (если есть) и сумма всегда начинаются
    в одной точке колонки — цифры разной длины продлеваются вправо, а не
    «плавают» по горизонтали от строки к строке, как было при text-align:right */
-.t-am{font-size:0.875rem;font-weight:800;text-align:left;white-space:nowrap;}
-.t-sub{font-size:0.6875rem;font-weight:500;color:var(--mt);margin-top:1px;white-space:nowrap;}
+.t-am{font-size:0.9375rem;font-weight:700;text-align:left;white-space:nowrap;}
+.t-sub{font-size:0.6875rem;font-weight:500;color:var(--mt);margin-top:0px;white-space:nowrap;}
 /* Колонка действий: фиксированная ширина и нулевые боковые отступы —
    кнопка сама себе даёт площадь, поэтому стоит на одном месте во всех строках */
 .t-ax{width:46px;padding:0 8px 0 0!important;text-align:right;}
@@ -363,8 +400,8 @@ select option{background:var(--card2);}
 /* overdraft row */
 .row-ov{background:var(--rl);}
 .row-ov td{border-bottom-color:rgba(255,79,71,.2);}
-.ov-tag{display:flex;align-items:center;gap:7px;margin-top:5px;font-size:0.75rem;font-weight:700;color:var(--rd);}
-.ov-btn{font-size:0.6875rem;font-weight:800;color:var(--accent);background:rgba(232,106,59,.15);border-radius:8px;padding:3px 9px;}
+.ov-tag{display:flex;align-items:center;gap:8px;margin-top:4px;font-size:0.8125rem;font-weight:700;color:var(--rd);}
+.ov-btn{font-size:0.6875rem;font-weight:700;color:var(--accent);background:rgba(232,106,59,.15);border-radius:var(--r1);padding:2px 8px;}
 
 /* ── DOTS MENU ───────────────────────────────
    Кнопка с фиксированным квадратом 32×32: текстовые «•••» разъезжались
@@ -372,7 +409,7 @@ select option{background:var(--card2);}
 .dots{
   width:44px;height:44px;flex-shrink:0;   /* было 32px */
   display:flex;align-items:center;justify-content:center;
-  border-radius:10px;color:var(--mt);
+  border-radius:var(--r1);color:var(--mt);
   transition:background .16s,color .16s;
 }
 .dots svg{display:block;fill:currentColor;}
@@ -391,16 +428,16 @@ select option{background:var(--card2);}
   animation:pop .17s cubic-bezier(.2,.9,.3,1.15);
 }
 .ctx button{
-  display:block;width:100%;padding:15px 18px;
+  display:block;width:100%;padding:16px 16px;
   font-size:0.9375rem;font-weight:500;text-align:left;
   color:var(--t);
 }
 /* Разделители только между смысловыми группами, а не после каждой строки —
    сплошная сетка линий и делала меню похожим на таблицу */
 .ctx button.ctx-sep{border-top:1px solid var(--br2);}
-.ctx button.ctx-lines{display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding-top:14px;padding-bottom:14px;}
+.ctx button.ctx-lines{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding-top:12px;padding-bottom:12px;}
 .ctx-t{font-size:0.9375rem;font-weight:500;color:var(--t);}
-.ctx-s{font-size:0.7812rem;font-weight:500;color:var(--mt);line-height:1.35;}
+.ctx-s{font-size:0.8125rem;font-weight:500;color:var(--mt);line-height:1.35;}
 .ctx button:hover{background:rgba(255,255,255,.05);}
 .ctx button:active{background:rgba(255,255,255,.09);}
 .ctx button.del{color:var(--rd);}
@@ -420,9 +457,9 @@ select option{background:var(--card2);}
 .warn{
   background:var(--wbg);
   border:1px solid var(--wbr);
-  border-radius:16px;padding:13px 15px;margin-bottom:12px;
+  border-radius:var(--r2);padding:12px 16px;margin-bottom:12px;
 }
-.warn-t{font-size:0.875rem;font-weight:800;color:#D4A800;margin-bottom:3px;}
+.warn-t{font-size:0.9375rem;font-weight:700;color:#D4A800;margin-bottom:2px;}
 .warn-s{font-size:0.8125rem;font-weight:500;color:#9A8030;}
 
 /* ── КАРТОЧКА ДНЯ ────────────────────────── */
@@ -430,26 +467,26 @@ select option{background:var(--card2);}
   background:linear-gradient(158deg,#212121 0%,#191919 100%);
   border:1px solid var(--br2);
   border-radius:var(--r3);
-  padding:12px 14px 11px;
-  margin-bottom:10px;
+  padding:12px 12px 12px;
+  margin-bottom:8px;
   box-shadow:var(--sh);
 }
 /* Заголовок и «N дней» — одна строка, один стиль: обе части читаются как
    единая шапка блока, а не как подпись + случайно прибившееся число */
 .hero-top{
-  display:flex;align-items:baseline;justify-content:space-between;gap:10px;
-  font-size:0.7188rem;font-weight:800;letter-spacing:.7px;
+  display:flex;align-items:baseline;justify-content:space-between;gap:8px;
+  font-size:0.6875rem;font-weight:700;letter-spacing:.7px;
   text-transform:uppercase;color:var(--mt);
 }
 .hero-big{
-  font-size:1.8125rem;font-weight:900;letter-spacing:-1px;
-  line-height:1.05;margin-top:3px;
+  font-size:1.75rem;font-weight:900;letter-spacing:-1px;
+  line-height:1.05;margin-top:2px;
 }
 .hero-big.gd{color:var(--gd);}
 .hero-big.rd{color:var(--rd);}
 .hero-bar{
   height:6px;border-radius:99px;background:#2A2A2A;
-  overflow:hidden;margin-top:10px;
+  overflow:hidden;margin-top:8px;
 }
 .hero-fill{height:100%;border-radius:99px;transition:width .4s cubic-bezier(.4,0,.2,1);}
 .hero-fill.gd{background:linear-gradient(90deg,var(--gd),#5FE0A0);}
@@ -457,16 +494,16 @@ select option{background:var(--card2);}
 /* Тонкая строка под полосой: слева сколько ушло сегодня, справа — что
    добавится завтра. Симметрично и мельче большой цифры сверху. */
 .hero-sub{
-  display:flex;justify-content:space-between;gap:10px;margin-top:7px;
-  font-size:0.7188rem;font-weight:500;color:var(--mt);
+  display:flex;justify-content:space-between;gap:8px;margin-top:8px;
+  font-size:0.6875rem;font-weight:500;color:var(--mt);
 }
-.hero-sub b{color:var(--t2);font-weight:800;}
+.hero-sub b{color:var(--t2);font-weight:700;}
 
 /* ── HISTORY / QA ────────────────────────── */
 .qa{
   background:var(--card);
-  border-radius:var(--r3);padding:9px;
-  margin-bottom:10px;
+  border-radius:var(--r3);padding:8px;
+  margin-bottom:8px;
   box-shadow:var(--sh);
   border:1px solid var(--br);
   position:relative;
@@ -474,18 +511,18 @@ select option{background:var(--card2);}
 .qa-row{display:flex;align-items:center;gap:8px;}
 .qa-in{
   flex:1;border:1.5px solid var(--br2);border-radius:var(--r2);
-  padding:12px 14px;font-size:1rem;font-weight:700;
+  padding:12px 12px;font-size:0.9375rem;font-weight:700;
   background:var(--card2);color:var(--t);outline:none;min-width:0;
   transition:border-color .15s;
 }
 .qa-in:focus{border-color:var(--accent);}
-.qa-in::placeholder{color:var(--mt);font-weight:600;font-size:0.9375rem;}
+.qa-in::placeholder{color:var(--mt);font-weight:700;font-size:0.9375rem;}
 .qa-go{
   background:var(--accent);color:var(--on-accent);
   border-radius:var(--r2);
   width:48px;height:48px;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
-  font-size:1.25rem;font-weight:900;
+  font-size:1.375rem;font-weight:900;
   transition:transform .12s,opacity .12s;
 }
 .qa-go:active{transform:scale(.92);}
@@ -495,21 +532,21 @@ select option{background:var(--card2);}
 .qa-meta{display:flex;gap:8px;margin-top:8px;}
 .qa-chip{
   flex:1;min-width:0;
-  display:flex;align-items:center;gap:7px;
+  display:flex;align-items:center;gap:8px;
   border:1.5px solid var(--br2);border-radius:var(--r1);
-  padding:9px 11px;min-height:44px;   /* было 38px */font-size:0.8125rem;font-weight:700;
+  padding:8px 12px;min-height:44px;   /* было 38px */font-size:0.8125rem;font-weight:700;
   background:var(--card2);color:var(--t2);
   transition:border-color .16s,color .16s;
 }
-.qa-chip-em{font-size:0.875rem;line-height:1;flex-shrink:0;}
+.qa-chip-em{font-size:0.9375rem;line-height:1;flex-shrink:0;}
 .qa-chip-tx{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left;}
 .qa-chip-ar{font-size:0.6875rem;color:var(--mt);flex-shrink:0;}
 .qa-chip.pick{color:var(--accent-tx);border-color:rgba(232,106,59,.45);}
 .qa-chip.on{border-color:var(--accent);}
 .qa-cal{
   border:1.5px solid var(--br2);border-radius:var(--r1);
-  padding:9px 12px;min-height:44px;   /* было 38px */background:var(--card2);color:var(--t2);
-  display:flex;align-items:center;gap:6px;
+  padding:8px 12px;min-height:44px;   /* было 38px */background:var(--card2);color:var(--t2);
+  display:flex;align-items:center;gap:4px;
   font-size:0.8125rem;font-weight:700;flex-shrink:0;
   transition:border-color .16s,color .16s;
 }
@@ -517,16 +554,16 @@ select option{background:var(--card2);}
 
 /* ── СПИСОК КАТЕГОРИЙ ────────────────────── */
 .crow{
-  display:flex;align-items:center;gap:11px;
-  width:100%;padding:11px 12px;border-radius:14px;
-  font-size:0.875rem;font-weight:500;color:var(--t);text-align:left;
+  display:flex;align-items:center;gap:12px;
+  width:100%;padding:12px 12px;border-radius:var(--r2);
+  font-size:0.9375rem;font-weight:500;color:var(--t);text-align:left;
 }
 .crow+.crow{margin-top:2px;}
 .crow:hover{background:rgba(255,255,255,.05);}
 .crow.sel{background:rgba(232,106,59,.14);}
-.crow-em{font-size:1.0625rem;line-height:1;flex-shrink:0;width:22px;text-align:center;}
+.crow-em{font-size:1.125rem;line-height:1;flex-shrink:0;width:22px;text-align:center;}
 .crow-nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.crow-am{font-size:0.8125rem;font-weight:800;color:var(--t2);white-space:nowrap;flex-shrink:0;}
+.crow-am{font-size:0.8125rem;font-weight:700;color:var(--t2);white-space:nowrap;flex-shrink:0;}
 .crow-am.gd{color:var(--gd);}
 .crow-am.rd{color:var(--rd);}
 
@@ -536,7 +573,7 @@ select option{background:var(--card2);}
   border-radius:var(--r3);
   box-shadow:var(--sh2);
   border:1px solid var(--br2);
-  padding:10px;margin-top:8px;
+  padding:8px;margin-top:8px;
   z-index:300;position:relative;
   pointer-events:auto;
   max-height:min(58vh,420px);overflow-y:auto;
@@ -544,27 +581,27 @@ select option{background:var(--card2);}
   transform-origin:top center;
   animation:pop .17s var(--ease);
 }
-.cq{display:flex;gap:8px;margin-bottom:10px;}
+.cq{display:flex;gap:8px;margin-bottom:8px;}
 .copt{
   flex:1;display:flex;align-items:center;gap:8px;
-  padding:9px 11px;border-radius:14px;
+  padding:8px 12px;border-radius:var(--r2);
   border:1.5px solid var(--br2);background:var(--bg);
   cursor:pointer;font-size:0.8125rem;font-weight:700;color:var(--t);
 }
 .copt.sel{border-color:var(--accent);background:rgba(232,106,59,.1);}
 .cic{
-  width:30px;height:30px;border-radius:9px;
+  width:30px;height:30px;border-radius:var(--r1);
   display:flex;align-items:center;justify-content:center;
   font-size:0.8125rem;font-weight:900;color:var(--on-accent);flex-shrink:0;
 }
 .ctd{background:var(--accent);}
 .cyd{background:var(--mt);}
-.cck{margin-left:auto;color:var(--accent);font-size:0.875rem;font-weight:900;}
-.cmonth{font-size:0.75rem;font-weight:700;color:var(--mt);margin:4px 2px 8px;text-transform:capitalize;}
-.cgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
-.cdh{font-size:0.6875rem;font-weight:700;text-align:center;color:var(--mt);padding:3px 0;}
+.cck{margin-left:auto;color:var(--accent);font-size:0.9375rem;font-weight:900;}
+.cmonth{font-size:0.8125rem;font-weight:700;color:var(--mt);margin:4px 2px 8px;text-transform:capitalize;}
+.cgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.cdh{font-size:0.6875rem;font-weight:700;text-align:center;color:var(--mt);padding:2px 0;}
 .cday{
-  width:100%;aspect-ratio:1;border-radius:9px;
+  width:100%;aspect-ratio:1;border-radius:var(--r1);
   font-size:0.8125rem;font-weight:700;
   background:none;border:none;cursor:pointer;color:var(--t);
 }
@@ -574,7 +611,7 @@ select option{background:var(--card2);}
 .cday.cfut{color:var(--mt);cursor:default;pointer-events:none;opacity:.35;}
 
 /* ── TX LIST ─────────────────────────────── */
-.no-tx{text-align:center;padding:48px 20px;color:var(--mt);font-size:0.875rem;font-weight:600;}
+.no-tx{text-align:center;padding:48px 20px;color:var(--mt);font-size:0.9375rem;font-weight:700;}
 .dg{
   background:var(--card);
   border-radius:var(--r3);margin-bottom:8px;
@@ -584,15 +621,15 @@ select option{background:var(--card2);}
 }
 .dh{
   display:flex;justify-content:space-between;align-items:center;
-  padding:8px 13px 7px;
+  padding:8px 12px 8px;
   border-bottom:1px solid var(--br2);
 }
 /* Без capitalize: он ломает русскую дату — «11 Августа» вместо «11 августа» */
-.dt{font-size:0.75rem;font-weight:700;color:var(--mt);}
-.ds{font-size:0.8125rem;font-weight:800;color:var(--t2);}
+.dt{font-size:0.8125rem;font-weight:700;color:var(--mt);}
+.ds{font-size:0.8125rem;font-weight:700;color:var(--t2);}
 .txr{
-  display:flex;align-items:center;gap:11px;
-  padding:9px 13px;
+  display:flex;align-items:center;gap:12px;
+  padding:8px 12px;
   /* visible divider between transactions */
   border-bottom:1px solid var(--br);
   animation:fi .18s ease;
@@ -608,23 +645,23 @@ select option{background:var(--card2);}
 }
 .txe.day{background:rgba(232,106,59,.13);}
 .txi{flex:1;min-width:0;}
-.txn{font-size:0.9062rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.txc{font-size:0.75rem;font-weight:500;color:var(--mt);margin-top:2px;}
-.txa{font-size:0.9062rem;font-weight:800;flex-shrink:0;color:var(--t);white-space:nowrap;}
+.txn{font-size:0.9375rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.txc{font-size:0.8125rem;font-weight:500;color:var(--mt);margin-top:2px;}
+.txa{font-size:0.9375rem;font-weight:700;flex-shrink:0;color:var(--t);white-space:nowrap;}
 .txd{flex-shrink:0;}
 /* подсветка только что добавленной траты — глазу нужно подтверждение */
 @keyframes flash{0%{background:rgba(48,201,124,.22);}100%{background:transparent;}}
 .txr.fresh{animation:flash 1.1s ease-out;}
 
 /* ── BUTTONS ─────────────────────────────── */
-.btn{border-radius:var(--r2);padding:13px 22px;min-height:44px;font-size:0.9375rem;font-weight:800;cursor:pointer;transition:opacity .12s,transform .12s;}
+.btn{border-radius:var(--r2);padding:12px 20px;min-height:44px;font-size:0.9375rem;font-weight:700;cursor:pointer;transition:opacity .12s,transform .12s;}
 .btn:active{transform:scale(.97);}
 .btn:hover{opacity:.85;}
 .btn:active{opacity:.65;}
 .bp{background:var(--accent);color:var(--on-accent);}
 .bs{background:var(--card2);color:var(--t);border:1.5px solid var(--br2);}
 .bd{background:rgba(255,79,71,.12);color:var(--rd);}
-.sm{font-size:0.8125rem;padding:9px 15px;border-radius:var(--r1);}
+.sm{font-size:0.8125rem;padding:8px 16px;border-radius:var(--r1);}
 
 /* ── MODAL ───────────────────────────────── */
 .overlay{
@@ -645,56 +682,56 @@ select option{background:var(--card2);}
   border:1px solid var(--br2);
   border-bottom:none;
 }
-.mdrag{width:38px;height:4px;background:var(--br2);border-radius:2px;margin:10px auto 0;}
-.mbody{padding:18px 18px;}
+.mdrag{width:38px;height:4px;background:var(--br2);border-radius:2px;margin:8px auto 0;}
+.mbody{padding:16px 16px;}
 .mhd{
   font-size:1.125rem;font-weight:900;margin-bottom:16px;
   display:flex;align-items:center;justify-content:space-between;
 }
-.mcl{font-size:1.5rem;font-weight:300;color:var(--mt);line-height:1;
+.mcl{font-size:1.375rem;font-weight:500;color:var(--mt);line-height:1;
   min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;}
   /* было 20x24 — самая мелкая цель в приложении, и это «закрыть» */
-.f{display:flex;flex-direction:column;gap:5px;margin-bottom:13px;}
+.f{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
 .f label{font-size:0.6875rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--mt);}
 .inp{
-  border:1.5px solid var(--br2);border-radius:12px;
-  padding:12px 14px;font-size:1rem;font-weight:600;
+  border:1.5px solid var(--br2);border-radius:var(--r1);
+  padding:12px 12px;font-size:0.9375rem;font-weight:700;
   color:var(--t);background:var(--card2);outline:none;width:100%;
 }
 .inp:focus{border-color:var(--accent);}
 .inp::placeholder{color:var(--mt);}
-.ir{display:flex;gap:10px;}
+.ir{display:flex;gap:8px;}
 /* min-width:0 обязателен: без него flex-элемент не сжимается меньше
    собственного контента, а нативный input[type=date] на iOS достаточно
    широкий — два поля рядом наезжали друг на друга */
 .ir .f{flex:1;min-width:0;}
 .ir .inp{width:100%;min-width:0;}
-.max{display:flex;gap:10px;margin-top:8px;}
+.max{display:flex;gap:8px;margin-top:8px;}
 .max .btn{flex:1;}
-.sgs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:15px;}
+.sgs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:16px;}
 .sg{
-  font-size:0.8125rem;font-weight:600;padding:7px 12px;border-radius:12px;
+  font-size:0.8125rem;font-weight:700;padding:8px 12px;border-radius:var(--r1);
   min-height:44px;display:inline-flex;align-items:center;   /* было 34px */
   background:var(--card2);border:1.5px solid var(--br2);color:var(--t2);
 }
 .sg:hover{border-color:var(--accent);color:var(--t);}
 
 /* ── PLANNED PREVIEW ─────────────────────── */
-.pprev{font-size:0.8125rem;font-weight:600;color:var(--mt);padding:5px 2px;min-height:22px;margin-bottom:4px;}
+.pprev{font-size:0.8125rem;font-weight:700;color:var(--mt);padding:4px 2px;min-height:22px;margin-bottom:4px;}
 
 /* ── TRANSFER PREVIEW ────────────────────── */
 .trprev{margin-bottom:12px;}
-.trpbox{background:var(--card2);border-radius:13px;padding:11px 14px;border:1px solid var(--br2);}
+.trpbox{background:var(--card2);border-radius:13px;padding:12px 12px;border:1px solid var(--br2);}
 .trprow{
   display:flex;justify-content:space-between;align-items:center;
-  font-size:0.8125rem;font-weight:600;padding:6px 0;gap:8px;
+  font-size:0.8125rem;font-weight:700;padding:4px 0;gap:8px;
   border-bottom:1px solid var(--br);
 }
 .trprow:last-child{border-bottom:none;}
 .trprow span:first-child{color:var(--mt);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.trprow b{font-weight:800;}
+.trprow b{font-weight:700;}
 /* цена решения в пересчёте на день — выделяем, это главная строка */
-.trpday{margin-top:2px;border-top:1px solid var(--br2);border-bottom:none;padding-top:9px;}
+.trpday{margin-top:2px;border-top:1px solid var(--br2);border-bottom:none;padding-top:8px;}
 .trpday span:first-child{color:var(--t2);font-weight:700;}
 
 /* ── BACKDROPS ───────────────────────────── */
@@ -710,43 +747,43 @@ select option{background:var(--card2);}
 .ctx-wrap{position:relative;display:inline-flex;align-items:center;justify-content:flex-end;}
 
 /* ── WIZARD ──────────────────────────────── */
-.wz{max-width:520px;margin:0 auto;padding:20px 14px 48px;}
+.wz{max-width:520px;margin:0 auto;padding:20px 12px 48px;}
 .wzstar{font-size:2.125rem;text-align:center;color:var(--accent);margin-bottom:8px;}
-.wztt{font-size:1.5625rem;font-weight:900;text-align:center;margin-bottom:10px;}
+.wztt{font-size:1.75rem;font-weight:900;text-align:center;margin-bottom:8px;}
 .wzdc{list-style:none;margin-bottom:16px;}
-.wzdc li{display:flex;align-items:flex-start;gap:8px;font-size:0.875rem;font-weight:600;padding:4px 0;color:var(--t2);}
+.wzdc li{display:flex;align-items:flex-start;gap:8px;font-size:0.9375rem;font-weight:700;padding:4px 0;color:var(--t2);}
 .wzdc span{flex-shrink:0;}
-.wzcard{background:var(--card);border-radius:20px;padding:16px;box-shadow:var(--sh);margin-bottom:14px;border:1px solid var(--br);}
+.wzcard{background:var(--card);border-radius:20px;padding:16px;box-shadow:var(--sh);margin-bottom:12px;border:1px solid var(--br);}
 .wzper{font-size:0.8125rem;font-weight:700;padding:8px 0;border-bottom:1px solid var(--br2);margin-bottom:12px;color:var(--t2);}
-.wzpb{font-size:0.75rem;font-weight:700;color:var(--accent);}
-.wzinfo{font-size:0.875rem;font-weight:600;color:var(--t2);margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--br2);}
+.wzpb{font-size:0.8125rem;font-weight:700;color:var(--accent);}
+.wzinfo{font-size:0.9375rem;font-weight:700;color:var(--t2);margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--br2);}
 .wznum{font-size:2.875rem;font-weight:900;color:var(--accent);margin-bottom:4px;}
-.wzlbl{font-size:0.9375rem;font-weight:600;color:var(--mt);margin-bottom:16px;}
-.wzadd{font-size:0.8125rem;font-weight:700;color:var(--accent);padding:10px 0;display:block;}
-.wztot{display:flex;justify-content:space-between;font-size:0.875rem;font-weight:700;padding-top:10px;border-top:1px solid var(--br2);margin-top:8px;color:var(--t2);}
+.wzlbl{font-size:0.9375rem;font-weight:700;color:var(--mt);margin-bottom:16px;}
+.wzadd{font-size:0.8125rem;font-weight:700;color:var(--accent);padding:8px 0;display:block;}
+.wztot{display:flex;justify-content:space-between;font-size:0.9375rem;font-weight:700;padding-top:8px;border-top:1px solid var(--br2);margin-top:8px;color:var(--t2);}
 .wztot .am{color:var(--accent);font-weight:900;}
 .wznav{display:flex;justify-content:space-between;align-items:center;}
-.wzbk{font-size:0.875rem;font-weight:700;color:var(--mt);}
+.wzbk{font-size:0.9375rem;font-weight:700;color:var(--mt);}
 .mb12{margin-bottom:12px;}
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
-.chip{font-size:0.8125rem;font-weight:600;padding:7px 12px;border-radius:12px;background:var(--card2);border:1.5px solid var(--br2);color:var(--t2);}
+.chips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;}
+.chip{font-size:0.8125rem;font-weight:700;padding:8px 12px;border-radius:var(--r1);background:var(--card2);border:1.5px solid var(--br2);color:var(--t2);}
 .chip.pkd{border-color:var(--accent);background:rgba(232,106,59,.1);color:var(--accent);}
-.cl{list-style:none;margin-top:14px;}
-.cl li{font-size:0.8125rem;font-weight:600;color:var(--mt);padding:4px 0 4px 14px;position:relative;}
+.cl{list-style:none;margin-top:12px;}
+.cl li{font-size:0.8125rem;font-weight:700;color:var(--mt);padding:4px 0 4px 12px;position:relative;}
 .cl li::before{content:'·';position:absolute;left:4px;}
 /* Wizard table */
 .wt{width:100%;border-collapse:collapse;}
-.wt th{font-size:0.6875rem;font-weight:700;text-transform:uppercase;color:var(--mt);padding:7px 4px;border-bottom:1px solid var(--br2);}
-.wt td{padding:7px 4px;border-bottom:1px solid var(--br);}
+.wt th{font-size:0.6875rem;font-weight:700;text-transform:uppercase;color:var(--mt);padding:8px 4px;border-bottom:1px solid var(--br2);}
+.wt td{padding:8px 4px;border-bottom:1px solid var(--br);}
 .wt tr:last-child td{border-bottom:none;}
-.wri{display:flex;align-items:center;gap:6px;}
-.wem{width:38px;border:1.5px solid var(--br2);border-radius:10px;padding:7px 4px;font-size:1.125rem;text-align:center;background:var(--bg);}
-.wnm{flex:1;border:1.5px solid var(--br2);border-radius:10px;padding:8px 10px;font-size:0.875rem;font-weight:600;background:var(--bg);outline:none;}
-.wam{width:90px;border:1.5px solid var(--br2);border-radius:10px;padding:8px 10px;font-size:0.875rem;font-weight:600;background:var(--bg);text-align:right;outline:none;}
-.wdl{color:var(--rd);font-size:1.25rem;font-weight:300;padding:4px 8px;}
+.wri{display:flex;align-items:center;gap:4px;}
+.wem{width:38px;border:1.5px solid var(--br2);border-radius:var(--r1);padding:8px 4px;font-size:1.125rem;text-align:center;background:var(--bg);}
+.wnm{flex:1;border:1.5px solid var(--br2);border-radius:var(--r1);padding:8px 8px;font-size:0.9375rem;font-weight:700;background:var(--bg);outline:none;}
+.wam{width:90px;border:1.5px solid var(--br2);border-radius:var(--r1);padding:8px 8px;font-size:0.9375rem;font-weight:700;background:var(--bg);text-align:right;outline:none;}
+.wdl{color:var(--rd);font-size:1.375rem;font-weight:500;padding:4px 8px;}
 
 /* ── EMPTY ───────────────────────────────── */
-.empty{text-align:center;padding:70px 20px;}
+.empty{text-align:center;padding:72px 20px;}
 
 /* ── ANIMATIONS ──────────────────────────── */
 @keyframes fi{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:scale(1)}}
@@ -760,25 +797,25 @@ select option{background:var(--card2);}
 }
 .auth-logo{
   font-size:1.75rem;font-weight:900;letter-spacing:-.5px;
-  color:var(--t);margin-bottom:6px;
+  color:var(--t);margin-bottom:4px;
 }
 .auth-logo span{color:var(--accent);}
-.auth-sub{font-size:0.875rem;font-weight:600;color:var(--mt);margin-bottom:28px;}
+.auth-sub{font-size:0.9375rem;font-weight:700;color:var(--mt);margin-bottom:24px;}
 .auth-card{
   background:var(--card);border:1px solid var(--br);
-  border-radius:22px;padding:24px 22px;
+  border-radius:22px;padding:24px 20px;
   width:100%;max-width:380px;
   box-shadow:var(--sh2);
 }
 
 .auth-err{
-  font-size:0.8125rem;font-weight:600;color:var(--rd);
+  font-size:0.8125rem;font-weight:700;color:var(--rd);
   min-height:18px;margin-bottom:8px;
 }
 .auth-link{
   display:block;width:100%;text-align:center;
   font-size:0.8125rem;font-weight:700;color:var(--mt);
-  padding:10px 0;margin-top:6px;
+  padding:8px 0;margin-top:4px;
   cursor:pointer;
 }
 .auth-link:hover{color:var(--accent);}
@@ -795,24 +832,24 @@ select option{background:var(--card2);}
 /* ── USER BAR (in header) ────────────────── */
 .usr-bar{
   display:flex;align-items:center;gap:8px;
-  padding:5px 10px 5px 5px;
+  padding:4px 8px 4px 4px;
   border-radius:99px;
   background:var(--card2);border:1px solid var(--br2);
-  font-size:0.75rem;font-weight:700;color:var(--mt);
+  font-size:0.8125rem;font-weight:700;color:var(--mt);
   cursor:pointer;
 }
 .usr-av{
   width:44px;height:44px;border-radius:50%;   /* было 28px — нижний предел, не норма */
   background:var(--accent);color:var(--on-accent);
   display:flex;align-items:center;justify-content:center;
-  font-size:0.75rem;font-weight:900;flex-shrink:0;
+  font-size:0.8125rem;font-weight:900;flex-shrink:0;
   cursor:pointer;border:none;
   transition:opacity .15s;
 }
 .usr-av:hover{opacity:.8;}
-.usr-menu{position:absolute;top:calc(100% + 6px);right:0;background:var(--card2);border-radius:14px;box-shadow:var(--sh2);border:1px solid var(--br2);min-width:200px;overflow:hidden;z-index:200;animation:fi .12s ease;}
-.usr-menu-email{padding:11px 14px;font-size:0.75rem;font-weight:600;color:var(--mt);border-bottom:1px solid var(--br);word-break:break-all;}
-.usr-menu-item{display:block;width:100%;padding:12px 14px;text-align:left;font-size:0.875rem;font-weight:700;color:var(--rd);}
+.usr-menu{position:absolute;top:calc(100% + 6px);right:0;background:var(--card2);border-radius:var(--r2);box-shadow:var(--sh2);border:1px solid var(--br2);min-width:200px;overflow:hidden;z-index:200;animation:fi .12s ease;}
+.usr-menu-email{padding:12px 12px;font-size:0.8125rem;font-weight:700;color:var(--mt);border-bottom:1px solid var(--br);word-break:break-all;}
+.usr-menu-item{display:block;width:100%;padding:12px 12px;text-align:left;font-size:0.9375rem;font-weight:700;color:var(--rd);}
 .usr-menu-item:hover{background:rgba(255,79,71,.08);}
 .usr-bar:hover{border-color:var(--br);}
 
@@ -842,7 +879,7 @@ select option{background:var(--card2);}
 /* ── iOS PWA FIXES ───────────────────────── */
 /* Запрет зума при фокусе на input (iOS) */
 input, select, textarea {
-  font-size:1rem !important;
+  font-size:0.9375rem !important;
   -webkit-text-size-adjust:100%;
 }
 /* Запрет выделения текста при долгом тапе */
@@ -1419,9 +1456,9 @@ async function doRegister() {
     document.getElementById('app').innerHTML =
       '<div class="auth-wrap"><div class="auth-logo">✦ <span>Б</span>юджет</div>' +
       '<div class="auth-card" style="text-align:center">' +
-        '<div style="font-size:2.5rem;margin-bottom:12px">📬</div>' +
-        '<div style="font-size:1.0625rem;font-weight:800;margin-bottom:8px">Проверь почту</div>' +
-        '<div style="font-size:0.875rem;color:var(--t2)">Мы отправили письмо на <b>'+esc(email)+'</b>.<br>Перейди по ссылке — и можно начинать.</div>' +
+        '<div style="font-size:2.875rem;margin-bottom:12px">📬</div>' +
+        '<div style="font-size:1.125rem;font-weight:700;margin-bottom:8px">Проверь почту</div>' +
+        '<div style="font-size:0.9375rem;color:var(--t2)">Мы отправили письмо на <b>'+esc(email)+'</b>.<br>Перейди по ссылке — и можно начинать.</div>' +
         '<button type="button" class="auth-link" style="margin-top:20px" onclick="renderAuth()">← Войти</button>' +
       '</div></div>';
   }
@@ -2784,7 +2821,7 @@ function rWz2(){
   var d=wd,ti=wdTI(),tp=wdTP(),avail=ti-tp,days=getDays(d.dateFrom,d.dateTo),daily=avail>0?avail/days:0;
   return '<div class="hdr" role="banner"><div class="hdr-r1"><h1 class="logo">✦ <span>Б</span>юджет</h1></div></div>'+
   '<div class="wz"><div class="wzstar">✦</div><div class="wztt">Ваш дневной бюджет</div>'+
-  '<div class="wzcard" style="text-align:center;padding:28px 16px">'+
+  '<div class="wzcard" style="text-align:center;padding:24px 16px">'+
     '<div class="wznum">'+fmt(daily)+'</div>'+
     '<div class="wzlbl">можно тратить каждый день</div>'+
     '<ul class="cl"><li>Тратьте на что угодно из дневного бюджета.</li><li>Накопилось — добавится завтра.</li><li>Ушли в минус — завтра меньше.</li></ul>'+
@@ -2796,8 +2833,8 @@ function rEmpty(){
   return '<div class="hdr" role="banner"><div class="hdr-r1"><h1 class="logo">✦ <span>Б</span>юджет</h1></div></div>'+
   '<div class="pg"><div class="empty">'+
     '<div style="font-size:2.875rem;margin-bottom:12px">✦</div>'+
-    '<div style="font-size:1.3125rem;font-weight:800;margin-bottom:8px">Нет бюджета</div>'+
-    '<div style="font-size:0.875rem;color:var(--mt);font-weight:500;margin-bottom:20px">Создай бюджет на месяц — и начни контролировать деньги</div>'+
+    '<div style="font-size:1.375rem;font-weight:700;margin-bottom:8px">Нет бюджета</div>'+
+    '<div style="font-size:0.9375rem;color:var(--mt);font-weight:500;margin-bottom:20px">Создай бюджет на месяц — и начни контролировать деньги</div>'+
     '<button type="button" class="btn bp" onclick="startWz()">+ Создать бюджет</button>'+
   '</div></div>';
 }

@@ -18,7 +18,7 @@
  * Прогон ничего не чинит и ничего не пишет в репозиторий — только считает.
  */
 const path = require('path');
-const {buildDemo, seedState, serve, freezeDate, TODAY, loadPlaywright} = require('./demo.js');
+const {buildDemo, seedState, seedStateBusy, serve, freezeDate, TODAY, loadPlaywright} = require('./demo.js');
 const pw = loadPlaywright();
 
 /* ── Замеры, исполняемые в браузере ───────────
@@ -168,7 +168,7 @@ const uniq = (arr, key) => {
     window.__CLOUD__ = JSON.parse(JSON.stringify(st));
     localStorage.setItem('budget_last_uid', 'u1');
     localStorage.setItem('budget_backup_u1', JSON.stringify(st));
-  }, seedState());
+  }, seedStateBusy());   /* рабочее состояние, а не пустое: см. demo.js */
   await pg.evaluate(() => window.__initApp());
   await pg.waitForTimeout(900);
   await pg.evaluate(() => swBdg('b-sep'));
@@ -278,6 +278,138 @@ const uniq = (arr, key) => {
       '  «' + x.text + '»'));
   await pg.screenshot({path: '/tmp/sintra-zoom200.png'});
   await pg.evaluate(() => { const z = document.getElementById('__zoom'); if (z) z.remove(); });
+
+  /* --- разнобой оформления ---
+     Скилл дизайн-ревью умеет сказать «соблюдайте шкалу» и не умеет сказать,
+     сколько у вас сейчас размеров. А число решает всё: 8 кеглей — система,
+     27 — случайность, и спорить тут не о чем. Считаем то, что в макете
+     обязано быть счётным: кегли, радиусы, отступы, цвета, тени. */
+  console.log('\n══ РАЗНОБОЙ ОФОРМЛЕНИЯ ══');
+  await pg.evaluate(() => setTab('history'));
+  await pg.waitForTimeout(200);
+  const sys = await pg.evaluate(() => {
+    const bag = {font: {}, radius: {}, pad: {}, color: {}, bg: {}, shadow: {}, weight: {}};
+    const add = (k, v) => { if (v && v !== '0px' && v !== 'none' && v !== 'rgba(0, 0, 0, 0)')
+      bag[k][v] = (bag[k][v] || 0) + 1; };
+    document.querySelectorAll('body *').forEach(el => {
+      const s = getComputedStyle(el);
+      if (s.display === 'none') return;
+      const hasText = Array.from(el.childNodes).some(n => n.nodeType === 3 && n.textContent.trim());
+      if (hasText) { add('font', s.fontSize); add('color', s.color); add('weight', s.fontWeight); }
+      /* Капсула (99px и больше) и круг (50%) — это ФОРМЫ, а не ступени
+         шкалы скруглений. Считать их наравне с 10/16/22 значит вечно
+         показывать «многовато» там, где система соблюдена. */
+      const rr = s.borderRadius;
+      if (!/^(50%|9\d px|9\d{1,3}px|100%)$/.test(rr.replace(/\s+/g, ' ')))
+        add('radius', rr);
+      add('bg', s.backgroundColor);
+      add('shadow', s.boxShadow);
+      [s.paddingTop, s.paddingLeft].forEach(v => add('pad', v));
+    });
+    const top = o => Object.entries(o).sort((a, b) => b[1] - a[1]);
+    const out = {};
+    for (const k in bag) out[k] = {n: Object.keys(bag[k]).length, top: top(bag[k]).slice(0, 6)};
+    return out;
+  });
+  const NORM = {font: 8, radius: 4, pad: 6, color: 6, bg: 6, shadow: 3, weight: 4};
+  const RUS = {font: 'кеглей', radius: 'радиусов', pad: 'отступов', color: 'цветов текста',
+               bg: 'цветов фона', shadow: 'теней', weight: 'начертаний'};
+  Object.keys(RUS).forEach(k => {
+    const n = sys[k].n, norm = NORM[k];
+    const mark = n > norm * 1.5 ? ' ← разнобой' : (n > norm ? ' ← многовато' : '');
+    console.log('  %s: %d (разумно до %d)%s', RUS[k].padEnd(14), n, norm, mark);
+    if (n > norm) console.log('      чаще всего: ' +
+      sys[k].top.map(([v, c]) => v + '×' + c).join(', '));
+  });
+
+  /* --- сколько экрана работает ---
+     Пустота внизу — не грех сама по себе, но на телефоне это главный ресурс.
+     Меряем долю высоты экрана, ниже которой нет ни одного видимого элемента. */
+  console.log('\n══ ИСПОЛЬЗОВАНИЕ ЭКРАНА ══');
+  /* Меряем ДВА состояния, иначе вывод врёт в любую сторону: на пустом
+     периоде экран законно полупустой (показывать нечего), на рабочем —
+     заполнен. Одно число без другого — повод переделать то, что цело. */
+  for (const [name, go] of [
+      ['Выписка·будни', async () => { await pg.evaluate(() => { swBdg('b-sep'); setTab('history'); }); }],
+      ['Выписка·пусто', async () => { await pg.evaluate(() => { swBdg('b-oct'); setTab('history'); }); }],
+      ['Доходы',        async () => { await pg.evaluate(() => { swBdg('b-sep'); setTab('incomes'); }); }],
+      ['Сводка',        async () => { await pg.evaluate(() => setTab('stats')); }]]) {
+    await go();
+    await pg.waitForTimeout(200);
+    const u = await pg.evaluate(() => {
+      /* ЛОВУШКА, третья в этом файле того же рода: если считать нижний край
+         любого блока, получится 100% на любом экране — контейнер страницы
+         растянут во всю высоту, даже когда он пуст. Такая цифра успокаивает
+         и врёт. Считаем только то, что человек ВИДИТ: узлы с собственным
+         текстом либо с собственным фоном, отличным от фона страницы. */
+      const pageBg = getComputedStyle(document.body).backgroundColor;
+      let bottom = 0, last = null;
+      document.querySelectorAll('body *').forEach(el => {
+        const s = getComputedStyle(el);
+        if (s.display === 'none' || s.visibility === 'hidden' || +s.opacity < 0.05) return;
+        const r = el.getBoundingClientRect();
+        if (r.height < 1 || r.width < 1 || r.top > window.innerHeight) return;
+        const hasText = Array.from(el.childNodes)
+          .some(n => n.nodeType === 3 && n.textContent.trim());
+        const ownBg = s.backgroundColor !== pageBg
+          && s.backgroundColor !== 'rgba(0, 0, 0, 0)';
+        const hasEdge = s.borderTopWidth !== '0px' || s.borderBottomWidth !== '0px';
+        if (!hasText && !ownBg && !hasEdge) return;
+        const b = Math.min(r.bottom, window.innerHeight);
+        if (b > bottom) { bottom = b; last = (el.className || el.tagName) + ''; }
+      });
+      return {used: Math.round(bottom), win: window.innerHeight, last: String(last).slice(0, 30)};
+    });
+    const pct = Math.round(u.used / u.win * 100);
+    const note = name.indexOf('пусто') > 0
+      ? '  (период без операций — так и должно быть)'
+      : (pct < 60 ? '  ← больше трети пустует' : '');
+    console.log('  %s: занято %d%% высоты (%d из %d px)%s',
+      name.padEnd(14), pct, u.used, u.win, note);
+    console.log('  %s  нижний видимый элемент: %s', ''.padEnd(14), u.last);
+  }
+
+  /* --- клавиатура и движение --- */
+  console.log('\n══ ФОКУС И ДВИЖЕНИЕ ══');
+  const kb = await pg.evaluate(() => {
+    const css = Array.from(document.styleSheets).flatMap(sh => {
+      try { return Array.from(sh.cssRules).map(r => r.cssText); } catch (e) { return []; }
+    }).join('\n');
+    return {
+      focusVisible: /:focus-visible/.test(css),
+      focusAny: /:focus/.test(css),
+      outlineNone: (css.match(/outline\s*:\s*(none|0)/g) || []).length,
+      reducedMotion: /prefers-reduced-motion/.test(css),
+      colorScheme: /prefers-color-scheme/.test(css),
+      transitions: (css.match(/transition\s*:/g) || []).length,
+      animations: (css.match(/@keyframes/g) || []).length
+    };
+  });
+  console.log('  видимый фокус клавиатуры : ' + (kb.focusVisible ? 'есть'
+    : kb.focusAny ? 'только :focus, без :focus-visible' : 'НЕТ — с клавиатуры не видно, где ты'));
+  /* outline:none сам по себе не грех: он гасит системную обводку ради вида,
+     а фокус возвращают через :focus-visible. Ругаться надо только когда
+     возврата нет — иначе замер требует чинить уже починенное. */
+  console.log('  снятие обводки outline:none: ' + kb.outlineNone +
+    (kb.outlineNone && !kb.focusVisible ? ' ← и возврата через :focus-visible нет'
+     : kb.outlineNone ? ' (возврат есть через :focus-visible — норма)' : ''));
+  console.log('  учёт «уменьшить движение» : ' + (kb.reducedMotion ? 'есть'
+    : 'НЕТ — при ' + kb.transitions + ' переходах и ' + kb.animations + ' анимациях'));
+  console.log('  светлая тема               : ' + (kb.colorScheme ? 'есть' : 'НЕТ, только тёмная'));
+
+  /* --- сколько касаний до частого действия ---
+     Самое дорогое число в приложении, которым пользуются каждый день. */
+  console.log('\n══ ПУТЬ ДО ЧАСТЫХ ДЕЙСТВИЙ ══');
+  const paths = [
+    ['записать трату',       'поле ввода на первом экране', 2],
+    ['посмотреть остаток',   'виден сразу, 0 касаний',       0],
+    ['сменить период',       'шапка → выбор из списка',      2],
+    ['добавить доход',       'вкладка Доходы → +Добавить → форма → Сохранить', 4],
+    ['посмотреть по категориям', 'шапка → меню → Сводка',    3]
+  ];
+  paths.forEach(([what, how, n]) =>
+    console.log('  %s %s  (%s)', String(n).padEnd(2), what.padEnd(26), how));
+  console.log('  [оценка по разметке, не замер поведения — считать ориентиром]');
 
   /* --- заявленные настройки --- */
   const meta = await pg.evaluate(() => {
