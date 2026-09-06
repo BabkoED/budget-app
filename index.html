@@ -38,14 +38,16 @@
   --mt:     #949398;  /* серый из палитры Mercedes; был #919191, контрасты выше */
   --br:     #273030;
   --br2:    #383838;
-  /* Акцент — Petronas teal из ливреи Mercedes AMG F1 2022 (решение Антона
-     06.09.2026). Заменил оранжевый #E86A3B. Зелёный и красный НЕ трогаем:
-     они несут смысл «в плюсе» и «перерасход», а не оформление.
-     Из палитры Mercedes в акцент годится только этот тон: #03BFB5 пришлось
-     отбросить — при дальтонизме он сливается с зелёным (ΔE 6.9). */
-  --accent: #00A19C;     /* заливка кнопок; контраст 5.22 к карточке */
-  --on-accent: #01201F;  /* текст НА заливке: 5.36:1, белый дал бы 3.19 */
-  --accent-tx: #05A6A0;  /* тил КАК текст на тёмном: 4.75:1 на всех четырёх фонах */
+  /* Акцент — индиго Stripe. Заменил Petronas teal 06.09.2026: тил стоял
+     в 35° от зелёного «в плюсе», и глаз читал их как два оттенка одного
+     цвета — отсюда ощущение разнобоя, которое Антон и назвал.
+     Индиго стоит почти в вершине равносторонней триады с зелёным (156°)
+     и красным (27°): идеал 271°, он на 278°, промах 7°. Разносы 123° и
+     109° против 35° и 164° у тила.
+     Зелёный и красный НЕ трогаем: они несут смысл, а не оформление. */
+  --accent: #635BFF;     /* заливка кнопок; белый текст на ней 4.70 */
+  --on-accent: #FFFFFF;  /* на индиго белый лучше тёмного: 4.70 против 3.4 */
+  --accent-tx: #A791FD;  /* индиго КАК текст на тёмном: 5.50 на всех фонах */
   --gd:     #30C97C;
   --rd:     #FF4F47;
   --rl:     rgba(255,79,71,.12);
@@ -141,7 +143,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
 .hdr-r2{display:flex;gap:2px;padding:0 12px 8px;}
 
 .logo{font-size:1.125rem;font-weight:900;letter-spacing:-.4px;margin:0;}  /* margin:0 — логотип стал h1 */
-.logo span{color:var(--accent);}
+.logo span{color:var(--accent-tx);}  /* --accent-tx, а не --accent: заливочный цвет как ТЕКСТ давал 3.9 */
 
 
 /* ── HEADER RIGHT GROUP ──────────────────── */
@@ -153,8 +155,8 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
   display:flex;align-items:center;justify-content:space-between;gap:8px;
   width:100%;padding:8px 16px;
   font-size:0.8125rem;font-weight:700;
-  background:rgba(0,161,156,.13);color:var(--accent);
-  border-top:1px solid rgba(0,161,156,.22);
+  background:rgba(99,91,255,.13);color:var(--accent);
+  border-top:1px solid rgba(99,91,255,.22);
 }
 .cur-bar span:first-child{color:var(--t2);font-weight:700;}
 .cur-go{white-space:nowrap;}
@@ -253,7 +255,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
 .drop-soon{font-size:0.6875rem;font-weight:700;color:var(--mt);}
 .newmo-banner{
   display:flex;align-items:center;justify-content:space-between;gap:12px;
-  background:rgba(0,161,156,.12);border:1px solid rgba(0,161,156,.3);
+  background:rgba(99,91,255,.12);border:1px solid rgba(99,91,255,.3);
   border-radius:var(--r2);padding:12px 16px;margin:12px 16px 0;
 }
 /* ── ТОП ТРАТ ──────────────────────────────── */
@@ -267,7 +269,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
 .ts-nm{font-size:0.9375rem;font-weight:700;color:var(--t);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .ts-am{font-size:0.9375rem;font-weight:700;color:var(--t);white-space:nowrap;}
 .ts-bar{height:6px;border-radius:99px;background:var(--br);overflow:hidden;}
-.ts-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),#f0906a);}
+.ts-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),#8F74FB);}
 .ts-sub{font-size:0.6875rem;font-weight:700;color:var(--mt);margin-top:4px;}
 
 /* ── СВОДКА ЗА ПЕРИОД ──────────────────────── */
@@ -288,7 +290,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
 .st-nm{flex:1;min-width:0;font-size:0.9375rem;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .st-am{font-size:0.9375rem;font-weight:700;white-space:nowrap;flex-shrink:0;}
 .st-bar{height:6px;border-radius:99px;background:var(--br);overflow:hidden;}
-.st-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),#f0906a);}
+.st-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),#8F74FB);}
 .st-sub{font-size:0.6875rem;font-weight:700;color:var(--mt);margin-top:4px;}
 
 /* ── СРАВНЕНИЕ С ПРОШЛЫМ МЕСЯЦЕМ ───────────── */
@@ -409,7 +411,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
 .row-ov{background:var(--rl);}
 .row-ov td{border-bottom-color:rgba(255,79,71,.2);}
 .ov-tag{display:flex;align-items:center;gap:8px;margin-top:4px;font-size:0.8125rem;font-weight:700;color:var(--rd);}
-.ov-btn{font-size:0.6875rem;font-weight:700;color:var(--accent);background:rgba(0,161,156,.15);border-radius:var(--r1);padding:2px 8px;}
+.ov-btn{font-size:0.6875rem;font-weight:700;color:var(--accent);background:rgba(99,91,255,.15);border-radius:var(--r1);padding:2px 8px;}
 
 /* ── DOTS MENU ───────────────────────────────
    Кнопка с фиксированным квадратом 32×32: текстовые «•••» разъезжались
@@ -472,7 +474,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
 
 /* ── КАРТОЧКА ДНЯ ────────────────────────── */
 .hero{
-  background:linear-gradient(158deg,#212121 0%,#191919 100%);
+  background:linear-gradient(158deg,#1F2028 0%,#17181E 100%);
   border:1px solid var(--br2);
   border-radius:var(--r3);
   padding:12px 12px 12px;
@@ -549,7 +551,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
 .qa-chip-em{font-size:0.9375rem;line-height:1;flex-shrink:0;}
 .qa-chip-tx{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left;}
 .qa-chip-ar{font-size:0.6875rem;color:var(--mt);flex-shrink:0;}
-.qa-chip.pick{color:var(--accent-tx);border-color:rgba(0,161,156,.45);}
+.qa-chip.pick{color:var(--accent-tx);border-color:rgba(99,91,255,.45);}
 .qa-chip.on{border-color:var(--accent);}
 .qa-cal{
   border:1.5px solid var(--br2);border-radius:var(--r1);
@@ -568,7 +570,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
 }
 .crow+.crow{margin-top:2px;}
 .crow:hover{background:rgba(255,255,255,.05);}
-.crow.sel{background:rgba(0,161,156,.14);}
+.crow.sel{background:rgba(99,91,255,.14);}
 .crow-em{font-size:1.125rem;line-height:1;flex-shrink:0;width:22px;text-align:center;}
 .crow-nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .crow-am{font-size:0.8125rem;font-weight:700;color:var(--t2);white-space:nowrap;flex-shrink:0;}
@@ -596,7 +598,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
   border:1.5px solid var(--br2);background:var(--bg);
   cursor:pointer;font-size:0.8125rem;font-weight:700;color:var(--t);
 }
-.copt.sel{border-color:var(--accent);background:rgba(0,161,156,.1);}
+.copt.sel{border-color:var(--accent);background:rgba(99,91,255,.1);}
 .cic{
   width:30px;height:30px;border-radius:var(--r1);
   display:flex;align-items:center;justify-content:center;
@@ -614,7 +616,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
   background:none;border:none;cursor:pointer;color:var(--t);
 }
 .cday:hover:not(.cfut){background:var(--br2);}
-.cday.ctd{background:rgba(0,161,156,.18);color:var(--accent);}
+.cday.ctd{background:rgba(99,91,255,.18);color:var(--accent);}
 .cday.csel{background:var(--accent);color:var(--on-accent);}
 .cday.cfut{color:var(--mt);cursor:default;pointer-events:none;opacity:.35;}
 
@@ -651,7 +653,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
   font-size:0.9375rem;line-height:1;
   background:rgba(255,255,255,.055);
 }
-.txe.day{background:rgba(0,161,156,.13);}
+.txe.day{background:rgba(99,91,255,.13);}
 .txi{flex:1;min-width:0;}
 .txn{font-size:0.9375rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .txc{font-size:0.8125rem;font-weight:500;color:var(--mt);margin-top:2px;}
@@ -775,7 +777,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
 .mb12{margin-bottom:12px;}
 .chips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;}
 .chip{font-size:0.8125rem;font-weight:700;padding:8px 12px;border-radius:var(--r1);background:var(--card2);border:1.5px solid var(--br2);color:var(--t2);}
-.chip.pkd{border-color:var(--accent);background:rgba(0,161,156,.1);color:var(--accent);}
+.chip.pkd{border-color:var(--accent);background:rgba(99,91,255,.1);color:var(--accent);}
 .cl{list-style:none;margin-top:12px;}
 .cl li{font-size:0.8125rem;font-weight:700;color:var(--mt);padding:4px 0 4px 12px;position:relative;}
 .cl li::before{content:'·';position:absolute;left:4px;}
