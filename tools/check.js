@@ -210,6 +210,60 @@ function checkPlural(ok){
   console.log('\n10. Склонение числительных');
   checkPlural(ok);
 
+  /* ── 11. Правка в СЕРЕДИНЕ периода ───────────
+     Своя страница с «сегодня» 10 сентября. На TODAY стенда (1-е число)
+     recalcDaily уходит в ветку «период только начался» и считает норму
+     обычной формулой — ветку правки середины периода там не проверить ничем.
+     А сломалось 10.09.2026 именно в ней: крупное перераспределение загнало
+     ставку в минус, accrued обрезал минус нулём, начисления за эти дни
+     потерялись — «осталось −1 212 ₽, завтра +0 ₽» при 32 149 ₽ свободных
+     на дневные. Лечилось только перезапуском (там сводит reconcileOnLoad). */
+  console.log('\n11. Правка в середине периода');
+  const pg2=await (await br.newContext({viewport:{width:430,height:932}})).newPage();
+  pg2.on('pageerror',e=>{console.log('PAGEERROR(mid):',e.message);fails++;});
+  await pg2.addInitScript(freezeDate('2026-09-10'));
+  await pg2.goto(url);
+  await pg2.evaluate(st=>{window.__CLOUD__=JSON.parse(JSON.stringify(st));
+    localStorage.setItem('budget_last_uid','u1');
+    localStorage.setItem('budget_backup_u1',JSON.stringify(st));},seedState());
+  await pg2.evaluate(()=>window.__initApp());
+  await pg2.waitForTimeout(900);
+  r=await pg2.evaluate(()=>{
+    var b=getAB();
+    function inv(){                     /* тот же инвариант, что в блоке 4 */
+      var res=0;
+      for(var i=0;i<b.planned.length;i++){var q=calcCatRem(b,b.planned[i].id);if(q>0)res+=q;}
+      return calcDayBal(b)+accrued(b,nextDay(today()),b.dateTo)+res-calcTotalBal(b);
+    }
+    /* воспроизводим состояние после крупного перераспределения */
+    b.rates=[{from:b.dateFrom,v:rateOn(b,b.dateFrom)},{from:today(),v:-5000}];
+    b.dailyBudget=0;
+    var before={d:b.dailyBudget,bal:calcDayBal(b),inv:inv()};
+    /* любая правка котла — перевод в категорию и обратно, как это делает doTr */
+    b.planned[0].amount+=1000;recalcDaily(b);
+    b.planned[0].amount-=1000;recalcDaily(b);
+    var want=(potOf(b)-accrued(b,accrualStart(b),prevDay(today())))/getDays(today(),b.dateTo);
+    return {before:before,d:b.dailyBudget,bal:calcDayBal(b),want:want,inv:inv()};
+  });
+  ok('залипшая в минусе норма сводится при первой правке, без перезапуска',
+     r.before.d===0&&r.d>0&&Math.abs(r.d-r.want)<0.01,r);
+  ok('и денежный инвариант в середине периода снова сходится',
+     Math.abs(r.before.inv)>1&&Math.abs(r.inv)<0.01,r);
+  r=await pg2.evaluate(()=>{
+    var b=getAB(),cat=b.planned[0];
+    var before=(document.querySelector('.hero-sub')||{}).textContent||'';
+    S.txs.push({id:'t-cat-today',seq:98,date:today(),name:'Аренда',category:cat.name,
+      categoryEmoji:cat.emoji,plannedCatId:cat.id,amount:9000,budgetId:b.id,mod:Date.now()});
+    render();
+    var sub=(document.querySelector('.hero-sub')||{}).textContent||'';
+    var w=parseFloat(((document.querySelector('.hero-fill')||{style:{}}).style.width)||'0');
+    S.txs=S.txs.filter(function(t){return t.id!=='t-cat-today';});render();
+    return {before:before,sub:sub,w:w,bal:calcDayBal(b)};
+  });
+  ok('категорийная трата дня видна в подписи, а не тонет в нуле',/по категориям/.test(r.sub),r.sub);
+  ok('но полоса от неё не обнулилась — она про дневной запас',r.w>0&&r.bal>0,r);
+  ok('без категорийных трат лишней подписи нет',!/по категориям/.test(r.before),r.before);
+
   const shot=path.join(os.tmpdir(),'budget-check.png');
   await pg.evaluate(()=>{drop=true;render();});await wait(150);
   await pg.screenshot({path:shot});
