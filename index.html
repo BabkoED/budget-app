@@ -2473,7 +2473,7 @@ function rHero(b){
       (ended?'':'<span>завтра <b>+'+fmt(b.dailyBudget)+'</b></span>')+
       (function(){
         var n=[];
-        if(catToday)n.push('+ '+fmt(catToday)+' сегодня по категориям');
+        if(catToday)n.push('Потрачено по категориям <b>'+fmt(catToday)+'</b>');
         if(!ended&&!b.dailyBudget)n.push('дневных до конца периода не осталось');
         return n.length?'<span class="hs-c">'+n.join(' · ')+'</span>':'';
       })()+
