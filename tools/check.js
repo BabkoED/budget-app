@@ -340,6 +340,51 @@ function checkPlural(ok){
   ok('повторяющийся доход переносит число месяца',r.same==='2026-10-25',r);
   ok('если числа в этом месяце уже нет — берётся следующий',r.late==='2026-11-10',r);
   ok('несуществующее число даты не получает',r.none===''&&r.empty==='',r);
+  /* Период длиннее двух месяцев: раньше перебирались ровно два, и число,
+     попадающее в третий, теряло дату на ровном месте. */
+  r=await pg3.evaluate(()=>({long:shiftDOM('2026-09-05','2026-10-10','2026-12-31'),
+    year:shiftDOM('2026-09-05','2026-10-10','2027-06-30')}));
+  ok('на длинном периоде число ищется до его конца',r.long==='2026-11-05'&&r.year==='2026-11-05',r);
+
+  /* ── Границы периода двигают НЕ ТОЛЬКО через доход ──
+     Проверка даты жила в saveInc, а границы меняются ещё в двух местах.
+     Пока перечни разные, дата спокойно оставалась снаружи периода. */
+  r=await pg3.evaluate(()=>{
+    var b=getAB();
+    b.incomes[0].date='2026-09-25';                    /* внутри 01.09–30.09 */
+    var was=b.incomes[0].date;
+    om('budget-edit');render();
+    document.getElementById('be-from').value='2026-09-01';
+    document.getElementById('be-to').value='2026-09-20';   /* сузили до 20-го */
+    saveBdgDates();
+    var after={date:b.incomes[0].date,to:b.dateTo,amount:b.incomes[0].amount,
+               tot:calcTotalBal(b),cash:calcCashBal(b),pend:incPending(b).length};
+    b.dateTo='2026-09-30';b.incomes[0].date='2026-09-25';recalcDaily(b);save();
+    return{was:was,after:after};});
+  ok('сужение периода гасит дату, оставшуюся снаружи',r.after.date==='',r);
+  ok('и сам доход при этом не потерялся',r.after.amount===120000&&r.after.pend===0,r);
+  ok('числа после сужения сходятся',Math.abs(r.after.tot-r.after.cash)<0.01,r);
+  await wait(SAVE);
+
+  /* Мастер: даты доходов считаются в initWD от первоначальных границ,
+     а потом человек может подвинуть период — и перенесённая дата окажется
+     за пределами бюджета, который ещё даже не создан. */
+  r=await pg3.evaluate(()=>{
+    /* мастер тянет доходы из ПОСЛЕДНЕГО по датам бюджета — это октябрь */
+    var oct=S.budgets.filter(function(x){return x.id==='b-oct';})[0];
+    oct.incomes[0].date='2026-10-25';oct.incomes[0].recur=true;save();
+    newBdg();                                   /* мастер предложит ноябрь */
+    var auto=wd.incomes[0].date;                /* ожидаем 25 ноября */
+    wd.dateFrom='2026-11-01';wd.dateTo='2026-11-15';   /* человек сузил период */
+    wd.incomes[0].amount=50000;
+    wzCr();
+    var nb=S.budgets.filter(function(x){return x.dateFrom==='2026-11-01';})[0]||{incomes:[]};
+    return{auto:auto,made:(nb.incomes[0]||{}).date,to:nb.dateTo,
+           amount:(nb.incomes[0]||{}).amount};});
+  ok('мастер переносит дату повторяющегося дохода',r.auto==='2026-11-25',r);
+  ok('но если период подвинули — дата не уезжает за его край',
+     r.made===''&&r.to==='2026-11-15'&&r.amount===50000,r);
+  await wait(SAVE);
 
   console.log('   детализация сводки');
   await pg3.evaluate(()=>{

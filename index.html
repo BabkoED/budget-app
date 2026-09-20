@@ -1723,6 +1723,22 @@ function calcCashBal(b){
   getSpentMap(b);
   return incReceived(b,today())-(_spentCache.totalUpto||0);
 }
+/* Дата вне границ периода бессмысленна: «придёт 25 сентября» в периоде,
+   который кончился 20-го, — показание, которому нечем сбыться.
+   Проверка ОДНА на все входы. Первая версия держала её только в saveInc,
+   и границы, сдвинутые из другого места (правка периода, мастер), спокойно
+   оставляли дату снаружи: перечень для проверки и перечень для записи
+   разошлись — та же ошибка, что и с очисткой витрины. */
+function incDateFit(b,d){return d&&d>=b.dateFrom&&d<=b.dateTo?d:'';}
+function clampIncDates(b){
+  var n=0;
+  for(var i=0;i<b.incomes.length;i++){
+    var was=b.incomes[i].date||'';
+    var now=incDateFit(b,was);
+    if(now!==was){b.incomes[i].date=now;n++;}
+  }
+  return n;
+}
 /* Кэш расходов по категориям: один проход по S.txs вместо N проходов.
    Инвалидируется в save() — при любом изменении данных. */
 var _spentCache={bid:null,map:null};
@@ -2866,18 +2882,23 @@ function updTrPrev(){
   el.innerHTML='<div class="trpbox">'+rows+'</div>';
 }
 
-/* Перенос числа месяца в новый период: 10-е остаётся 10-м.
-   Пробуем месяц начала периода, потом следующий — период может начинаться
-   15-го, и тогда «10-е» относится уже к следующему месяцу. */
+/* Перенос числа месяца в новый период: 10-е остаётся 10-м. Берём первое
+   вхождение этого числа внутрь периода. Период может начинаться 15-го —
+   тогда «10-е» относится уже к следующему месяцу; период может быть и
+   длиннее месяца, поэтому идём до его конца, а не фиксированные два шага.
+   Потолок в 24 месяца — страховка от бесконечного цикла на кривых датах. */
 function shiftDOM(date,from,to){
-  if(!date)return '';
+  if(!date||from>to)return '';
   var dom=+date.slice(8,10), f=new Date(from+'T00:00:00');
-  for(var k=0;k<2;k++){
+  for(var k=0;k<24;k++){
     var y=f.getFullYear(), m=f.getMonth()+k;
+    var first=localISO(new Date(y,m,1));
+    if(first>to)break;
     var last=new Date(y,m+1,0).getDate();
-    if(dom>last)continue;
-    var cand=localISO(new Date(y,m,dom));
-    if(cand>=from&&cand<=to)return cand;
+    if(dom<=last){
+      var cand=localISO(new Date(y,m,dom));
+      if(cand>=from&&cand<=to)return cand;
+    }
   }
   return '';
 }
@@ -3054,7 +3075,11 @@ function bindMain(b){
         return;
       }
     }
-    b.dateFrom=f;b.dateTo=t;recalcDaily(b);save();modal=null;render();
+    b.dateFrom=f;b.dateTo=t;
+    /* Сузили период — дата прихода могла остаться снаружи. Гасим молча:
+       доход при этом не теряется, он просто снова считается поступившим. */
+    clampIncDates(b);
+    recalcDaily(b);save();modal=null;render();
   };
   window.delBdg=function(id){
     if(S.budgets.length<=1){alert('Нельзя удалить единственный бюджет');return;}
@@ -3141,8 +3166,7 @@ function bindMain(b){
     /* Дата вне периода бессмысленна: этот доход относится к этому бюджету,
        и «придёт 5 ноября» в сентябрьском периоде ничего не значит.
        Пустая дата — штатный случай, а не ошибка: деньги уже на руках. */
-    var dt=((document.getElementById('mdi')||{}).value||'').trim();
-    if(dt&&(dt<b.dateFrom||dt>b.dateTo))dt='';
+    var dt=incDateFit(b,((document.getElementById('mdi')||{}).value||'').trim());
     if(modal.type==='add-income')b.incomes.push({id:uid(),name:n,emoji:e,amount:a,recur:rc,date:dt});
     else{var inc=b.incomes.filter(function(x){return x.id===modal.data.id;})[0];if(inc){inc.name=n;inc.emoji=e;inc.amount=a;inc.recur=rc;inc.date=dt;}}
     recalcDaily(b);save();modal=null;render();
@@ -3281,6 +3305,10 @@ function bindWiz(){
       dailyBudget:avail>0?avail/days:0,
       pot:avail,potV:2,
       rates:[{from:d.dateFrom,v:avail>0?avail/days:0}]};
+    /* Даты доходов посчитаны в initWD от ПЕРВОНАЧАЛЬНЫХ границ, а wzDts мог
+       их потом подвинуть — тогда перенесённая дата оказывается за пределами
+       только что созданного бюджета. Сводим по фактическим границам. */
+    clampIncDates(bdg);
     S.budgets.push(touch(bdg));S.activeBudgetId=bdg.id;save();tab='history';wd=null;render();
   };
 }
