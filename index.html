@@ -297,6 +297,17 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
 .st-bar{height:6px;border-radius:99px;background:var(--br);overflow:hidden;}
 .st-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),#E0A182);}
 .st-sub{font-size:0.6875rem;font-weight:700;color:var(--mt);margin-top:4px;}
+/* Вся строка сводки — одна кнопка: зона нажатия во всю ширину, пальцем
+   не промахнёшься. Внешний вид не меняется, поэтому сбрасываем стиль кнопки. */
+.st-btn{display:block;width:100%;padding:0;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.st-ar{font-size:0.75rem;color:var(--mt);flex-shrink:0;margin-left:2px;}
+.st-row.on{background:var(--br);border-radius:12px;padding:8px;margin:0 -8px 12px;}
+.sd{margin-top:8px;border-top:1px solid var(--br2);}
+.sd-row{display:flex;align-items:baseline;gap:8px;padding:6px 0;border-bottom:1px solid var(--br2);font-size:0.8125rem;}
+.sd-row:last-child{border-bottom:0;padding-bottom:0;}
+.sd-dt{flex:0 0 58px;color:var(--mt);font-size:0.6875rem;font-weight:700;}
+.sd-nm{flex:1;min-width:0;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.sd-am{font-weight:700;white-space:nowrap;}
 
 /* ── СРАВНЕНИЕ С ПРОШЛЫМ МЕСЯЦЕМ ───────────── */
 .cmp{margin-left:4px;font-size:0.6875rem;font-weight:700;}
@@ -357,6 +368,11 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
 .srow-big{font-size:1.75rem;font-weight:900;letter-spacing:-.7px;margin-bottom:2px;}
 .srow-divider{height:1px;background:var(--br2);margin:8px 0 4px;}
 .srow{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:4px 0;font-size:0.8125rem;font-weight:700;border-bottom:1px solid var(--br);}
+/* «На картах сейчас» — главное из этой пары, поэтому крупнее соседних строк;
+   ожидаемые поступления под ней намеренно приглушены: это ещё не деньги. */
+.srow-cash{font-size:0.9375rem;}
+.srow-pend{color:var(--mt);font-size:0.75rem;}
+.srow-pend b{font-weight:700;color:var(--mt);}
 .srow b{white-space:nowrap;}
 .srow:last-child{border-bottom:none;}
 .srow span{color:var(--t2);}
@@ -402,6 +418,11 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
    в одной точке колонки — цифры разной длины продлеваются вправо, а не
    «плавают» по горизонтали от строки к строке, как было при text-align:right */
 .t-am{font-size:0.9375rem;font-weight:700;text-align:left;white-space:nowrap;}
+.t-dt{font-size:0.6875rem;font-weight:700;color:var(--mt);margin-top:2px;padding-left:26px;}
+.t-dt.wait{color:var(--accent);}
+/* Строка ожидаемого дохода приглушена целиком: сумма в ней уже учтена
+   в общем остатке, но на карте её ещё нет. */
+.t-wait .t-nm,.t-wait .t-am{opacity:.55;}
 .t-sub{font-size:0.6875rem;font-weight:500;color:var(--mt);margin-top:0px;white-space:nowrap;}
 /* Колонка действий: фиксированная ширина и нулевые боковые отступы —
    кнопка сама себе даёт площадь, поэтому стоит на одном месте во всех строках */
@@ -713,6 +734,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
   /* было 20x24 — самая мелкая цель в приложении, и это «закрыть» */
 .f{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
 .f label{font-size:0.6875rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--mt);}
+.fhint{display:block;margin-top:4px;font-size:0.75rem;font-weight:500;font-style:normal;color:var(--mt);line-height:1.35;}
 .inp{
   border:1.5px solid var(--br2);border-radius:var(--r1);
   padding:12px 12px;font-size:0.9375rem;font-weight:700;
@@ -1665,6 +1687,42 @@ function calcTotalBal(b){
   getSpentMap(b);                 /* один общий проход вместо своего */
   return ti-(_spentCache.totalUpto||0);
 }
+
+/* ── Доход с датой начисления ─────────────────
+   Дата у дохода НЕ участвует в счёте нормы: котёл и ставки по-прежнему
+   считаются от всей суммы периода. Это сознательно — иначе пришлось бы
+   резать период на отрезки по датам прихода и переписывать accrued/rates,
+   тот самый узел, который уже разъезжался трижды. Здесь только показ:
+   «общий остаток» отвечает на вопрос «сколько денег у меня в этом месяце»,
+   «на картах сейчас» — «сколько из них уже пришло».
+
+   Доход БЕЗ даты считается уже поступившим. Иначе все бюджеты, заведённые
+   до появления поля, разом стали бы «ожидаемыми» и показали бы ноль
+   на руках при полном кошельке. */
+function incReceived(b,upto){
+  var s=0;
+  for(var i=0;i<b.incomes.length;i++){
+    var d=b.incomes[i].date;
+    if(!d||d<=upto)s+=b.incomes[i].amount;
+  }
+  return s;
+}
+/* Ожидаемые поступления, по возрастанию даты. Прошедшая дата ожидаемой
+   не считается: деньги пришли, даже если приложение об этом не спросили. */
+function incPending(b){
+  var t=today(),a=[];
+  for(var i=0;i<b.incomes.length;i++){
+    var x=b.incomes[i];
+    if(x.date&&x.date>t)a.push(x);
+  }
+  a.sort(function(p,q){return p.date.localeCompare(q.date);});
+  return a;
+}
+function calcCashBal(b){
+  if(!b)return 0;
+  getSpentMap(b);
+  return incReceived(b,today())-(_spentCache.totalUpto||0);
+}
 /* Кэш расходов по категориям: один проход по S.txs вместо N проходов.
    Инвалидируется в save() — при любом изменении данных. */
 var _spentCache={bid:null,map:null};
@@ -1934,7 +1992,7 @@ function exportCSV(){
   }
   rows.push([]);
   rows.push(['Доходы','','','']);
-  for(var j=0;j<b.incomes.length;j++)rows.push(['',b.incomes[j].name,'',Math.round(b.incomes[j].amount)]);
+  for(var j=0;j<b.incomes.length;j++)rows.push([b.incomes[j].date||'',b.incomes[j].name,'',Math.round(b.incomes[j].amount)]);
   rows.push(['Плановые расходы','','','']);
   for(var k=0;k<b.planned.length;k++){
     var p=b.planned[k];
@@ -2243,6 +2301,8 @@ function rCatPop(b){
    в месячную рамку не помещается. Здесь считаем сквозь все периоды.
    Категории сопоставляем по названию: id у них в каждом месяце новые. */
 var statRange='3m';   /* cur | 3m | 12m | all */
+var statOpen='';      /* имя раскрытой категории в сводке */
+var _statArr=[];      /* строки последней отрисовки: номер кнопки → категория */
 
 function statBounds(){
   var t=today(), d=new Date(t+'T00:00:00');
@@ -2269,12 +2329,16 @@ function rStats(){
     if(tx.date<R.from||tx.date>R.to)continue;
     var key=tx.category||'Дневные расходы';
     var em=tx.category?(tx.categoryEmoji||'📌'):'💳';
-    if(!map[key])map[key]={name:key,emoji:em,sum:0,n:0};
-    map[key].sum+=tx.amount;map[key].n++;
+    if(!map[key])map[key]={name:key,emoji:em,sum:0,n:0,txs:[]};
+    map[key].sum+=tx.amount;map[key].n++;map[key].txs.push(tx);
     total+=tx.amount;
   }
   var arr=[];for(var k in map)arr.push(map[k]);
   arr.sort(function(a,c){return c.sum-a.sum;});
+  /* Раскрытая категория запоминается по имени, а кнопка передаёт номер строки:
+     имя может содержать кавычки и апостроф, и в onclick оно бы сломало разметку.
+     Список пересобирается на каждой отрисовке, поэтому номер всегда свежий. */
+  _statArr=arr;
 
   /* Доход берём из бюджетов, целиком попавших в интервал: он задан планом,
      а не транзакциями, поэтому дробить его по дням было бы враньём */
@@ -2298,14 +2362,32 @@ function rStats(){
   var rows='';
   for(var r=0;r<arr.length;r++){
     var it=arr[r],pct=Math.round(it.sum/max*100),share=total>0?Math.round(it.sum/total*100):0;
-    rows+='<div class="st-row">'+
-      '<div class="st-hd">'+
-        '<span class="st-em">'+it.emoji+'</span>'+
-        '<span class="st-nm">'+esc(it.name)+'</span>'+
-        '<span class="st-am">'+fmt(it.sum)+'</span>'+
-      '</div>'+
-      '<div class="st-bar"><div class="st-fill" style="width:'+pct+'%"></div></div>'+
-      '<div class="st-sub">'+share+'% · '+it.n+'&nbsp;'+plurOps(it.n)+'</div>'+
+    var open=statOpen===it.name;
+    var det='';
+    if(open){
+      /* Порядок как на «Выписке»: свежее сверху, внутри дня — по seq */
+      var list=it.txs.slice().sort(function(a,c){
+        return c.date.localeCompare(a.date)||((c.seq||0)-(a.seq||0));});
+      for(var q=0;q<list.length;q++){
+        det+='<div class="sd-row">'+
+          '<span class="sd-dt">'+fmtSh(list[q].date)+'</span>'+
+          '<span class="sd-nm">'+esc(list[q].name)+'</span>'+
+          '<span class="sd-am">'+fmt(list[q].amount)+'</span>'+
+        '</div>';
+      }
+      det='<div class="sd">'+det+'</div>';
+    }
+    rows+='<div class="st-row'+(open?' on':'')+'">'+
+      '<button type="button" class="st-btn" aria-expanded="'+(open?'true':'false')+'" onclick="togStat('+r+')">'+
+        '<div class="st-hd">'+
+          '<span class="st-em">'+it.emoji+'</span>'+
+          '<span class="st-nm">'+esc(it.name)+'</span>'+
+          '<span class="st-am">'+fmt(it.sum)+'</span>'+
+          '<span class="st-ar">'+(open?'▴':'▾')+'</span>'+
+        '</div>'+
+        '<div class="st-bar"><div class="st-fill" style="width:'+pct+'%"></div></div>'+
+        '<div class="st-sub">'+share+'% · '+it.n+'&nbsp;'+plurOps(it.n)+'</div>'+
+      '</button>'+det+
     '</div>';
   }
   if(!arr.length)rows='<div class="no-tx">За этот интервал трат нет</div>';
@@ -2488,12 +2570,16 @@ function rIncomes(b){
   var tp=0;for(var j=0;j<b.planned.length;j++)tp+=b.planned[j].amount;
   /* total = all income minus ALL spending (daily + planned categories) */
   var totalBal=calcTotalBal(b);
+  var cashBal=calcCashBal(b), pend=incPending(b), td=today();
   var rows='';
   for(var k=0;k<b.incomes.length;k++){
     var inc=b.incomes[k];
+    var waits=inc.date&&inc.date>td;
     /* FIX #2: emoji inline with text using t-nm class */
-    rows+='<tr>'+
-      '<td><div class="t-nm"><span class="t-em">'+(inc.emoji||'💰')+'</span><span class="t-tx">'+esc(inc.name)+'</span></div></td>'+
+    rows+='<tr'+(waits?' class="t-wait"':'')+'>'+
+      '<td><div class="t-nm"><span class="t-em">'+(inc.emoji||'💰')+'</span><span class="t-tx">'+esc(inc.name)+'</span></div>'+
+        (inc.date?'<div class="t-dt'+(waits?' wait':'')+'">'+(waits?'придёт ':'пришёл ')+fmtSh(inc.date)+'</div>':'')+
+      '</td>'+
       '<td class="t-am"><span class="t-amw"><span class="recur-slot">'+
         (inc.recur?'<span class="recur-b" title="Повторяющийся — сумма переносится в новый месяц">🔁</span>':'')+
         '</span>'+fmt(inc.amount)+'</span></td>'+
@@ -2506,12 +2592,29 @@ function rIncomes(b){
       '</div></td>'+
     '</tr>';
   }
+  /* Строка «на картах сейчас» показывается ТОЛЬКО когда есть чего ждать.
+     Без ожидаемых поступлений она равна общему остатку, и два одинаковых
+     числа подряд читаются как ошибка, а не как уточнение. */
+  var cashRows='';
+  if(pend.length){
+    var run=cashBal;
+    cashRows='<div class="srow srow-cash"><span>На картах сейчас</span>'+
+      '<b class="'+(cashBal>=0?'gd':'rd')+'">'+fmt(cashBal)+'</b></div>';
+    for(var p=0;p<pend.length;p++){
+      run+=pend[p].amount;
+      cashRows+='<div class="srow srow-pend">'+
+        '<span>'+fmtSh(pend[p].date)+' · '+esc(pend[p].name)+'</span>'+
+        '<b>+'+fmt(pend[p].amount)+' → '+fmt(run)+'</b></div>';
+    }
+  }
+
   return '<div class="ph"><h2 class="ptl">Доходы</h2>'+
     '<button type="button" class="btn bp sm" onclick="om(\'add-income\')">+ Добавить</button></div>'+
   '<div class="stat-card">'+
     '<div class="srow-lbl">ОБЩИЙ ОСТАТОК</div>'+
     '<div class="srow-big '+(totalBal>=0?'gd':'rd')+'">'+fmt(totalBal)+'</div>'+
     '<div class="srow-divider"></div>'+
+    cashRows+
     '<div class="srow"><span>Всего доходов</span><b class="gd">'+fmt(ti)+'</b></div>'+
     '<div class="srow"><span>Потрачено всего</span><b class="rd">−'+fmt(ti-totalBal)+'</b></div>'+
     '<div class="srow"><span>Дневной бюджет</span><b>'+fmt(b.dailyBudget)+' /день</b></div>'+
@@ -2627,6 +2730,9 @@ function rModal(b){
       '<div class="ir"><div class="f" style="flex:0 0 68px"><label for="me">Иконка</label><input class="inp" id="me" value="'+esc(d.emoji||'💰')+'" style="text-align:center;font-size:1.375rem" maxlength="4"></div>'+
       '<div class="f"><label>Название</label><input class="inp" id="mn" value="'+esc(d.name)+'" placeholder="Зарплата"></div></div>'+
       '<div class="f"><label>Сумма ₽</label><input class="inp" id="ma" type="text" inputmode="decimal" oninput="fmtInp(this)" value="'+(d.amount||'')+'" placeholder="0"></div>'+
+      '<div class="f"><label for="mdi">Когда придёт</label>'+
+        '<input class="inp" id="mdi" type="date" value="'+esc(d.date||'')+'" min="'+b.dateFrom+'" max="'+b.dateTo+'">'+
+        '<i class="fhint">Пусто — деньги уже на руках. С датой видно, сколько на картах сейчас и сколько станет после прихода.</i></div>'+
       '<label class="chkrow"><input type="checkbox" id="mr"'+(d.recur?' checked':'')+'>'+
         '<span><b>Повторяющийся</b><i>Сумма перенесётся в новый месяц автоматически</i></span></label>'+
       '<div class="max">'+
@@ -2760,6 +2866,22 @@ function updTrPrev(){
   el.innerHTML='<div class="trpbox">'+rows+'</div>';
 }
 
+/* Перенос числа месяца в новый период: 10-е остаётся 10-м.
+   Пробуем месяц начала периода, потом следующий — период может начинаться
+   15-го, и тогда «10-е» относится уже к следующему месяцу. */
+function shiftDOM(date,from,to){
+  if(!date)return '';
+  var dom=+date.slice(8,10), f=new Date(from+'T00:00:00');
+  for(var k=0;k<2;k++){
+    var y=f.getFullYear(), m=f.getMonth()+k;
+    var last=new Date(y,m+1,0).getDate();
+    if(dom>last)continue;
+    var cand=localISO(new Date(y,m,dom));
+    if(cand>=from&&cand<=to)return cand;
+  }
+  return '';
+}
+
 /* ── WIZARD ──────────────────────────────────── */
 function initWD(){
   var now=new Date(),y=now.getFullYear(),m=now.getMonth();
@@ -2787,8 +2909,15 @@ function initWD(){
     df=localISO(nd);
     if(dt<df)dt=lastDOM(nd.getFullYear(),nd.getMonth());
   }
-  /* Регулярные доходы (зарплата, аренда) переносят сумму — как и категории */
-  var inc=last?last.incomes.map(function(i){return{id:uid(),name:i.name,emoji:i.emoji,amount:i.recur?i.amount:'',recur:!!i.recur};}) :[];
+  /* Регулярные доходы (зарплата, аренда) переносят сумму — как и категории.
+     Дата начисления переносится тем же числом месяца: аванс 10-го остаётся
+     авансом 10-го. Если такого числа в новом периоде нет (период короче или
+     начался позже) — дата снимается, и доход считается уже поступившим:
+     это заметно на экране, в отличие от даты, тихо уехавшей на край месяца. */
+  var inc=last?last.incomes.map(function(i){
+    return{id:uid(),name:i.name,emoji:i.emoji,amount:i.recur?i.amount:'',recur:!!i.recur,
+           date:i.recur?shiftDOM(i.date,df,dt):''};
+  }) :[];
   /* Регулярные категории (ипотека, подписки) переносят сумму —
      их не надо вбивать заново каждый месяц. Остальные — пустые. */
   var pln=last?last.planned.map(function(p){return{id:uid(),name:p.name,emoji:p.emoji,amount:p.recur?p.amount:'',recur:!!p.recur};}) :[{id:uid(),name:'Непредвиденные расходы',emoji:'✨',amount:''}];
@@ -2884,7 +3013,13 @@ function bindEmpty(){window.startWz=function(){tab='wizard';wizStep=0;wd=initWD(
 function bindMain(b){
   window.setTab    =function(t){tab=t;drop=false;render();};
   window.openStats =function(){tab='stats';drop=false;render();};
-  window.setRange  =function(r){statRange=r;render();};
+  /* Смена интервала пересобирает список — раскрытая категория в нём может
+     и не встретиться, поэтому раскрытие снимается вместе с интервалом. */
+  window.setRange  =function(r){statRange=r;statOpen='';render();};
+  window.togStat   =function(i){
+    var it=_statArr[i];if(!it)return;
+    statOpen=(statOpen===it.name?'':it.name);render();
+  };
   window.togDrop   =function(){drop=!drop;archOpen=false;usrMenu=false;txMenu=null;incMenu=null;plnMenu=null;render();};
   window.togArch   =function(){archOpen=!archOpen;render();};
   window.moveRemToDaily=function(pid){
@@ -3003,8 +3138,13 @@ function bindMain(b){
     var e=((document.getElementById('me')||{}).value||'💰').trim();
     if(!n||!a)return;
     var rc=!!(document.getElementById('mr')||{}).checked;
-    if(modal.type==='add-income')b.incomes.push({id:uid(),name:n,emoji:e,amount:a,recur:rc});
-    else{var inc=b.incomes.filter(function(x){return x.id===modal.data.id;})[0];if(inc){inc.name=n;inc.emoji=e;inc.amount=a;inc.recur=rc;}}
+    /* Дата вне периода бессмысленна: этот доход относится к этому бюджету,
+       и «придёт 5 ноября» в сентябрьском периоде ничего не значит.
+       Пустая дата — штатный случай, а не ошибка: деньги уже на руках. */
+    var dt=((document.getElementById('mdi')||{}).value||'').trim();
+    if(dt&&(dt<b.dateFrom||dt>b.dateTo))dt='';
+    if(modal.type==='add-income')b.incomes.push({id:uid(),name:n,emoji:e,amount:a,recur:rc,date:dt});
+    else{var inc=b.incomes.filter(function(x){return x.id===modal.data.id;})[0];if(inc){inc.name=n;inc.emoji=e;inc.amount=a;inc.recur=rc;inc.date=dt;}}
     recalcDaily(b);save();modal=null;render();
   };
 

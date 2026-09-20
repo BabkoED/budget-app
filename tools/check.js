@@ -264,6 +264,113 @@ function checkPlural(ok){
   ok('но полоса от неё не обнулилась — она про дневной запас',r.w>0&&r.bal>0,r);
   ok('без категорийных трат лишней подписи нет',!/по категориям/.test(r.before),r.before);
 
+  /* ── 12. Дата у дохода и детализация сводки ──
+     Своя страница с чистым посевом: к этому месту блоки 7 и 11 уже создали
+     лишний бюджет и подвинули ставки, а здесь нужен предсказуемый сентябрь.
+
+     Главное, что проверяется: дата начисления НЕ трогает счёт. Котёл, норма
+     и общий остаток обязаны остаться теми же до копейки — иначе это уже
+     вариант B (норма до ближайшего прихода), на который не договаривались. */
+  console.log('\n12. Дата у дохода и детализация сводки');
+  const pg3=await (await br.newContext({viewport:{width:430,height:932}})).newPage();
+  pg3.on('pageerror',e=>{console.log('PAGEERROR(inc):',e.message);fails++;});
+  await pg3.addInitScript(freezeDate(TODAY));
+  await pg3.goto(url);
+  await pg3.evaluate(st=>{window.__CLOUD__=JSON.parse(JSON.stringify(st));
+    localStorage.setItem('budget_last_uid','u1');
+    localStorage.setItem('budget_backup_u1',JSON.stringify(st));},seedState());
+  await pg3.evaluate(()=>window.__initApp());
+  await pg3.waitForTimeout(900);
+
+  r=await pg3.evaluate(()=>{var b=getAB();
+    return{id:b.id,tot:calcTotalBal(b),cash:calcCashBal(b),pend:incPending(b).length};});
+  ok('доход без даты считается уже поступившим',
+     r.id==='b-sep'&&Math.abs(r.tot-r.cash)<0.01&&r.pend===0,r);
+
+  r=await pg3.evaluate(()=>{
+    var b=getAB(), before={pot:b.pot,daily:b.dailyBudget,tot:calcTotalBal(b)};
+    b.incomes[0].date='2026-09-25';                      /* зарплата придёт 25-го */
+    b.incomes.push({id:'i-now',name:'Кэшбэк',emoji:'💳',amount:30000,recur:false,date:''});
+    recalcDaily(b);save();invalidateSpentCache();
+    var pend=incPending(b), ps=0;
+    for(var i=0;i<pend.length;i++)ps+=pend[i].amount;
+    return{before:before,pot:b.pot,daily:b.dailyBudget,
+           tot:calcTotalBal(b),cash:calcCashBal(b),ps:ps,pend:pend.length};});
+  ok('на картах сейчас = только поступившее',Math.abs(r.cash-30000)<0.01,r);
+  ok('разница между общим и наличным = сумма ожидаемого',
+     Math.abs(r.tot-r.cash-r.ps)<0.01&&r.pend===1,r);
+  ok('дата не сдвинула норму: она выросла ровно на новый доход',
+     Math.abs(r.daily-(r.before.daily+30000/30))<0.01,r);
+  ok('и общий остаток вырос ровно на него же',
+     Math.abs(r.tot-(r.before.tot+30000))<0.01,r);
+  await wait(SAVE);
+
+  await pg3.evaluate(()=>setTab('incomes'));await wait(150);
+  r=await pg3.evaluate(()=>({cash:(document.querySelector('.srow-cash')||{}).textContent||'',
+    pend:(document.querySelector('.srow-pend')||{}).textContent||'',
+    wait:document.querySelectorAll('.t-wait').length}));
+  ok('на экране Доходы есть строка «На картах сейчас»',/На картах сейчас/.test(r.cash),r.cash);
+  ok('и строка ожидаемого прихода с датой',/25 сент/.test(r.pend)&&/150\s?000/.test(r.pend.replace(/ /g,' ')),r.pend);
+  ok('сам ожидаемый доход помечен в списке',r.wait===1,r);
+
+  /* Прошедшая дата — это пришедшие деньги, а не вечное ожидание */
+  r=await pg3.evaluate(()=>{var b=getAB();b.incomes[0].date='2026-08-28';
+    invalidateSpentCache();render();
+    var c=calcCashBal(b),p=incPending(b).length;
+    b.incomes[0].date='2026-09-25';invalidateSpentCache();render();
+    return{c:c,p:p,tot:calcTotalBal(b)};});
+  ok('прошедшая дата считается поступившей',Math.abs(r.c-r.tot)<0.01&&r.p===0,r);
+
+  /* Дата вне периода бессмысленна и не должна сохраняться */
+  await pg3.evaluate(()=>om('add-income'));await wait(120);
+  await pg3.evaluate(()=>{document.getElementById('mn').value='Премия';
+    document.getElementById('ma').value='5000';
+    document.getElementById('mdi').value='2026-11-05';saveInc();});
+  await wait(200);
+  r=await pg3.evaluate(()=>{var b=getAB(),i=b.incomes.filter(function(x){return x.name==='Премия';})[0];
+    return{has:!!i,date:i?i.date:'?'};});
+  ok('дата вне периода не сохранилась, доход остался',r.has&&r.date==='',r);
+  await wait(SAVE);
+
+  /* Перенос числа месяца в новый период */
+  r=await pg3.evaluate(()=>({same:shiftDOM('2026-09-25','2026-10-01','2026-10-31'),
+    late:shiftDOM('2026-09-10','2026-10-15','2026-11-14'),
+    none:shiftDOM('2026-01-31','2026-02-01','2026-02-28'),
+    empty:shiftDOM('','2026-10-01','2026-10-31')}));
+  ok('повторяющийся доход переносит число месяца',r.same==='2026-10-25',r);
+  ok('если числа в этом месяце уже нет — берётся следующий',r.late==='2026-11-10',r);
+  ok('несуществующее число даты не получает',r.none===''&&r.empty==='',r);
+
+  console.log('   детализация сводки');
+  await pg3.evaluate(()=>{
+    var mk=(id,seq,d,n,a)=>({id:id,seq:seq,date:d,name:n,category:'Продукты',
+      categoryEmoji:'🛒',plannedCatId:null,amount:a,budgetId:'b-aug',mod:1});
+    S.txs.push(mk('s1',1,'2026-08-20','Пятёрочка',1200));
+    S.txs.push(mk('s2',2,'2026-08-21','Магнит',800));
+    invalidateSpentCache();setTab('stats');render();});
+  await wait(150);
+  r=await pg3.evaluate(()=>({n:document.querySelectorAll('.sd-row').length,
+    i:_statArr.findIndex(function(x){return x.name==='Продукты';}),
+    sum:(_statArr.filter(function(x){return x.name==='Продукты';})[0]||{}).sum}));
+  ok('до нажатия деталей на экране нет',r.n===0,r);
+  ok('категория «Продукты» собрана из двух трат',r.sum===2000&&r.i>-1,r);
+  await pg3.evaluate(i=>togStat(i),r.i);await wait(150);
+  let d=await pg3.evaluate(()=>({
+    rows:Array.from(document.querySelectorAll('.sd-row')).map(e=>e.textContent),
+    sum:Array.from(document.querySelectorAll('.sd-am'))
+          .reduce((s,e)=>s+ +e.textContent.replace(/\D/g,''),0),
+    open:statOpen}));
+  ok('раскрылись именно её траты, обе',d.rows.length===2&&d.open==='Продукты',d.rows);
+  ok('сумма раскрытых трат сходится с суммой строки',d.sum===2000,d);
+  ok('свежая трата сверху',/21 авг/.test(d.rows[0]),d.rows);
+  await pg3.evaluate(i=>togStat(i),r.i);await wait(120);
+  ok('повторное нажатие закрывает',
+     await pg3.evaluate(()=>document.querySelectorAll('.sd-row').length)===0);
+  await pg3.evaluate(i=>{togStat(i);setRange('cur');},r.i);await wait(150);
+  ok('смена интервала снимает раскрытие',
+     await pg3.evaluate(()=>statOpen)===''&&
+     await pg3.evaluate(()=>document.querySelectorAll('.sd-row').length)===0);
+
   const shot=path.join(os.tmpdir(),'budget-check.png');
   await pg.evaluate(()=>{drop=true;render();});await wait(150);
   await pg.screenshot({path:shot});
