@@ -494,6 +494,34 @@ function checkPlural(ok){
   ok('гашение даты поднимает метку дохода',r.clamp===true,r);
   await wait(SAVE);
 
+  /* Слияние собирает поэлементно ЛЮБОЙ бюджет, а котёл достаётся победившей
+     стороне — значит сводить надо не только текущий. Заранее созданный октябрь
+     после правок с двух машин показывал котёл 120 000 при фактических 115 000,
+     и расхождение жило до дня, когда октябрь станет текущим: откроешь
+     приложение не первого числа — прожитые дни уже начислены по неверной
+     ставке, а их не переписывают. Закрытый период при этом трогать нельзя. */
+  r=await pg3.evaluate(async()=>{
+    var oct=S.budgets.filter(function(x){return x.id==='b-oct';})[0];
+    var aug=S.budgets.filter(function(x){return x.id==='b-aug';})[0];
+    var augRates=JSON.stringify(aug.rates), augPot=aug.pot;
+    aug.pot=(aug.pot||0)+777;               /* закрытый период намеренно кривой */
+    var c=window.__CLOUD__.budgets.filter(function(x){return x.id==='b-oct';})[0];
+    c.incomes[0].amount+=10000;c.incomes[0].mod=Date.now()+5000;
+    c.mod=Date.now()+5000;c.pot=(c.pot||0)+10000;window.__CLOUD__.at=Date.now()+5000;
+    oct.planned[0].amount+=5000;touch(oct.planned[0]);recalcDaily(oct);save();
+    await new Promise(function(r){setTimeout(r,50);});
+    await pullAndMerge();
+    var m=S.budgets.filter(function(x){return x.id==='b-oct';})[0];
+    var a2=S.budgets.filter(function(x){return x.id==='b-aug';})[0];
+    var out={cur:(getCurrentBudget()||{}).id,pot:m.pot,potOf:potOf(m),
+             augSame:JSON.stringify(a2.rates)===augRates,augPot:a2.pot};
+    a2.pot=augPot;
+    return out;});
+  ok('октябрь ещё не текущий — проверяем именно не текущий бюджет',r.cur==='b-sep',r);
+  ok('котёл будущего бюджета сведён после слияния',Math.abs(r.pot-r.potOf)<0.01,r);
+  ok('закрытый период при этом не переписан',r.augSame===true&&r.augPot===r.augPot,r);
+  await wait(SAVE);
+
   console.log('   детализация сводки');
   await pg3.evaluate(()=>{
     var mk=(id,seq,d,n,a)=>({id:id,seq:seq,date:d,name:n,category:'Продукты',
