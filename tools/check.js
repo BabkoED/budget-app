@@ -473,6 +473,27 @@ function checkPlural(ok){
   ok('и денежный инвариант после слияния сходится',Math.abs(m.inv)<0.01,m);
   await wait(SAVE);
 
+  /* Каждая правка строки обязана поднимать её метку — иначе слияние вернёт
+     прежнее значение. Проверяем ВСЕ пути правки, а не только модалку дохода:
+     перенос остатка в дневные и гашение даты при сужении периода меняют
+     строку в обход saveInc/savePln. */
+  /* «Сегодня» на стенде заморожено, поэтому Date.now() всегда одинаков и
+     touch не двигает метку вперёд. Ставим строке заведомо старую метку
+     и смотрим, что правка её подняла. */
+  r=await pg3.evaluate(()=>{
+    var b=getAB(),out={};
+    var p=b.planned[0];p.amount+=5000;p.mod=1;
+    moveRemToDaily(p.id);                       /* остаток категории в дневные */
+    out.moveRem=(b.planned[0].mod||0)>1;
+    var inc=b.incomes[0];inc.date='2026-09-25';inc.mod=1;
+    b.dateTo='2026-09-20';clampIncDates(b);     /* сузили период — дата гасится */
+    out.clamp=inc.date===''&&(inc.mod||0)>1;
+    b.dateTo='2026-09-30';recalcDaily(b);save();
+    return out;});
+  ok('перенос остатка в дневные поднимает метку категории',r.moveRem===true,r);
+  ok('гашение даты поднимает метку дохода',r.clamp===true,r);
+  await wait(SAVE);
+
   console.log('   детализация сводки');
   await pg3.evaluate(()=>{
     var mk=(id,seq,d,n,a)=>({id:id,seq:seq,date:d,name:n,category:'Продукты',

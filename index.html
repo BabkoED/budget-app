@@ -1811,7 +1811,9 @@ function clampIncDates(b){
   for(var i=0;i<b.incomes.length;i++){
     var was=b.incomes[i].date||'';
     var now=incDateFit(b,was);
-    if(now!==was){b.incomes[i].date=now;n++;}
+    /* touch обязателен: без метки погашенную дату вернёт обратно слияние
+       с другим устройством, где она ещё лежит за границами периода */
+    if(now!==was){b.incomes[i].date=now;touch(b.incomes[i]);n++;}
   }
   return n;
 }
@@ -3130,7 +3132,7 @@ function bindMain(b){
     /* Лимит категории урезаем ровно до уже потраченного — остаток = 0.
        Освободившаяся сумма из "планов" уходит в знаменатель recalcDaily,
        поэтому дневная норма поднимается сама, без ручного пересчёта. */
-    p.amount-=rem;
+    p.amount-=rem;touch(p);   /* строка сливается сама — без метки правка уедет */
     recalcDaily(b);
     plnMenu=null;
     save();render();
