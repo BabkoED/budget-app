@@ -56,6 +56,63 @@ function checkMerge(ok){
   const st={budgets:[bdg('a',1)],txs:[{id:'t',mod:2}],activeBudgetId:'a',rip:{},at:T};
   ok('mergeState: слияние с собой ничего не меняет',
      fn(st,st).activeBudgetId==='a'&&fn(st,st).txs.length===1);
+
+  /* ── Доходы и категории внутри бюджета ──────
+     Пока бюджет побеждал целым объектом, правка с одного устройства молча
+     съедала правку с другого. Воспроизведено 20.09.2026 на живом mergeState:
+     аванс, поднятый на телефоне до 60 000, возвращался к 50 000, потому что
+     на ноутбуке в том же бюджете тронули лимит категории. */
+  const full=(mod,avans,prod,extra)=>Object.assign({id:'b1',mod:mod,
+    dateFrom:'2026-09-01',dateTo:'2026-09-30',
+    incomes:[{id:'i1',name:'Зарплата',amount:120000,mod:1},
+             {id:'i2',name:'Аванс',amount:avans.v,mod:avans.mod}],
+    planned:[{id:'p1',name:'Продукты',amount:prod.v,mod:prod.mod}]},extra||{});
+  /* облако — телефон (правил аванс раньше), местное — ноутбук (лимит позже) */
+  let mb=fn({budgets:[full(T+100,{v:60000,mod:T+100},{v:30000,mod:1})],txs:[],rip:{},at:T},
+            {budgets:[full(T+200,{v:50000,mod:1},{v:35000,mod:T+200})],txs:[],rip:{},at:T}).budgets[0];
+  ok('mergeState: правка дохода с другого устройства не потерялась',
+     mb.incomes.filter(i=>i.id==='i2')[0].amount===60000,mb.incomes);
+  ok('mergeState: и своя правка категории осталась',
+     mb.planned[0].amount===35000,mb.planned);
+  ok('mergeState: порядок доходов не перетасовался',
+     mb.incomes.map(i=>i.id).join()==='i1,i2',mb.incomes);
+  /* Верхний уровень бюджета — по-прежнему целиком за свежей стороной:
+     даты, котёл и ставки связаны между собой и поэлементно не смешиваются. */
+  ok('mergeState: верхний уровень бюджета взят у свежей стороны',mb.mod===T+200,mb.mod);
+
+  /* Удалённый доход не возвращается со второго устройства */
+  mb=fn({budgets:[full(T+100,{v:50000,mod:T-9000},{v:30000,mod:1})],txs:[],rip:{},at:T},
+        {budgets:[full(T+200,{v:50000,mod:T-9000},{v:30000,mod:1})],txs:[],
+         rip:{'inc:i2':T-100},at:T}).budgets[0];
+  ok('mergeState: удалённый доход не вернулся',
+     mb.incomes.length===1&&mb.incomes[0].id==='i1',mb.incomes);
+  /* но правка ПОЗЖЕ удаления сильнее: доход завели обратно осознанно */
+  mb=fn({budgets:[full(T+100,{v:70000,mod:T-100},{v:30000,mod:1})],txs:[],rip:{},at:T},
+        {budgets:[full(T+200,{v:50000,mod:T-9000},{v:30000,mod:1})],txs:[],
+         rip:{'inc:i2':T-9000},at:T}).budgets[0];
+  ok('mergeState: правка дохода позже удаления сохранилась',
+     mb.incomes.length===2&&mb.incomes.filter(i=>i.id==='i2')[0].amount===70000,mb.incomes);
+
+  /* Новая категория с одной стороны приезжает, а не пропадает */
+  const withNew=full(T+100,{v:50000,mod:1},{v:30000,mod:1});
+  withNew.planned=withNew.planned.concat([{id:'p2',name:'Связь',amount:900,mod:T+100}]);
+  mb=fn({budgets:[withNew],txs:[],rip:{},at:T},
+        {budgets:[full(T+200,{v:50000,mod:1},{v:30000,mod:1})],txs:[],rip:{},at:T}).budgets[0];
+  ok('mergeState: новая категория со второго устройства приехала',
+     mb.planned.length===2&&mb.planned[1].id==='p2',mb.planned);
+
+  /* Равные метки: побеждает эта машина, а не облако. Иначе правка, не
+     поднявшая mod, откатывается на ближайшем сохранении — молча. */
+  mb=fn({budgets:[full(T+100,{v:50000,mod:5},{v:30000,mod:5})],txs:[],rip:{},at:T},
+        {budgets:[full(T+100,{v:77000,mod:5},{v:30000,mod:5})],txs:[],rip:{},at:T}).budgets[0];
+  ok('mergeState: при равных метках сильнее местная сторона',
+     mb.incomes.filter(i=>i.id==='i2')[0].amount===77000,mb.incomes);
+
+  /* Бюджет, который есть только на одной стороне, не теряет своих строк */
+  mb=fn({budgets:[full(T+100,{v:50000,mod:1},{v:30000,mod:1})],txs:[],rip:{},at:T},
+        {budgets:[],txs:[],rip:{},at:T}).budgets[0];
+  ok('mergeState: односторонний бюджет цел',
+     mb.incomes.length===2&&mb.planned.length===1,mb);
 }
 
 /* ── Склонение: чистый node, без браузера ────
@@ -384,6 +441,36 @@ function checkPlural(ok){
   ok('мастер переносит дату повторяющегося дохода',r.auto==='2026-11-25',r);
   ok('но если период подвинули — дата не уезжает за его край',
      r.made===''&&r.to==='2026-11-15'&&r.amount===50000,r);
+  await wait(SAVE);
+
+  /* ── Две машины правят ОДИН бюджет ──────────
+     Чистое слияние проверено в блоке 9. Здесь то же самое, но через живое
+     приложение: правка уезжает в облако, местная правка идёт своим путём,
+     и обе обязаны уцелеть — вместе со сведённым котлом. */
+  await pg3.evaluate(()=>swBdg('b-sep'));await wait(SAVE);
+  r=await pg3.evaluate(()=>{
+    var b=getAB(), inc=b.incomes[0], future=Date.now()+5000;
+    /* телефон поднял зарплату на 10 000 и уже записал это в облако */
+    var c=window.__CLOUD__.budgets.filter(function(x){return x.id==='b-sep';})[0];
+    var ci=c.incomes.filter(function(x){return x.id===inc.id;})[0];
+    ci.amount=inc.amount+10000;ci.mod=future;c.mod=future;window.__CLOUD__.at=future;
+    /* а здесь в это же время подняли лимит категории */
+    b.planned[0].amount=25000;touch(b.planned[0]);recalcDaily(b);save();
+    return{incWas:inc.amount,plnWas:b.planned[0].amount};});
+  await wait(SAVE);
+  await pg3.evaluate(()=>pullAndMerge());await wait(300);
+  let m=await pg3.evaluate(()=>{
+    var b=getAB(),res=0;
+    for(var i=0;i<b.planned.length;i++){var q=calcCatRem(b,b.planned[i].id);if(q>0)res+=q;}
+    return{inc:b.incomes[0].amount,pln:b.planned[0].amount,pot:b.pot,potOf:potOf(b),
+           inv:calcDayBal(b)+accrued(b,nextDay(today()),b.dateTo)+res-calcTotalBal(b),
+           order:b.incomes.map(function(x){return x.name;}).join()};});
+  ok('чужая правка дохода доехала',m.inc===r.incWas+10000,{m,r});
+  ok('и своя правка категории не затёрлась',m.pln===25000,m);
+  ok('порядок доходов на экране не перетасовался',/^Зарплата сентября/.test(m.order),m.order);
+  ok('котёл сведён с новыми суммами сразу после слияния',
+     Math.abs(m.pot-m.potOf)<0.01,m);
+  ok('и денежный инвариант после слияния сходится',Math.abs(m.inv)<0.01,m);
   await wait(SAVE);
 
   console.log('   детализация сводки');

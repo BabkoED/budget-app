@@ -1111,7 +1111,14 @@ function mergeState(A, B) {
       x = all[i];
       if (!x || !x.id) continue;
       cur = by[x.id];
-      if (!cur || (x.mod||0) > (cur.mod||0)) by[x.id] = x;
+      /* При РАВНЫХ метках побеждает B — эта машина. Порядок в `all` — сначала
+         A (облако), потом B, поэтому сравнение нестрогое. Равные метки при
+         разном содержимом означают правку, не поднявшую `mod`; сделал её тот,
+         кто сейчас за устройством, и терять её нельзя. До 20.09.2026 это
+         спасал `touch(b)` на бюджете: строки внутри побеждали вместе с ним.
+         Теперь строки сливаются сами, и тай-брейк стал виден — на стенде
+         сразу пропала дата, проставленная в обход saveInc. */
+      if (!cur || (x.mod||0) >= (cur.mod||0)) by[x.id] = x;
     }
     var out = [];
     for (var id in by) {
@@ -1123,8 +1130,51 @@ function mergeState(A, B) {
     return out;
   }
 
+  function byId(l){var o={},i;for(i=0;i<(l||[]).length;i++)if(l[i]&&l[i].id)o[l[i].id]=l[i];return o;}
+
+  /* Порядок строк виден на экране, а mergeList отдаёт произвольный — обход
+     идёт по ключам объекта. Возвращаем порядок победившей стороны, чужие
+     строки дописываем в конец в их собственном порядке. */
+  function orderLike(merged, refs){
+    var by=byId(merged), seen={}, out=[], r, i, id;
+    for(r=0;r<refs.length;r++){
+      var list=refs[r]||[];
+      for(i=0;i<list.length;i++){
+        id=list[i].id;
+        if(by[id]&&!seen[id]){seen[id]=1;out.push(by[id]);}
+      }
+    }
+    for(i=0;i<merged.length;i++)if(!seen[merged[i].id]){seen[merged[i].id]=1;out.push(merged[i]);}
+    return out;
+  }
+
+  /* Бюджет целиком побеждать не может: доходы и категории внутри него —
+     такие же самостоятельные записи, как траты. Пока побеждал весь объект,
+     правка с одного устройства молча съедала правку с другого: жена меняет
+     сумму аванса на телефоне, я в это же время поднимаю лимит продуктов на
+     ноутбуке — уезжает то, что записано позже, целиком, вместе с чужой
+     суммой. Воспроизведено 20.09.2026 на этом же mergeState: аванс
+     60 000 → 50 000, и ни одного признака на экране.
+     Верхний уровень (даты, котёл, ставки) остаётся за свежей стороной —
+     это связанные между собой числа, их поэлементно смешивать нельзя.
+     Котёл после слияния сводится с фактическими суммами в syncPot. */
+  function mergeBudgets(la, lb){
+    var win=mergeList('bdg', la, lb), ia=byId(la), ib=byId(lb), i;
+    for(i=0;i<win.length;i++){
+      var w=win[i], a=ia[w.id], c=ib[w.id];
+      if(!a||!c)continue;                 /* бюджет есть только на одной стороне */
+      var other=(w===a?c:a), out=Object.assign({},w);
+      out.incomes=orderLike(mergeList('inc', a.incomes, c.incomes),
+                            [w.incomes||[], other.incomes||[]]);
+      out.planned=orderLike(mergeList('pln', a.planned, c.planned),
+                            [w.planned||[], other.planned||[]]);
+      win[i]=out;
+    }
+    return win;
+  }
+
   return {
-    budgets: mergeList('bdg', A.budgets, B.budgets),
+    budgets: mergeBudgets(A.budgets, B.budgets),
     txs:     mergeList('tx',  A.txs,     B.txs),
     /* ВАЖЕН ПОРЯДОК АРГУМЕНТОВ: A — облако, B — эта машина. Так вызывается
        во всех трёх местах (loadFromCloud, pullAndMerge, saveToCloud).
@@ -1148,9 +1198,18 @@ function mergeState(A, B) {
    новая правка гарантированно перевесила запись, пришедшую из прошлого. */
 function stampLegacy(st) {
   if (!st) return st;
-  var i, mark = 1;
+  var i, j, mark = 1;
   for (i = 0; i < (st.budgets||[]).length; i++) if (!st.budgets[i].mod) st.budgets[i].mod = mark;
   for (i = 0; i < (st.txs||[]).length; i++)     if (!st.txs[i].mod)     st.txs[i].mod     = mark;
+  /* Доходы и категории сливаются поэлементно, а метки правки у них появились
+     20.09.2026. Без метки строка идёт с mod=0 и проигрывает любой правленой
+     с другого устройства — в том числе своей же копии. Поэтому старым строкам
+     проставляем метку бюджета: они правились тогда же, когда и он. */
+  for (i = 0; i < (st.budgets||[]).length; i++) {
+    var bg = st.budgets[i];
+    for (j = 0; j < (bg.incomes||[]).length; j++) if (!bg.incomes[j].mod) bg.incomes[j].mod = bg.mod || mark;
+    for (j = 0; j < (bg.planned||[]).length; j++) if (!bg.planned[j].mod) bg.planned[j].mod = bg.mod || mark;
+  }
   if (!st.rip) st.rip = {};
   return roundAmounts(st);
 }
@@ -1251,10 +1310,21 @@ async function loadFromCloud() {
 /* Отпечаток состояния. Считать только количество записей мало: правка суммы
    на втором устройстве их не меняет — поэтому берём ещё и максимальный mod. */
 function stateSig(st) {
-  var mx = 0, i;
+  var mx = 0, n = 0, i, j, b;
   for (i = 0; i < (st.txs||[]).length; i++)     if ((st.txs[i].mod||0) > mx)     mx = st.txs[i].mod;
-  for (i = 0; i < (st.budgets||[]).length; i++) if ((st.budgets[i].mod||0) > mx) mx = st.budgets[i].mod;
-  return (st.txs||[]).length + '/' + (st.budgets||[]).length + '/' + mx;
+  for (i = 0; i < (st.budgets||[]).length; i++) {
+    b = st.budgets[i];
+    if ((b.mod||0) > mx) mx = b.mod;
+    /* Счёт строк — чтобы удаление с другого устройства тоже меняло отпечаток:
+       метка удаления mod не поднимает, а список становится короче. */
+    n += (b.incomes||[]).length + (b.planned||[]).length;
+    /* Строки внутри бюджета сливаются отдельно, поэтому и в отпечаток входят
+       отдельно. Иначе чужая правка суммы дохода приезжает, но перерисовки нет:
+       у победившего бюджета mod свой, прежний, и отпечаток не меняется. */
+    for (j = 0; j < (b.incomes||[]).length; j++) if ((b.incomes[j].mod||0) > mx) mx = b.incomes[j].mod;
+    for (j = 0; j < (b.planned||[]).length; j++) if ((b.planned[j].mod||0) > mx) mx = b.planned[j].mod;
+  }
+  return (st.txs||[]).length + '/' + (st.budgets||[]).length + '/' + n + '/' + mx;
 }
 
 /* Подтянуть чужие правки и влить в текущее состояние.
@@ -1268,6 +1338,11 @@ async function pullAndMerge() {
     var merged = mergeState(cloud, S);
     S = merged;
     invalidateSpentCache();
+    /* Доходы и категории собраны поэлементно, а котёл достался от победившей
+       стороны — он мог не сойтись с получившимся набором сумм. Сводим сразу:
+       иначе расхождение живёт до первой правки и всё это время норма
+       раздаёт не те деньги. */
+    syncPot(getCurrentBudget());
     saveLocal();
     return stateSig(merged) !== before;
   } catch(e) { return false; }
@@ -1310,6 +1385,7 @@ async function saveToCloud() {
       var sig0 = stateSig(S);
       S = mergeState(cloud, S);
       invalidateSpentCache();
+      syncPot(getCurrentBudget());   /* см. pullAndMerge: котёл сводится сразу */
       /* слияние принесло чужие записи — показываем их сразу */
       if (stateSig(S) !== sig0) render();
     }
@@ -1907,6 +1983,10 @@ function reconcileOnLoad(){
     if(typeof b.pot==='number')b.pot=potOf(b);
     changed=true;
   }
+  /* Котёл сводится с фактическими суммами ДО сведения ставок: после слияния
+     доходы и категории могли приехать от другой стороны, а снимок pot остаться
+     от этой. Порядок важен — reconcileRates считает норму от pot. */
+  syncPot(cur);
   /* Сводим только текущий бюджет: у закрытого периода ставку менять нечего,
      а у будущего начисление ещё не началось. Если всё сходится — молча выходит. */
   if(reconcileRates(cur))changed=true;
@@ -3156,7 +3236,9 @@ function bindMain(b){
   window.fillSg=function(eid,ev,nid,nv){var a=document.getElementById(eid),c=document.getElementById(nid);if(a)a.value=ev;if(c)c.value=nv;};
 
   window.editInc=function(id){var i=b.incomes.filter(function(x){return x.id===id;})[0];incMenu=null;modal={type:'edit-income',data:Object.assign({},i)};render();};
-  window.delInc =function(id){if(!confirm('Удалить?'))return;incMenu=null;b.incomes=b.incomes.filter(function(i){return i.id!==id;});recalcDaily(b);save();modal=null;render();};
+  /* Метка удаления обязательна: без неё второе устройство вернёт строку
+     обратно при первом же слиянии — она там ещё жива и с прежним mod. */
+  window.delInc =function(id){if(!confirm('Удалить?'))return;incMenu=null;ripEnt('inc',id);b.incomes=b.incomes.filter(function(i){return i.id!==id;});recalcDaily(b);save();modal=null;render();};
   window.saveInc=function(){
     var n=((document.getElementById('mn')||{}).value||'').trim();
     var a=pf((document.getElementById('ma')||{}).value);
@@ -3167,8 +3249,10 @@ function bindMain(b){
        и «придёт 5 ноября» в сентябрьском периоде ничего не значит.
        Пустая дата — штатный случай, а не ошибка: деньги уже на руках. */
     var dt=incDateFit(b,((document.getElementById('mdi')||{}).value||'').trim());
-    if(modal.type==='add-income')b.incomes.push({id:uid(),name:n,emoji:e,amount:a,recur:rc,date:dt});
-    else{var inc=b.incomes.filter(function(x){return x.id===modal.data.id;})[0];if(inc){inc.name=n;inc.emoji=e;inc.amount=a;inc.recur=rc;inc.date=dt;}}
+    /* touch на самой строке, а не только на бюджете: доходы сливаются
+       поэлементно, и без метки правка проиграет чужой копии той же строки */
+    if(modal.type==='add-income')b.incomes.push(touch({id:uid(),name:n,emoji:e,amount:a,recur:rc,date:dt}));
+    else{var inc=b.incomes.filter(function(x){return x.id===modal.data.id;})[0];if(inc){inc.name=n;inc.emoji=e;inc.amount=a;inc.recur=rc;inc.date=dt;touch(inc);}}
     recalcDaily(b);save();modal=null;render();
   };
 
@@ -3190,6 +3274,7 @@ function bindMain(b){
       var t=S.txs[i];
       if(t.budgetId===b.id&&t.plannedCatId===id){t.plannedCatId=null;t.category='';t.categoryEmoji='';}
     }
+    ripEnt('pln',id);
     b.planned=b.planned.filter(function(p){return p.id!==id;});
     recalcDaily(b);save();modal=null;render();
   };
@@ -3199,8 +3284,8 @@ function bindMain(b){
     var e=((document.getElementById('me')||{}).value||'✨').trim();
     if(!n||!a)return;
     var rc=!!(document.getElementById('mr')||{}).checked;
-    if(modal.type==='add-planned')b.planned.push({id:uid(),name:n,emoji:e,amount:a,recur:rc});
-    else{var pl=b.planned.filter(function(x){return x.id===modal.data.id;})[0];if(pl){pl.name=n;pl.emoji=e;pl.amount=a;pl.recur=rc;}}
+    if(modal.type==='add-planned')b.planned.push(touch({id:uid(),name:n,emoji:e,amount:a,recur:rc}));
+    else{var pl=b.planned.filter(function(x){return x.id===modal.data.id;})[0];if(pl){pl.name=n;pl.emoji=e;pl.amount=a;pl.recur=rc;touch(pl);}}
     recalcDaily(b);save();modal=null;render();
   };
 
@@ -3230,8 +3315,8 @@ function bindMain(b){
       if(rem<=0)return err('В категории нет свободных средств');
       if(a>rem)return err('В категории только '+fmt(rem)+' — перевести '+fmt(a)+' нельзя');
     }
-    if(fid){var cf=b.planned.filter(function(p){return p.id===fid;})[0];if(cf)cf.amount-=a;}
-    if(tid){var ct=b.planned.filter(function(p){return p.id===tid;})[0];if(ct)ct.amount+=a;}
+    if(fid){var cf=b.planned.filter(function(p){return p.id===fid;})[0];if(cf){cf.amount-=a;touch(cf);}}
+    if(tid){var ct=b.planned.filter(function(p){return p.id===tid;})[0];if(ct){ct.amount+=a;touch(ct);}}
     recalcDaily(b);save();modal=null;render();
   };
 
@@ -3300,8 +3385,8 @@ function bindWiz(){
       }
     }
     var bdg={id:uid(),dateFrom:d.dateFrom,dateTo:d.dateTo,createdAt:today(),
-      incomes:d.incomes.map(function(i){return Object.assign({},i,{amount:pf(i.amount)||0});}),
-      planned:d.planned.map(function(p){return Object.assign({},p,{amount:pf(p.amount)||0});}),
+      incomes:d.incomes.map(function(i){return touch(Object.assign({},i,{amount:pf(i.amount)||0}));}),
+      planned:d.planned.map(function(p){return touch(Object.assign({},p,{amount:pf(p.amount)||0}));}),
       dailyBudget:avail>0?avail/days:0,
       pot:avail,potV:2,
       rates:[{from:d.dateFrom,v:avail>0?avail/days:0}]};
