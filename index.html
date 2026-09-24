@@ -995,6 +995,7 @@ var saveTimer = null;
    не отвечает. try/catch тут бессилен: ловить нечего, ждать можно вечно.
    Поэтому у каждого сетевого шага, от которого зависит первая отрисовка,
    должен быть срок. */
+var NOT_READ = {};   /* метка «облако не прочитано» для withDeadline */
 function withDeadline(p, ms, fallback) {
   return Promise.race([
     Promise.resolve(p).catch(function() { return fallback; }),
@@ -1069,6 +1070,7 @@ async function initApp() {
     }
     if (event === 'SIGNED_OUT') {
       authReady = false;
+      cloudAt = null;
       stopRealtime();
       /* Порядок важен: localKey() собирается из currentUser, поэтому
          бэкап удаляем ДО обнуления — иначе он останется лежать и всплывёт
@@ -1282,6 +1284,12 @@ function saveLocal() {
   try { localStorage.setItem(localKey(), JSON.stringify(S)); } catch(e) {}
 }
 
+/* Метка `at` облачной копии, содержимое которой УЖЕ ЛЕЖИТ в S: слито или
+   записано нами. По ней flushSave пишет условно — см. комментарий там.
+   Ставится только у вызывающих, ПОСЛЕ слияния, а не в fetchCloud: чтение
+   обёрнуто в withDeadline, и запоздавший ответ выставил бы метку облака,
+   которого в S нет, — тогда условная запись перетёрла бы чужое. */
+var cloudAt = null;
 async function fetchCloud() {
   var res = await sb.from('user_state')
     .select('state')
@@ -1304,10 +1312,12 @@ async function loadFromCloud() {
          Трата, внесённая с телефона, больше не пропадает от того,
          что ноутбук сохранился последним. */
       S = mergeState(cloud, local);
+      cloudAt = cloud.at || null;
       saveLocal();
       saveToCloud();
     } else if (cloud) {
       S = cloud;
+      cloudAt = cloud.at || null;
       saveLocal();
     } else if (local && local.budgets && local.budgets.length) {
       /* В облаке пусто, локальный бэкап есть — восстанавливаем и заливаем */
@@ -1354,6 +1364,7 @@ async function pullAndMerge() {
     var before = stateSig(S);
     var merged = mergeState(cloud, S);
     S = merged;
+    cloudAt = cloud.at || null;
     invalidateSpentCache();
     /* Доходы и категории собраны поэлементно, а котёл достался от победившей
        стороны — он мог не сойтись с получившимся набором сумм. Сводим сразу:
@@ -1403,22 +1414,36 @@ async function saveToCloud() {
   try {
     /* Читаем облако перед записью и сливаем: если со второго устройства
        что-то прилетело, пока мы редактировали, оно не будет затёрто. */
-    var cloud = stampLegacy(await withDeadline(fetchCloud(), netDeadline(), null));
+    /* «Не дождались» и «строки нет» — разные вещи. Раньше оба давали null,
+       и при медленной сети запись шла ВСЛЕПУЮ, без слияния: трата со второго
+       телефона пропадала из облака, а статус писал «сохранено» (24.09.2026).
+       Не дождались или ошибка чтения — не пишем: правка в локальном бэкапе,
+       pendingSave поднят, повтор ниже, по сети и при возврате. */
+    var raw = await withDeadline(fetchCloud(), netDeadline(), NOT_READ);
+    if (raw === NOT_READ) {
+      setSync(navigator.onLine ? 'error' : 'offline');
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(function(){ if (pendingSave) saveToCloud(); }, 15000);
+      return;
+    }
+    var cloud = stampLegacy(raw);
     if (cloud) {
       var sig0 = stateSig(S);
       S = mergeState(cloud, S);
+      cloudAt = cloud.at || null;
       invalidateSpentCache();
       syncPotOpen();   /* см. pullAndMerge: котёл сводится сразу */
       /* слияние принесло чужие записи — показываем их сразу */
       if (stateSig(S) !== sig0) renderBg();
     }
-    S.at = nowMs();
+    var at1 = S.at = nowMs();
     var res = await sb.from('user_state').upsert({
       user_id: currentUser.id,
       state: S,
       updated_at: new Date().toISOString()
     }, {onConflict: 'user_id'});
     if (res.error) throw res.error;
+    cloudAt = at1;            /* облако теперь — ровно то, что записали */
     saveLocal();              /* облако ок — синхронизируем локальный бэкап */
     if (saveGen === gen0) { pendingSave = false; setSync('saved'); }
   } catch(e) {
@@ -1428,33 +1453,43 @@ async function saveToCloud() {
   }
 }
 
-/* BUG FIX: мгновенный сброс при закрытии вкладки.
-   sendBeacon доставит данные даже после закрытия страницы. */
+/* Сброс при закрытии вкладки: fetch с keepalive доедет и после закрытия.
+   Прочитать облако и слить здесь уже некогда, поэтому запись УСЛОВНАЯ:
+   PATCH только если в облаке всё ещё та копия, которую мы видели
+   (`state->>at` = cloudAt). До 24.09.2026 здесь был безусловный upsert
+   всего S: закрыл приложение, пока второй телефон успел записать своё, —
+   и облако теряло его правки до следующего сохранения на втором телефоне.
+   Условие не сработало — ничего страшного: правка лежит в локальном
+   бэкапе, pendingSave остаётся поднятым, и при возврате или следующем
+   запуске она уедет обычным путём, со слиянием. */
 function flushSave() {
   if (!pendingSave || !currentUser) return;
   clearTimeout(saveTimer);
   saveLocal();   /* гарантируем локальный бэкап перед закрытием вкладки */
+  if (cloudAt === null || offlineMode) return;   /* облака не видели — сверять не с чем */
   try {
-    var url = SUPA_URL + '/rest/v1/user_state?on_conflict=user_id';
+    var url = SUPA_URL + '/rest/v1/user_state?user_id=eq.' + encodeURIComponent(currentUser.id) +
+              '&state->>at=eq.' + encodeURIComponent(String(cloudAt));
+    var st = Object.assign({}, S, {at: nowMs()});
     var payload = JSON.stringify({
-      user_id: currentUser.id,
-      state: S,
+      state: st,
       updated_at: new Date().toISOString()
     });
     var blob = new Blob([payload], {type: 'application/json'});
     /* sendBeacon не умеет кастомные заголовки — поэтому fetch с keepalive */
     fetch(url, {
-      method: 'POST',
+      method: 'PATCH',
       keepalive: true,
       headers: {
         'apikey': SUPA_KEY,
         'Authorization': 'Bearer ' + (sbToken() || SUPA_KEY),
         'Content-Type': 'application/json',
-        'Prefer': 'resolution=merge-duplicates,return=minimal'
+        'Prefer': 'return=minimal'
       },
       body: payload
     }).catch(function(){});
-    pendingSave = false;
+    /* pendingSave НЕ снимаем: дошла ли условная запись, неизвестно. Лишняя
+       запись при возврате безвредна — она идёт со слиянием. */
   } catch(e) {}
 }
 function sbToken() {
@@ -1496,7 +1531,11 @@ function stopRealtime() {
 
 window.addEventListener('visibilitychange', function() {
   if (document.visibilityState === 'hidden') { flushSave(); return; }
-  if (currentUser) pullAndMerge().then(function(changed){ if (changed) renderBg(); });
+  if (!currentUser) return;
+  /* Несохранённое (в том числе после условного flushSave) — записать со
+     слиянием; saveToCloud сам подтянет чужое и перерисует. */
+  if (pendingSave) saveToCloud();
+  else pullAndMerge().then(function(changed){ if (changed) renderBg(); });
 });
 window.addEventListener('pagehide', flushSave);
 window.addEventListener('online',  function(){

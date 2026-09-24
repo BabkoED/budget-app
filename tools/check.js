@@ -692,6 +692,49 @@ function checkPlural(ok){
    ok('подсказка в окне категории = итоговая норма',Math.abs(r.shown-r.made)<=1,r);
    await p.context().close();}
 
+  /* Сброс при закрытии пишет УСЛОВНО: только если облако не менялось с
+     последнего чтения. Иначе — не перетирает чужое, правка уезжает при
+     возврате со слиянием (24.09.2026). fetch эмулирует PostgREST: PATCH
+     применяется, только если state->>at совпадает. */
+  const FETCH=String.raw`window.__PATCH__=[];window.fetch=function(u,o){var m=/state->>at=eq\.(\d+)/.exec(decodeURIComponent(u));
+    var hit=!!(m&&window.__CLOUD__&&String(window.__CLOUD__.at)===m[1]&&/user_id=eq\./.test(u)&&o.method==='PATCH');
+    if(o.method==='POST')hit=true;   /* прежний безусловный upsert — перетирает */
+    window.__PATCH__.push(hit);if(hit)window.__CLOUD__=JSON.parse(o.body).state;return Promise.resolve({ok:true});};`;
+  {const st=seedState();st.activeBudgetId='b-sep';
+   const p=await open13('2026-09-10',st);
+   await p.evaluate(FETCH);
+   /* облако не менялось — запись проходит */
+   r=await p.evaluate(()=>{S.txs.push(touch({id:'f1',seq:21,date:'2026-09-10',name:'Перед закрытием',category:'',plannedCatId:null,amount:70,budgetId:'b-sep'}));save();
+     flushSave();return{hit:window.__PATCH__[0],inCloud:window.__CLOUD__.txs.some(t=>t.id==='f1')};});
+   ok('закрытие: облако не менялось — запись прошла',r.hit===true&&r.inCloud,r);
+   await wait(SAVE);
+   /* второй телефон записал своё — сброс не перетирает */
+   r=await p.evaluate(()=>{var c=window.__CLOUD__;c.txs.push({id:'f2',seq:22,date:'2026-09-10',name:'С телефона жены',category:'',plannedCatId:null,amount:500,budgetId:'b-sep',mod:Date.now()+5});
+     c.at=Date.now()+5;
+     S.txs.push(touch({id:'f3',seq:23,date:'2026-09-10',name:'Моя перед закрытием',category:'',plannedCatId:null,amount:90,budgetId:'b-sep'}));save();
+     flushSave();return{hit:window.__PATCH__[window.__PATCH__.length-1],wife:window.__CLOUD__.txs.some(t=>t.id==='f2'),pending:pendingSave};});
+   ok('закрытие: чужая запись в облаке не перетёрта',r.hit===false&&r.wife&&r.pending,r);
+   /* вернулся в приложение — обе правки в облаке */
+   await p.evaluate(()=>window.dispatchEvent(new Event('visibilitychange')));await wait(SAVE);
+   r=await p.evaluate(()=>({mine:window.__CLOUD__.txs.some(t=>t.id==='f3'),wife:window.__CLOUD__.txs.some(t=>t.id==='f2'),
+     local:S.txs.some(t=>t.id==='f2'),pending:pendingSave}));
+   ok('возврат: обе правки в облаке и на экране',r.mine&&r.wife&&r.local&&!r.pending,r);
+   await p.context().close();}
+
+  /* Медленная сеть: чтение облака не уложилось в срок — запись не идёт
+     вслепую (раньше шёл upsert без слияния и стирал чужую трату). */
+  {const st=seedState();st.activeBudgetId='b-sep';
+   const p=await open13('2026-09-10',st);
+   await p.evaluate(()=>{var c=window.__CLOUD__;c.txs.push({id:'w1',seq:31,date:'2026-09-10',name:'С телефона жены',category:'',plannedCatId:null,amount:500,budgetId:'b-sep',mod:Date.now()+5});c.at=Date.now()+5;
+     window.__HANG__=true;S.txs.push(touch({id:'m1',seq:32,date:'2026-09-10',name:'Моя',category:'',plannedCatId:null,amount:90,budgetId:'b-sep'}));save();});
+   await wait(7500);
+   r=await p.evaluate(()=>({wife:window.__CLOUD__.txs.some(t=>t.id==='w1'),pending:pendingSave,sync:syncState,ups:window.__UPSERTS__}));
+   ok('медленная сеть: чужая трата в облаке цела, правка ждёт',r.wife&&r.pending&&r.sync!=='saved',r);
+   await p.evaluate(()=>{window.__HANG__=false;window.dispatchEvent(new Event('visibilitychange'));});await wait(SAVE);
+   r=await p.evaluate(()=>({wife:window.__CLOUD__.txs.some(t=>t.id==='w1'),mine:window.__CLOUD__.txs.some(t=>t.id==='m1'),pending:pendingSave,sync:syncState}));
+   ok('сеть ожила: обе траты в облаке, статус «сохранено»',r.wife&&r.mine&&!r.pending&&r.sync==='saved',r);
+   await p.context().close();}
+
   const shot=path.join(os.tmpdir(),'budget-check.png');
   await pg.evaluate(()=>{drop=true;render();});await wait(150);
   await pg.screenshot({path:shot});
