@@ -1157,18 +1157,35 @@ function mergeState(A, B) {
      60 000 → 50 000, и ни одного признака на экране.
      Верхний уровень (даты, котёл, ставки) остаётся за свежей стороной —
      это связанные между собой числа, их поэлементно смешивать нельзя.
-     Котёл после слияния сводится с фактическими суммами в syncPot. */
+     Котёл после слияния сводится с фактическими суммами в syncPot.
+
+     Результат пишется В МЕСТНЫЙ объект бюджета и в его же массивы, а не
+     в копию. Обработчики экрана (bindMain) держат ссылку на бюджет с
+     последней отрисовки, а после слияния без перемен в отпечатке
+     перерисовки нет. Пока здесь стоял Object.assign({},w), каждое
+     сохранение через 600 мс подменяло бюджет новым объектом, и следующая
+     правка уходила в выброшенный: второй доход подряд или доход после
+     возврата из другого приложения молча не добавлялся. Воспроизведено
+     24.09.2026 на стенде, проверка «правка после слияния» в check.js. */
+  function refill(arr, src){arr.length=0;for(var j=0;j<src.length;j++)arr.push(src[j]);return arr;}
   function mergeBudgets(la, lb){
-    var win=mergeList('bdg', la, lb), ia=byId(la), ib=byId(lb), i;
+    var win=mergeList('bdg', la, lb), ia=byId(la), ib=byId(lb), i, k;
     for(i=0;i<win.length;i++){
       var w=win[i], a=ia[w.id], c=ib[w.id];
       if(!a||!c)continue;                 /* бюджет есть только на одной стороне */
-      var other=(w===a?c:a), out=Object.assign({},w);
-      out.incomes=orderLike(mergeList('inc', a.incomes, c.incomes),
-                            [w.incomes||[], other.incomes||[]]);
-      out.planned=orderLike(mergeList('pln', a.planned, c.planned),
-                            [w.planned||[], other.planned||[]]);
-      win[i]=out;
+      var other=(w===a?c:a);
+      var inc=orderLike(mergeList('inc', a.incomes, c.incomes),
+                        [w.incomes||[], other.incomes||[]]);
+      var pln=orderLike(mergeList('pln', a.planned, c.planned),
+                        [w.planned||[], other.planned||[]]);
+      var li=c.incomes||[], lp=c.planned||[];
+      if(w!==c){                          /* верхний уровень достался облаку */
+        for(k in c)if(!(k in w))delete c[k];
+        Object.assign(c,w);
+      }
+      c.incomes=refill(li,inc);
+      c.planned=refill(lp,pln);
+      win[i]=c;
     }
     return win;
   }

@@ -389,6 +389,31 @@ function checkPlural(ok){
   ok('дата вне периода не сохранилась, доход остался',r.has&&r.date==='',r);
   await wait(SAVE);
 
+  /* Правка после слияния. Обработчики держат бюджет с последней отрисовки,
+     а слияние без перемен в отпечатке экран не перерисовывает. Пока слияние
+     собирало бюджет в новый объект, доход, сохранённый после него, уходил
+     в выброшенную копию и молча пропадал (24.09.2026). Два пути: вторая
+     запись подряд, пока идёт отложенное сохранение, и возврат из другого
+     приложения с открытым окном. */
+  await pg3.evaluate(()=>{om('add-income');document.getElementById('mn').value='Подряд-1';
+    document.getElementById('ma').value='1000';saveInc();om('add-income');});
+  await wait(SAVE);
+  await pg3.evaluate(()=>{document.getElementById('mn').value='Подряд-2';
+    document.getElementById('ma').value='2000';saveInc();});
+  await wait(SAVE);
+  await pg3.evaluate(()=>om('add-income'));
+  await pg3.evaluate(()=>pullAndMerge());await wait(150);
+  await pg3.evaluate(()=>{document.getElementById('mn').value='После-возврата';
+    document.getElementById('ma').value='3000';saveInc();});
+  await wait(SAVE);
+  r=await pg3.evaluate(()=>{var has=function(st,n){var b=st.budgets.filter(function(x){return x.id===getAB().id;})[0];
+      return b.incomes.some(function(i){return i.name===n;});};
+    return{loc:['Подряд-1','Подряд-2','После-возврата'].map(function(n){return has(S,n);}),
+           cld:['Подряд-1','Подряд-2','После-возврата'].map(function(n){return has(window.__CLOUD__,n);}),
+           same:S.budgets.indexOf(getAB())>-1};});
+  ok('второй доход подряд не теряется',r.loc[1]&&r.cld[1],r);
+  ok('доход после фонового слияния не теряется',r.loc[2]&&r.cld[2],r);
+
   /* Перенос числа месяца в новый период */
   r=await pg3.evaluate(()=>({same:shiftDOM('2026-09-25','2026-10-01','2026-10-31'),
     late:shiftDOM('2026-09-10','2026-10-15','2026-11-14'),
