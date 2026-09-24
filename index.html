@@ -1370,6 +1370,10 @@ async function pullAndMerge() {
    Индикатор рисуется в шапке (точка). */
 var syncState = 'saved';
 var pendingSave = false;
+/* Номер правки. saveToCloud снимает pendingSave, только если за время записи
+   новых правок не было: иначе правка, сделанная пока шёл запрос, числилась
+   сохранённой, и закрытие приложения в эти 600 мс не отправляло её. */
+var saveGen = 0;
 
 function setSync(st) {
   syncState = st;
@@ -1383,6 +1387,7 @@ function save() {
   syncPot(getCurrentBudget());/* трата могла увести категорию за лимит */
   saveLocal();                /* мгновенный локальный бэкап — не зависит от сети */
   pendingSave = true;
+  saveGen++;
   setSync('saving');
   clearTimeout(saveTimer);
   saveTimer = setTimeout(function() { saveToCloud(); }, 600);
@@ -1394,6 +1399,7 @@ async function saveToCloud() {
      Локально всё уже записано в save(), поэтому честный статус — «офлайн». */
   if (offlineMode) { pendingSave = false; setSync('offline'); return; }
   if (!currentUser) return;
+  var gen0 = saveGen;
   try {
     /* Читаем облако перед записью и сливаем: если со второго устройства
        что-то прилетело, пока мы редактировали, оно не будет затёрто. */
@@ -1404,7 +1410,7 @@ async function saveToCloud() {
       invalidateSpentCache();
       syncPotOpen();   /* см. pullAndMerge: котёл сводится сразу */
       /* слияние принесло чужие записи — показываем их сразу */
-      if (stateSig(S) !== sig0) render();
+      if (stateSig(S) !== sig0) renderBg();
     }
     S.at = nowMs();
     var res = await sb.from('user_state').upsert({
@@ -1414,8 +1420,7 @@ async function saveToCloud() {
     }, {onConflict: 'user_id'});
     if (res.error) throw res.error;
     saveLocal();              /* облако ок — синхронизируем локальный бэкап */
-    pendingSave = false;
-    setSync('saved');
+    if (saveGen === gen0) { pendingSave = false; setSync('saved'); }
   } catch(e) {
     /* Сеть/облако упали — данные уже в локальном бэкапе, не потеряются.
        Допишем при восстановлении связи (слушатель 'online'). */
@@ -1479,7 +1484,7 @@ function startRealtime() {
     rtChannel = sb.channel('state-' + currentUser.id)
       .on('postgres_changes',
           {event:'*', schema:'public', table:'user_state', filter:'user_id=eq.' + currentUser.id},
-          function(){ pullAndMerge().then(function(changed){ if (changed) render(); }); })
+          function(){ pullAndMerge().then(function(changed){ if (changed) renderBg(); }); })
       .subscribe();
   } catch(e) { rtChannel = null; }
 }
@@ -1491,12 +1496,12 @@ function stopRealtime() {
 
 window.addEventListener('visibilitychange', function() {
   if (document.visibilityState === 'hidden') { flushSave(); return; }
-  if (currentUser) pullAndMerge().then(function(changed){ if (changed) render(); });
+  if (currentUser) pullAndMerge().then(function(changed){ if (changed) renderBg(); });
 });
 window.addEventListener('pagehide', flushSave);
 window.addEventListener('online',  function(){
   if (pendingSave) saveToCloud();
-  else { setSync('saved'); if (currentUser) pullAndMerge().then(function(c){ if(c) render(); }); }
+  else { setSync('saved'); if (currentUser) pullAndMerge().then(function(c){ if(c) renderBg(); }); }
 });
 window.addEventListener('offline', function(){ setSync('offline'); });
 
@@ -1751,6 +1756,21 @@ function accrued(b,from,to){
 function accrualStart(b){
   var cr=b.createdAt||b.dateFrom;
   return cr>b.dateFrom?cr:b.dateFrom;
+}
+/* Сколько дней норма реально начисляется. Котёл делится именно на них, а не
+   на все дни периода: бюджет, заведённый 10-го, начисляет с 10-го, и деление
+   на 30 дней раздавало бы только две трети котла. До 24.09.2026 так считали
+   ветка «не начался / закрыт» в recalcDaily и мастер: правка в день создания
+   роняла норму с 4 762 до 3 367 при РОСТЕ дохода, правка закрытого августа,
+   заведённого 10-го, теряла 22 500 ₽ начислений. Бюджет, заведённый уже
+   после конца периода, не начисляет ничего — для него знаменатель прежний. */
+/* Мастер обязан ПОКАЗЫВАТЬ ту же норму, что создаст: шаги и wzCr считают
+   дни через одну функцию. Первая правка 24.09.2026 поменяла только wzCr —
+   экран обещал 2 333 ₽/день, а бюджет создавался с 10 000. */
+function wdAccDays(d){return accrualDays({dateFrom:d.dateFrom,dateTo:d.dateTo,createdAt:today()});}
+function accrualDays(b){
+  var st=accrualStart(b);
+  return st<=b.dateTo?getDays(st,b.dateTo):getDays(b.dateFrom,b.dateTo);
 }
 
 function calcDayBal(b){
@@ -2050,18 +2070,22 @@ function recalcDaily(b){
   b.pot=pot;
   var t=today(), start=accrualStart(b);
 
-  /* Период не начался или уже закрыт — считаем обычной формулой */
-  if(t<=start||t>b.dateTo){
-    b.rates=[{from:b.dateFrom,v:Math.max(0,pot/getDays(b.dateFrom,b.dateTo))}];
+  /* Период не начался или уже закрыт — одна ставка на все дни начисления.
+     День старта сюда НЕ входит (t<start, а не t<=start): в этот день идёт
+     обычное сведение ниже, и оно даёт ту же цифру без отдельной формулы. */
+  if(t<start||t>b.dateTo){
+    b.rates=[{from:b.dateFrom,v:Math.max(0,pot/accrualDays(b))}];
     b.dailyBudget=b.rates[0].v;
     return;
   }
   /* Первый пересчёт бюджета, созданного до появления b.pot: сколько именно
      изменилось — неизвестно, поэтому ставки не трогаем, только запоминаем котёл.
      Иначе пришлось бы гадать и цифра прыгнула бы на ровном месте. */
-  if(prevPot===null){
+  /* В день старта прожитых дней нет — гадать нечего, идём обычным сведением.
+     Без t>start октябрь без pot, правленный 1-го, не видел правку вовсе. */
+  if(prevPot===null&&t>start){
     if(!b.rates||!b.rates.length){
-      b.rates=[{from:b.dateFrom,v:Math.max(0,pot/getDays(b.dateFrom,b.dateTo))}];
+      b.rates=[{from:b.dateFrom,v:Math.max(0,pot/accrualDays(b))}];
     }
     b.dailyBudget=rateOn(b,t);
     return;
@@ -2163,6 +2187,33 @@ var _pc={inc:[],pln:[],eid:'',days:1,curD:0};
 var _trCtx={pln:[],bid:'',dayBal:0};
 
 /* ── RENDER ──────────────────────────────────── */
+/* Перерисовка по фоновому слиянию. Окно рисуется заново из modal.data,
+   и набранное в полях пропадало: вернулся из банка с открытым окном дохода,
+   на втором устройстве что-то поменялось — поля пустые (24.09.2026).
+   Значения полей окна снимаются до перерисовки и возвращаются после, если
+   открыто то же самое окно. Обычный render() так не делает намеренно:
+   там перерисовка по действию человека, и поля обязаны показать новое. */
+function renderBg(){
+  var m=modal, keep=[], root=document.querySelector('.modal');
+  if(m&&root){
+    var els=root.querySelectorAll('input[id],select[id],textarea[id]');
+    for(var i=0;i<els.length;i++)keep.push({id:els[i].id,v:els[i].value,c:els[i].checked});
+  }
+  var qa=document.getElementById('qa-inp'), qv=qa?qa.value:null;
+  render();
+  if(m&&modal===m){
+    for(var j=0;j<keep.length;j++){
+      var el=document.getElementById(keep[j].id);
+      if(el){el.value=keep[j].v;if(el.type==='checkbox')el.checked=keep[j].c;}
+    }
+    /* подсказки в окне считаются от полей — пересчитать от возвращённых */
+    if(m.type==='transfer')updTrPrev();
+    var pa=document.getElementById('ma');
+    if(pa&&(m.type==='add-planned'||m.type==='edit-planned'))updPlnPrev(pa.value);
+  }
+  var qa2=document.getElementById('qa-inp');
+  if(qa2&&qv!==null&&!qa2.value)qa2.value=qv;
+}
 function render(){
   /* Убеждаемся что auth-экран скрыт, #app виден */
   var authScr=document.getElementById('auth-screen');
@@ -2954,7 +3005,17 @@ function updPlnPrev(rawVal){
   var ti=0;for(var i=0;i<_pc.inc.length;i++)ti+=_pc.inc[i].amount;
   var tp=0;for(var j=0;j<_pc.pln.length;j++){if(_pc.pln[j].id!==_pc.eid)tp+=_pc.pln[j].amount;}
   var newAmt=pf(rawVal);tp+=newAmt;
-  var newD=Math.max(0,(ti-tp)/_pc.days),diff=newD-_pc.curD;
+  var newD=Math.max(0,(ti-tp)/_pc.days);
+  /* Точная подсказка: тот же recalcDaily на копии бюджета. Формула «(доходы −
+     планы) / все дни» расходится с нормой у бюджета, заведённого не с 1-го,
+     и в середине периода, где ставка сводится с уже начисленным. */
+  if(_pc.b){
+    var cb=JSON.parse(JSON.stringify(_pc.b)), hit=false;
+    for(var k=0;k<cb.planned.length;k++)if(cb.planned[k].id===_pc.eid){cb.planned[k].amount=newAmt;hit=true;}
+    if(!hit)cb.planned.push({id:'__prev__',name:'',amount:newAmt});
+    recalcDaily(cb);newD=cb.dailyBudget;
+  }
+  var diff=newD-_pc.curD;
   var col=diff>=0?'var(--gd)':'var(--rd)';
   el.innerHTML='Дневной бюджет: <b>'+fmt(newD)+'</b> <span style="color:'+col+';">'+(diff>=0?'+':'−')+fmt(Math.abs(diff))+'/день</span>';
 }
@@ -3093,7 +3154,7 @@ function rWz0(){
 }
 
 function rWz1(){
-  var d=wd,ti=wdTI(),tp=wdTP(),avail=ti-tp,days=getDays(d.dateFrom,d.dateTo),daily=avail>0?avail/days:0;
+  var d=wd,ti=wdTI(),tp=wdTP(),avail=ti-tp,days=wdAccDays(d),daily=avail>0?avail/days:0;
   var pk={};for(var pi=0;pi<d.planned.length;pi++)pk[d.planned[pi].name]=true;
   var chips='';for(var ci=0;ci<EC.length;ci++)chips+='<button type="button" class="chip'+(pk[EC[ci].n]?' pkd':'')+'" onclick="wzTP(\''+esc(EC[ci].e)+'\',\''+esc(EC[ci].n)+'\')">'+EC[ci].e+' '+EC[ci].n+'</button>';
   var rows='';
@@ -3120,7 +3181,7 @@ function rWz1(){
 }
 
 function rWz2(){
-  var d=wd,ti=wdTI(),tp=wdTP(),avail=ti-tp,days=getDays(d.dateFrom,d.dateTo),daily=avail>0?avail/days:0;
+  var d=wd,ti=wdTI(),tp=wdTP(),avail=ti-tp,days=wdAccDays(d),daily=avail>0?avail/days:0;
   return '<div class="hdr" role="banner"><div class="hdr-r1"><h1 class="logo">✦ <span>Б</span>юджет</h1></div></div>'+
   '<div class="wz"><div class="wzstar">✦</div><div class="wztt">Твой дневной бюджет</div>'+
   '<div class="wzcard" style="text-align:center;padding:24px 16px">'+
@@ -3262,7 +3323,7 @@ function bindMain(b){
   };
 
   window.om=function(type){
-    if(type==='add-planned')_pc={inc:b.incomes,pln:b.planned,eid:'__new__',days:getDays(b.dateFrom,b.dateTo),curD:b.dailyBudget};
+    if(type==='add-planned')_pc={b:b,inc:b.incomes,pln:b.planned,eid:'__new__',days:getDays(b.dateFrom,b.dateTo),curD:b.dailyBudget};
     modal={type:type,data:null};render();
   };
 
@@ -3291,7 +3352,7 @@ function bindMain(b){
 
   window.editPln=function(id){
     var p=b.planned.filter(function(x){return x.id===id;})[0];plnMenu=null;
-    _pc={inc:b.incomes,pln:b.planned,eid:id,days:getDays(b.dateFrom,b.dateTo),curD:b.dailyBudget};
+    _pc={b:b,inc:b.incomes,pln:b.planned,eid:id,days:getDays(b.dateFrom,b.dateTo),curD:b.dailyBudget};
     modal={type:'edit-planned',data:Object.assign({},p)};render();
   };
   window.delPln=function(id){
@@ -3305,7 +3366,10 @@ function bindMain(b){
     plnMenu=null;
     for(var i=0;i<S.txs.length;i++){
       var t=S.txs[i];
-      if(t.budgetId===b.id&&t.plannedCatId===id){t.plannedCatId=null;t.category='';t.categoryEmoji='';}
+      /* touch обязателен: без метки второе устройство при равных mod оставит
+         свою копию, привязанную к удалённой категории, и трата выпадет из
+         счёта — ни в дневных, ни в категориях (+5 000 к «осталось», 24.09) */
+      if(t.budgetId===b.id&&t.plannedCatId===id){t.plannedCatId=null;t.category='';t.categoryEmoji='';touch(t);}
     }
     ripEnt('pln',id);
     b.planned=b.planned.filter(function(p){return p.id!==id;});
@@ -3357,11 +3421,14 @@ function bindMain(b){
   window.delTx =function(id){if(!confirm('Удалить трату?'))return;ripEnt('tx',id);S.txs=S.txs.filter(function(t){return t.id!==id;});txMenu=null;save();modal=null;render();};
   window.saveTx=function(id){
     var tx=S.txs.filter(function(t){return t.id===id;})[0];if(!tx)return;
-    tx.name=((document.getElementById('mn')||{}).value||'').trim()||tx.name;
-    tx.amount=pf((document.getElementById('ma')||{}).value)||tx.amount;
+    /* Проверки ДО записи в трату: отклонённая правка не должна оставаться
+       в памяти. Раньше сумма менялась первой, предупреждение о дате
+       закрывало окно, а 9 999 уезжали в облако со следующим сохранением. */
     var nd=(document.getElementById('md')||{}).value||tx.date;
     if(nd>today()){alert('Нельзя ставить будущую дату');return;}
     if(nd<b.dateFrom||nd>b.dateTo){alert('Дата вне периода бюджета ('+fmtSh(b.dateFrom)+' — '+fmtSh(b.dateTo)+')');return;}
+    tx.name=((document.getElementById('mn')||{}).value||'').trim()||tx.name;
+    tx.amount=pf((document.getElementById('ma')||{}).value)||tx.amount;
     tx.date=nd;
     var cv=(document.getElementById('mc2')||{}).value||'';
     if(cv.startsWith('p:')){
@@ -3394,7 +3461,7 @@ function bindWiz(){
   window.wf   =function(arr,i,key,val){if(arr==='inc'&&wd.incomes[i])wd.incomes[i][key]=val;if(arr==='pln'&&wd.planned[i])wd.planned[i][key]=val;};
   window.updIT=function(){var ti=wdTI();var el=document.getElementById('wz-it');if(el)el.textContent=fmt(ti);var btn=document.getElementById('wz-next0');if(btn)btn.disabled=!(ti>0);};
   window.updPT=function(){
-    var tp=wdTP(),ti=wdTI(),avail=ti-tp,days=getDays(wd.dateFrom,wd.dateTo),daily=avail>0?avail/days:0;
+    var tp=wdTP(),ti=wdTI(),avail=ti-tp,days=wdAccDays(wd),daily=avail>0?avail/days:0;
     var el=document.getElementById('wz-pt');if(el)el.textContent=fmt(tp);
     var dl=document.getElementById('wz-dl');if(dl)dl.textContent=fmt(daily)+'/день';
   };
@@ -3417,6 +3484,7 @@ function bindWiz(){
         return;
       }
     }
+    days=wdAccDays(d);   /* норма — на дни начисления, см. accrualDays */
     var bdg={id:uid(),dateFrom:d.dateFrom,dateTo:d.dateTo,createdAt:today(),
       incomes:d.incomes.map(function(i){return touch(Object.assign({},i,{amount:pf(i.amount)||0}));}),
       planned:d.planned.map(function(p){return touch(Object.assign({},p,{amount:pf(p.amount)||0}));}),

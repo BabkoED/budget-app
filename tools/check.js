@@ -577,6 +577,121 @@ function checkPlural(ok){
      await pg3.evaluate(()=>statOpen)===''&&
      await pg3.evaluate(()=>document.querySelectorAll('.sd-row').length)===0);
 
+  /* ── 13. Суммы верны в любой момент ─────────
+     Пять багов от 24.09.2026, каждый воспроизведён до правки. Инвариант inv:
+     «осталось на сегодня» + «ещё начислят» + остатки категорий = общий
+     остаток. Ноль — сведено, иначе экран врёт. */
+  console.log('\n13. Суммы верны в любой момент');
+  const INV=`function inv(b){var res=0;for(var i=0;i<b.planned.length;i++){var q=calcCatRem(b,b.planned[i].id);if(q>0)res+=q;}
+    return Math.round((calcDayBal(b)+accrued(b,nextDay(today()),b.dateTo)+res-calcTotalBal(b))*100)/100;}`;
+  async function open13(day,st){
+    const p=await (await br.newContext({viewport:{width:430,height:932}})).newPage();
+    p.on('pageerror',e=>{console.log('PAGEERROR(13):',e.message);fails++;});
+    p.on('dialog',d=>d.accept());
+    await p.addInitScript(freezeDate(day));await p.goto(url);
+    await p.evaluate(st=>{window.__CLOUD__=JSON.parse(JSON.stringify(st));localStorage.setItem('budget_last_uid','u1');
+      localStorage.setItem('budget_backup_u1',JSON.stringify(st));},st);
+    await p.evaluate(()=>window.__initApp());await p.waitForTimeout(900);
+    await p.evaluate(()=>{window.alert=function(m){window.__ALERT__=m;};window.confirm=function(){return true;};});
+    return p;
+  }
+  /* Бюджет заведён 10-го, правка в тот же день. Норма делилась на все 30 дней
+     периода, а начисляется с 10-го: +1 000 к доходу роняли её с 4 762 до 3 367. */
+  {const st=seedState();st.budgets[1].createdAt='2026-09-10';st.activeBudgetId='b-sep';
+   const p=await open13('2026-09-10',st);
+   r=await p.evaluate(`(function(){${INV};var b=getAB(),d0=b.dailyBudget;om('add-income');
+     document.getElementById('mn').value='Премия';document.getElementById('ma').value='1000';saveInc();
+     return{d0:d0,d1:b.dailyBudget,want:b.pot/getDays(today(),b.dateTo),inv:inv(b)};})()`);
+   ok('правка в день создания: норма = котёл / дни начисления',Math.abs(r.d1-r.want)<0.01&&r.d1>r.d0,r);
+   ok('и инвариант котла сходится',r.inv===0,r);
+   await p.context().close();}
+  /* Закрытый август, заведённый 10-го: правка переписывала ставку на 31 день
+     и теряла ~22 500 ₽ начислений. */
+  {const st=seedState();const a=st.budgets[0];a.createdAt='2026-08-10';a.rates=[{from:'2026-08-01',v:a.pot/22}];a.dailyBudget=a.pot/22;
+   st.activeBudgetId='b-aug';
+   const p=await open13('2026-09-10',st);
+   r=await p.evaluate(()=>{swBdg('b-aug');var b=getAB();b.incomes[0].amount+=1000;touch(b.incomes[0]);recalcDaily(b);save();
+     return{pot:b.pot,acc:accrued(b,accrualStart(b),b.dateTo)};});
+   ok('правка закрытого периода: начислено = котёл',Math.abs(r.acc-r.pot)<0.01,r);
+   await p.context().close();}
+  /* Мастер 10-го числа: норма на 21 день начисления, а не на 30 */
+  {const st=seedState();st.budgets=[st.budgets[0]];st.activeBudgetId='b-aug';
+   const p=await open13('2026-09-10',st);
+   r=await p.evaluate(`(function(){${INV};newBdg();wd.incomes[0].amount=100000;wzN(0);wzN(1);wzCr();var b=getAB();
+     return{d:b.dailyBudget,want:b.pot/getDays(today(),b.dateTo),inv:inv(b),from:b.dateFrom};})()`);
+   ok('мастер в середине месяца: норма на дни начисления',r.from==='2026-09-01'&&Math.abs(r.d-r.want)<0.01&&r.inv===0,r);
+   await p.context().close();}
+  /* Удаление категории: отвязанные траты обязаны уехать с меткой, иначе на
+     втором устройстве трата выпадает из счёта (+5 000 к «осталось»). */
+  {const st=seedState();st.activeBudgetId='b-sep';
+   st.txs.push({id:'tc',seq:3,date:'2026-09-05',name:'Аренда часть',category:'Аренда',categoryEmoji:'🏠',plannedCatId:'b-sep-p',amount:5000,budgetId:'b-sep',mod:10});
+   const p1=await open13('2026-09-10',st), p2=await open13('2026-09-10',st);
+   await wait(SAVE);
+   await p2.evaluate(c=>{window.__CLOUD__=JSON.parse(c);},await p1.evaluate(()=>JSON.stringify(window.__CLOUD__)));
+   await p1.evaluate(()=>delPln('b-sep-p'));await p1.waitForTimeout(SAVE);
+   await p2.evaluate(c=>{window.__CLOUD__=JSON.parse(c);},await p1.evaluate(()=>JSON.stringify(window.__CLOUD__)));
+   const f=`(function(){${INV};return pullAndMerge().then(function(){var b=getAB();var t=S.txs.filter(x=>x.id==='tc')[0];
+     return{cat:t.plannedCatId,day:Math.round(calcDayBal(b)),inv:inv(b)};});})()`;
+   const r2=await p2.evaluate(f), r1=await p1.evaluate(f);
+   ok('удаление категории: второе устройство видит трату дневной',r2.cat===null&&r2.day===r1.day&&r2.inv===0,{r1,r2});
+   await p1.context().close();await p2.context().close();}
+  /* Отклонённая правка траты: сумма менялась до проверки даты */
+  {const st=seedState();st.activeBudgetId='b-sep';
+   st.txs.push({id:'tk',seq:4,date:'2026-09-05',name:'Кофе',category:'',categoryEmoji:'',plannedCatId:null,amount:300,budgetId:'b-sep',mod:10});
+   const p=await open13('2026-09-10',st);
+   r=await p.evaluate(()=>{editTx('tk');document.getElementById('ma').value='9 999';document.getElementById('md').value='2026-09-25';
+     saveTx('tk');var al=window.__ALERT__;closeModal();var t=S.txs.filter(x=>x.id==='tk')[0];return{al:al,amount:t.amount};});
+   ok('отклонённая правка траты не меняет её',!!r.al&&r.amount===300,r);
+   await p.context().close();}
+  /* Возврат в приложение с открытым окном: чужая правка перерисовывает экран,
+     набранное в окне обязано остаться. Путь настоящий — событие visibilitychange. */
+  {const st=seedState();st.activeBudgetId='b-sep';
+   const p=await open13('2026-09-10',st);
+   await p.evaluate(()=>{om('add-income');document.getElementById('mn').value='Премия';document.getElementById('ma').value='5 000';
+     window.__CLOUD__.txs.push({id:'tp',seq:5,date:'2026-09-10',name:'С телефона',category:'',plannedCatId:null,amount:100,budgetId:'b-sep',mod:Date.now()+1});
+     document.dispatchEvent(new Event('visibilitychange'));window.dispatchEvent(new Event('visibilitychange'));});
+   await wait(400);
+   r=await p.evaluate(()=>({merged:S.txs.some(t=>t.id==='tp'),mn:document.getElementById('mn').value,ma:document.getElementById('ma').value,modal:!!modal}));
+   ok('фоновое обновление не стирает набранное в окне',r.merged&&r.modal&&r.mn==='Премия'&&r.ma==='5 000',r);
+   await p.context().close();}
+  /* Правка во время записи в облако: флаг «не сохранено» не должен сниматься */
+  {const st=seedState();st.activeBudgetId='b-sep';
+   const p=await open13('2026-09-10',st);
+   r=await p.evaluate(async()=>{save();clearTimeout(saveTimer);var pr=saveToCloud();
+     S.txs.push(touch({id:'tz',seq:9,date:'2026-09-10',name:'Посреди записи',category:'',plannedCatId:null,amount:50,budgetId:'b-sep'}));save();
+     await pr;return{pending:pendingSave};});
+   ok('правка во время записи остаётся несохранённой до своей записи',r.pending===true,r);
+   await wait(SAVE);
+   r=await p.evaluate(()=>({pending:pendingSave,inCloud:window.__CLOUD__.txs.some(t=>t.id==='tz')}));
+   ok('и уезжает своей записью',!r.pending&&r.inCloud,r);
+   await p.context().close();}
+
+  /* Мастер показывает ту же норму, что создаёт (регрессия первой правки
+     24.09: шаги обещали 2 333, бюджет создавался с 10 000). */
+  {const st=seedState();st.budgets=[st.budgets[0]];st.activeBudgetId='b-aug';
+   const p=await open13('2026-09-24',st);
+   r=await p.evaluate(()=>{newBdg();wd.incomes[0].amount=100000;wzN(0);
+     var mm=document.body.innerText.match(/Дневной:\s*([^₽]+)₽/);var shown=mm?+mm[1].replace(/\D/g,''):-1;
+     wzN(1);wzCr();var b=getAB();return{shown:shown,made:Math.round(b.dailyBudget)};});
+   ok('мастер: показанная норма = созданная',r.shown===r.made&&r.made>0,r);
+   await p.context().close();}
+  /* Старый бюджет без pot, правка в день старта: правка обязана дойти до нормы */
+  {const st=seedState();const o=st.budgets[2];delete o.pot;st.activeBudgetId='b-oct';
+   const p=await open13('2026-10-01',st);
+   r=await p.evaluate(`(function(){${INV};var b=getAB();delete b.pot;var d0=b.dailyBudget;
+     b.incomes[0].amount+=31000;touch(b.incomes[0]);recalcDaily(b);
+     return{id:b.id,d0:d0,d1:b.dailyBudget,inv:inv(b)};})()`);
+   ok('бюджет без pot в день старта видит правку',r.id==='b-oct'&&Math.abs(r.d1-r.d0-1000)<0.01&&r.inv===0,r);
+   await p.context().close();}
+  /* Подсказка в окне категории = норма после сохранения (бюджет с 10-го) */
+  {const st=seedState();st.budgets[1].createdAt='2026-09-10';st.activeBudgetId='b-sep';
+   const p=await open13('2026-09-15',st);
+   r=await p.evaluate(()=>{om('add-planned');var a=document.getElementById('ma');a.value='6 000';updPlnPrev(a.value);
+     var shown=+(document.getElementById('pln-prev').querySelector('b').textContent.replace(/\D/g,''));
+     document.getElementById('mn').value='Кино';savePln();return{shown:shown,made:Math.round(getAB().dailyBudget)};});
+   ok('подсказка в окне категории = итоговая норма',Math.abs(r.shown-r.made)<=1,r);
+   await p.context().close();}
+
   const shot=path.join(os.tmpdir(),'budget-check.png');
   await pg.evaluate(()=>{drop=true;render();});await wait(150);
   await pg.screenshot({path:shot});
