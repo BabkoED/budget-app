@@ -510,10 +510,12 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
 /* Заголовок и «N дней» — одна строка, один стиль: обе части читаются как
    единая шапка блока, а не как подпись + случайно прибившееся число */
 .hero-top{
-  display:flex;align-items:baseline;justify-content:space-between;gap:8px;
-  font-size:0.6875rem;font-weight:700;letter-spacing:.7px;
+  display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:2px 8px;
+  font-size:0.75rem;font-weight:700;letter-spacing:.7px;
   text-transform:uppercase;color:var(--mt);
 }
+/* На узком экране «N дней» уходит строкой целиком, а не рвёт обе части */
+.hero-top>span{white-space:nowrap;}
 .hero-big{
   font-size:1.75rem;font-weight:900;letter-spacing:-1px;
   line-height:1.05;margin-top:2px;
@@ -531,7 +533,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
    добавится завтра. Симметрично и мельче большой цифры сверху. */
 .hero-sub{
   display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 8px;margin-top:8px;
-  font-size:0.6875rem;font-weight:500;color:var(--mt);
+  font-size:0.8125rem;font-weight:500;color:var(--mt);
 }
 .hero-sub b{color:var(--t2);font-weight:700;}
 /* Уточнение под тонкой строкой: категорийные траты дня и причина нулевой
