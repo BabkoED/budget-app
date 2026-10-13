@@ -13,7 +13,8 @@
  * Пороги взяты из HIG/WCAG AA (см. skills/apple-design/references/hig):
  *   контраст  — 4.5:1 обычный текст, 3:1 крупный (>=24px или >=18.7px жирный)
  *   нажатие   — 44x44 норма, 28x28 нижний предел
- *   шрифт     — не мельче 11pt (~14.7px), тонкие начертания ещё крупнее
+ *   шрифт     — не мельче 11pt; в мобильном браузере 1px CSS = 1pt (iPhone 13 — 390×844 и в pt, и в px),
+ *               поэтому порог 11px, а не 14.7px (пересчёт для монитора 96 dpi); тонкие начертания — крупнее порога
  *
  * Прогон ничего не чинит и ничего не пишет в репозиторий — только считает.
  */
@@ -96,7 +97,7 @@ const PROBE = `(() => {
         [bg.r,bg.g,bg.b].map(Math.round).join(',') + ')',
       px, weight: w, got: +got.toFixed(2), need
     });
-    if (px < 14.7) out.tiny.push({el: label(el), px, weight: w, text: own.slice(0,30)});
+    if (px < 11) out.tiny.push({el: label(el), px, weight: w, text: own.slice(0,30)});
   });
 
   /* --- 2. размер зоны нажатия --- */
@@ -221,7 +222,7 @@ const uniq = (arr, key) => {
   N.slice(0, 15).forEach(x =>
     console.log('  <' + x.tag + '> «' + x.raw + '»  [' + x.screen + '] ' + x.el));
 
-  console.log('\\n══ ШРИФТ мельче 11pt (14.7px) ══ найдено: ' + S.length);
+  console.log('\\n══ ШРИФТ мельче 11pt (11px) ══ найдено: ' + S.length);
   S.sort((a, b) => a.px - b.px).slice(0, 12).forEach(x =>
     console.log('  ' + x.px + 'px/' + x.weight + '  [' + x.screen + '] ' + x.el));
 
