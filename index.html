@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Бюджет</title>
-<meta name="theme-color" content="#141414">
+<meta name="theme-color" content="#1F1E1D">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -15,934 +15,531 @@
 <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjogItCR0Y7QtNC20LXRgiIsICJzaG9ydF9uYW1lIjogItCR0Y7QtNC20LXRgiIsICJkZXNjcmlwdGlvbiI6ICLQm9C40YfQvdGL0Lkg0YTQuNC90LDQvdGB0L7QstGL0Lkg0YLRgNC10LrQtdGAIiwgInN0YXJ0X3VybCI6ICIuLyIsICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLCAiYmFja2dyb3VuZF9jb2xvciI6ICIjMTQxNDE0IiwgInRoZW1lX2NvbG9yIjogIiMxNDE0MTQiLCAiaWNvbnMiOiBbeyJzcmMiOiAiZGF0YTppbWFnZS9wbmc7YmFzZTY0LGlWQk9SdzBLR2dvQUFBQU5TVWhFVWdBQUFNQUFBQURBQ0FJQUFBRGR2dnRRQUFBRnUwbEVRVlI0bk8zZFBXd2JaUnpIOFRzN3RwUGFTWjMyb09sTGtxb0JPZ1FRRVZKQmxScUpxbElYUmxSZ1lLWkZIV0JIVEpYb0FrSklWRlhaWUdoQlJlb0luU0FDVldMb0MxWGJnU1pObXBTR0puRmU3TVQyblgzSFVLa0RsY0M2MzltUHovbCs1cHp6ai9PVjc4N1BuVzA3am1NQllTVk1ENEI0SXlCSUNBZ1NBb0tFZ0NBaElFZ0lDQklDZ29TQUlDRWdTQWdJRWdLQ2hJQWdJU0JJQ0FnU0FvS0VnQ0FoSUVnSUNCSUNnb1NBSUNFZ1NBZ0lFZ0tDaElBZ0lTQklDQWdTQW9LRWdDQWhJRWdJQ0JJQ2dvU0FJQ0VnU0FnSUVnS0NoSUFnSVNCSUNBZ1NBb0tFZ0NBaElFZ0lDQklDZ29TQUlDRWdTQWdJRWdLQ2hJQWdJU0JJQ0FnU0FvS0VnQ0FoSUVnSUNCSUNncVRMOUFBUmVITzQ3L1JyTzAxUDBhaHpkNWErdkxsb2Vvckk4QW9FQ1FGQlFrQ1FFQkFrQkFRSkFVRkNRSkFRRUNRRUJBa0JRVUpBa0JBUUpKMndtS3I0K1BmNVM5T3JwcWVJTVY2QklDRWdTQWdJRWdLQ2hJQWdJU0JJQ0FnU0FvS0VnQ0FoSUVnSUNCSUNnb1NBSUNFZ1NBZ0lFZ0tDaElBZ3NSM0hNVDJEcWdVZjd4SllsdWNIYmozdy9LRG8xWmVyOVVLMXZsQ3UzUzk1TTBYM1h0R2RLYnBCVXlkb1Y1djlrdFlHMlphVlR0anBoRzFaVm44bU9aVDc5dzhVUGYvbVV2bnFZbm5pNGZydDVZcUJFUTBob0dqMHBoSUhCN0lIQjdJblgzUWVsV3MvelJaL3VMZDZkN1ZxZXE2bTR4Z29lcy8yZEwzM1F2K2xvM3UvUFR3MHZqTnJlcHptSXFBbUduTjZ6aHphYy83SThKalRZM3FXWmlHZ3BudHBXL2MzaDRjK2VYVkhMdFdCejNZSC9rbHR5TGFzWXlQNUMwZUc5L2FtVGM4U01RSnFuYjI5NlF0SGhrZTNkWnNlSkVvRTFGSzVWT0xzb1QzNytqcm5kWWlBV3EwL2svemk0TzVNMGpZOVNEUUl5SUI5ZmVtUFhuN0c5QlRSSUNBejNuMHVQNVRyaEIwWkFabVJ0TzBQUnJlYm5pSUNtMzBwbzVHUGQwa243R3dxa2UxS0RPYlMrL09aVjdaM2orL0tQVjRYVXh3ZDdQMzAycU5WdHk0K2psbWJQYUJHdUg3Z1Z1dkwxZnJjdW5mbDczWExzcmFtazhkRzhpZEd0eXNacFJMMjBjSGU3eWRYSWh2VUJIWmhZYXk2OWEvdkxMMTFlWHArbzZZOHpodTdubHJXanhzQ0NtOXF6WDEvWW5aTjJBZU5PVDN5bnRBd0FwSk1ycmxmM1ZvS3ZYa3VsUmpweTBRNFQrc1JrT3E3eVJWbFJ6YVVTMFU0VE9zUmtLcm1CeE1QUzZFM0g0ejV1MEVFRklFcmYyK0UzdGJwVGtZNFNlc1JVQVRtTjd6UTIyN3BpdmUvSU43VHQ0bENOZnlKV0E4QklXbkgvRnhjUUVBUjZNK0VQNDRwMS93SUoyazlBb3JBN216NFUvRnlQZDQzSkJKUUJGN2ZzU1gwdG90bGFUSEVPQUpTWlpLMmN2UFgzSHI0TTdoMlFFQ3FkMGJ5VG5mNGl4cG1TbTZFdzdRZUFVbWUzNW81TVJyKzB5bldhMzdjYjM4bW9QRDI5YVhQanU5UmJoZTh2bGoyNDMwTXpRVmxvV3hOSjk4ZXlSL1hMaWl6TE92bnY4SXZvclVKQXZwL3FZU2Q3VXBrVTRtaFhHcC92bnZNNlJuZm1VM0pGL0xVL09ESDJXSWtFeHEwMlFNNmRXRGcxSUVCSTcvNjhseHhXVmdEYVJNY0E1bmhCOVlaNFVxMDlrRkFacHkvdXp4ZGpQY0ovR01FWk1DOW92djVId3VtcDRnR0FiWGFpbHYvOExjSDFaZ3ZnVDFCUUMxVjh2empFM09UYTUydzgzcHNzNStGdGRKMDBUMzU2NFBPT1BSNWdvQmFJYkNzaTFNcm45MVlLSG54dnZybmFRVFVkTGNLbGRQWEgxMWJMSnNlcENrSXFJbHVMSlhQM1NuOEV2LzFpdjlBUU5GYnFOUXV6eFl2VHEzK0dmT1Y5a1lRVURSS25uK3pVTG02c0RFeHYzNjdVT21RYy9RR0VGQ2pQRC93L01EMWc1TG5GeXIxNVdwdG9WSy9YM0puaXU3VW1qdTlXYjlzcFJPK3JRY0c4VVlpSkFRRUNRRkJRa0NRRUJBa0JBUUpBVUZDUUpBUUVDUUVCQWtCUVVKQWtCQVFKQVFFQ1FGQlFrQ1FFQkFrQkFRSkFVRkNRSkFRRUNRRUJBa0JRVUpBa0JBUUpBUUVDUUZCUWtDUUVCQWtCQVFKQVVGQ1FKQVFFQ1FFQkFrQlFVSkFrQkFRSkFRRUNRRkJRa0NRRUJBa0JBUUpBVUZDUUpBUUVDUUVCQWtCUVVKQWtCQVFKQVFFQ1FGQlFrQ1FFQkFrQkFRSkFVRkNRSkFRRUNUL0FFb2lTclc3U2pHUkFBQUFBRWxGVGtTdVFtQ0MiLCAic2l6ZXMiOiAiMTkyeDE5MiIsICJ0eXBlIjogImltYWdlL3BuZyIsICJwdXJwb3NlIjogImFueSBtYXNrYWJsZSJ9LCB7InNyYyI6ICJkYXRhOmltYWdlL3BuZztiYXNlNjQsaVZCT1J3MEtHZ29BQUFBTlNVaEVVZ0FBQWdBQUFBSUFDQUlBQUFCN0drT3RBQUFRcUVsRVFWUjRuTzNkZTJ5ZGQzM0g4WE5zSDl1MW5UZ1hOOWNtVFdnbzBJN0NoRVlMSGJUak1qWnByUEFQYU5vWXV3dE5FeE1naGpRMC9tRmkwc1NHdG1sREFyYXhDYlRCSDR5aUZZUTJPbWhMU2F0eTYwaWhMVzNUM0p6RWJoemY3WE44enRrZmJJV1ZRcHppaytjNTUvTjZLWW9pSzVldlpPZTgvVHZQOC94KzFZbUppUW9BZWZxS0hnQ0FZZ2dBUUNnQkFBZ2xBQUNoQkFBZ2xBQUFoQklBZ0ZBQ0FCQktBQUJDQ1FCQUtBRUFDQ1VBQUtFRUFDQ1VBQUNFRWdDQVVBSUFFRW9BQUVJSkFFQW9BUUFJSlFBQW9RUUFJSlFBQUlRU0FJQlFBZ0FRU2dBQVFna0FRQ2dCQUFnbEFBQ2hCQUFnbEFBQWhCSUFnRkFDQUJCS0FBQkNDUUJBS0FFQUNDVUFBS0VFQUNDVUFBQ0VFZ0NBVUFJQUVFb0FBRUlKQUVBb0FRQUlKUUFBb1FRQUlKUUFBSVFTQUlCUUFnQVFTZ0FBUWdrQVFDZ0JBQWdsQUFDaEJBQWdsQUFBaEJJQWdGQUNBQkJLQUFCQ0NRQkFLQUVBQ0NVQUFLRUVBQ0NVQUFDRUVnQ0FVQUlBRUVvQUFFSUpBRUFvQVFBSUpRQUFvUVFBSUpRQUFJUVNBSUJRQWdBUVNnQUFRZ2tBUUNnQkFBZ2xBQUNoQkFBZ2xBQUFoQklBZ0ZBQ0FCQktBQUJDQ1FCQUtBRUFDQ1VBQUtFRUFDQ1VBQUNFRWdDQVVBSUFFRW9BQUVJSkFFQW9BUUFJSlFBQW9RUUFJSlFBQUlRU0FJQlFBZ0FRU2dBQVFna0FRQ2dCQUFnbEFBQ2hCQUFnbEFBQWhCSUFnRkFDQUJCS0FBQkNDUUJBS0FFQUNDVUFBS0VFQUNDVUFBQ0VFZ0NBVUFJQUVFb0FBRUlKQUVBb0FRQUlKUUFBb1FRQUlKUUFBSVFTQUlCUUFnQVFTZ0FBUWdrQVFDZ0JBQWdsQUFDaEJBQWdsQUFBaEJJQWdGQUNBQkJLQUFCQ0NRQkFLQUVBQ0NVQUFLRUVBQ0NVQUFDRUVnQ0FVQUlBRUVvQUFFSUpBRUFvQVFBSUpRQUFvUVFBSUpRQUFJUVNBSUJRQWdBUVNnQUFRZ2tBUUNnQkFBZ2xBQUNoQkFBZ2xBQUFoQklBZ0ZBQ0FCQnFvT2dCS0l0cnR3MS80bFZYRmowRkcrYU95Y1hmdi9ORTBWTlFhbFlBQUtFRUFDQ1VBQUNFRWdDQVVBSUFFRW9BQUVJSkFFQW9BUUFJSlFBQW9RUUFJSlFBQUlRU0FJQlFBZ0FRU2dBQVFna0FRQ2dCQUFnbEFBQ2hCQUFnbEFBQWhCSUFnRkFDQUJCS0FBQkNDUUJBS0FFQUNDVUFBS0VFQUNDVUFBQ0VFZ0NBVUFJQUVFb0FBRUlKQUVBb0FRQUlKUUFBb1FRQUlKUUFBSVFTQUlCUUFnQVFTZ0FBUWdrQVFLaUJvZ2VBZGJuMTZPeTc3ejFkOUJUUVU2d0FBRUlKQUVBb0FRQUlKUUFBb1FRQUlKUUFBSVFTQUlCUUFnQVFTZ0FBUWdrQVFDZ0JBQWdsQUFDaEJBQWdsQUFBaEJJQWdGQUNBQkJLQUFCQ0NRQkFLQUVBQ0NVQUFLRUVBQ0NVQUFDRUVnQ0FVQUlBRUVvQUFFSUpBRUFvQVFBSUpRQUFvUVFBSUpRQUFJUVNBSUJRQWdBUVNnQUFRZ2tBUUNnQkFBZ2xBQUNoQkFBZzFFRFJBOEM2M0hKZy9KWUQ0NWZtMzJxMUsydnRkcXZkWG10VjF0cnRsYlgyY3JPMXZOWmFhYllYR3EzWmVuT3UzcHl0TjgrdnRxWlcxczR1cjAydnJFMHRyOVZiN1Vzekhtd1VBWUNuNnF0V0JxdlZTcVZhNmE5VUtwWEs0THIrMVBUSzJvbUZ4b25GeG9uRnh0SDUraU56cTQvTzFWZWJxa0I1Q1FCc2pJbmhnWW5oZ1JkT1hQYmtSMXJ0eXNuRnhrT3pxOTg2dDNKa1p1WEl1WlhaZXJQQUNlRXBCQUE2cGE5YTJUZFcyemRXZStYZXNlOTk1TmhDL2F0VHkvZE5MZDgzdFhSeXNWSHNlQ0FBY09uc0h4dmNQemI0K29QamxVcmw1R0xqenNuRk95WVg3ajI3dk5Kc0ZUMGFpYW9URXhORnowQXBYTHR0K0JPdnVyTG9LUkxWVysyN1R5OSsvdmo4ZjUxYVdHZ29BWmVPRlFBVWJMQ3Zldk9lc1p2M2pEVmE3YnRQTDM3NjZOd1hUeTAwM0ZORTV3a0FsRVd0cjNyVG5yR2I5b3pOckRadk96YjN5VWZPUHpwWEwzb29lcGtId2FCMHRnNzEvOXF6dDM3bUZ3NSsrS1lyWHI1N3RGcjBQUFFxS3dBb3I1ZnNISDNKenRISDV1c2ZldUNKMjQ3TmVWdUlqV1VGQUdWM2NOUGduMTIvKzdaZmZOYnJENDczV1E2d2NRUUF1c08rc2RwN2YyYlhwMzcrd010M2p4WTlDejFDQUtDYkhCb2YrcnVYWGZIM04rODd1R2w5TzFUQWp5WUEwSDJ1M3pIeXFkY2MrTVBuVHd6MWUwdUlaMDRBb0N2VitxcS8rN3p0bjM3TndaLytnZDJINEtJSUFIU3hmV08xZi9xNS9XKzc3dkthcThOY1BBR0E3dFpYcmZ6MmM3ZDkvSlg3OTQ3V2lwNkZMaU1BMEF1dTJUcjh5VmRmZWVNdU53aHhFUVFBZXNUNFlQOEhYM2JGRzY3YVV2UWdkQTBCZ043UlY2Mjg1MFU3LytDbmJQSEx1Z2dBOUpxM1hMUDluUy9jVWZRVWRBRUJnQjcwNXF1M3Z2WDUxZ0ZjZ0FCQWIvcTk1MjEvODlWYmk1NkNVaE1BNkZudmVNR09tL2VNRlQwRjVTVUEwTFA2cXBVL3YySDNvZkdob2dlaHBBUUFldG5JUU4vN2I5aHR5eUNlbGdCQWp6czBQdlF1TndYeGRBUUFldDhicnRyeVVnOEo4ME1FQUNLODUwVTd2UkhFVXdnQVJMaGl0UGFXYTdZWFBRWGxJZ0NRNHRldjNyYnpzb0dpcDZCRUJBQlNEUFZYYlJQRUR4SUFDSExMZ2ZFRERoUG0vd2dBQk9tclZuN3pPZHVLbm9LeUVBREk4dG9EbXllR1hRbWdVaEVBU0RQWVYzM2pvUzFGVDBFcENBREVlZDJCemM2UXB5SUFFR2ozU08yR25SNE1SZ0FnMGk5ZnVibm9FU2llQUVDaW0vZU0xYndORk0vTkFIU0hXNC9PdnZ2ZTA1MzcrMnQ5MVNkL2pBLzJiUjNxM3pJMHNHMm9mLzlZYmQvWTRQNngyc0ZOZ3dNOTlJbzVWdXU3ZnNmSVhhY1hpeDZFSWdrQVZDcVZTcVBWYnJUYTMvdjE5TXJUL0lhaC91cnp0ZzVmdDIzNGhwMmoxKzhZNllHTjFWNnhkMHdBd2drQXJNdHFzLzJONmVWdlRDLy84ME16dy8xOU4rNGFlZDNCOFp0MmozWHZxdUFscmdQSEV3QzRhQ3ZOMWhkT0xuemg1TUx1a2RxdlBudkxyeHphMm8wTGduMWp0VDBqdFZOTGphSUhvVEF1QXNNek43blVlUDgzcDE3N3VjYytkMnkrNkZtZWlldDNqaFE5QWtVU0FQaEpuVnBxdlBQd3FUODZQTG00MWlwNmxvdHozZmJob2tlZ1NBSUFHK096eCtiZStCK1BUM2JWT3lyWGJoV0FhQUlBRytib2ZQMU50eDg3T2w4dmVwRDF1bnA4YUxCN3IyTHpFeE1BMkVpbmw5Wis1MHZIcDFmV2loNWtYUWI2cW9mR2g0cWVnc0lJQUd5dzAwdHJiLzN5eWRWbXUraEIxc1g1TU1rRUFEYmUvVStzZlBESWRORlRyTXVCVGJXaVI2QXdBZ0FkOFk4UHpqd3c4M1NQRkplTUZVQXlBWUNPYUxiYmYvSE5xYUtudUxDOW8xWUF1UVFBT3VXZXMwdGZuMTR1ZW9vTHVQd3kyd0hrRWdEb29JOCtlSzdvRVM3Zzh1RUI5NEhHRWdEb29Ec25GK2NicFg0OHVOWlgzVExVWC9RVUZFTUFvSVBxcmZaL25pajdOa0hqZ3dJUVNnQ2dzdzZmV1NwNmhBdllWUE02RU1vbkhqcXIvTmVCeDJwV0FLRUVBRHJyMUZLajVEdERXQUhFOG9tSGpqdStVT290UWdlNzhEUWJOb1FBUU1lZFdDeDFBQWFxQWhCS0FLRGpUcGY3a0lBQkx3T3BmT2FoNDViWFNyMHo2SUFqQVZJSkFIVGNTclBVejRLMVNwMG5Pa2dBb09NYTVYNkpMZmw0ZEk0QVFNY045NWY2UDVvQXhDcjExeVgwaHN2S3ZkK2FBTVFTQU9pNDBYSS9hcnUwVnVwTEZIU09BRURIN1JrcDlaNzdKZCt2bE00UkFPaTRrcCs2TlY5dkZqMEN4UkFBNkt5K2FtWC9XS25QM2JVQ2lDVUEwRm1IeG9mR1NyemJXcXRkS2ZsZWRYUk9lYjh1b1RlOGNQdGxSWS93NDB5dnJMa0pLSllBUUdmZHVHdTA2QkYrbktsbDMvN25FZ0Rvb0xGYTM4dDJsem9BaytYZXFJNk9FZ0Rvb0ZkZnNXbXczRnV0UFRaZkwzb0VDaU1BMENuVlN1VTNuck90NkNrdTRPaThGVUF1QVlCT2VjWGVzYXMybC9vRzBFcWxjdFFLSUpnQVFFY005VmZmL29MTGk1N2lBbHJ0eXNPenEwVlBRV0VFQURyaUxkZHN2N0xjejM5VktwWEg1dXMyQWtvbUFMRHhYcnhqNUxlZVcvWjMveXVWeXBGekswV1BRSkVFQURiWTN0SGFYNzUwVDM4M25MVCt6U2VXaXg2Qklna0FiS1E5STdXUDNMUnZ5MkNwOTM5KzBqMW5sNG9lZ1NLVmVwZGE2QzRITmcxKzVLWjl1OHE5K2ZPVHppNnZ1UVVvWEhkOHBVTDUvZEtWbS8va1JUdEhCN3BtVmYyVk00dEZqMERCQkFCK1VudEhhMisvN3ZMWDdOdFU5Q0FYNS9hVEMwV1BRTUVFQUo2NXZhTzFOMTI5OVkxWGJhbVZlNytISDdiU2JIMzV0QXNBNlFRQUx0cklRTitOdTBaZmYzRDhaM2VOZHRzci8vKzZhM0p4cGVrSmdIUUNBT3N5MUYrOWR1dndkZHN2dTJIbnlJdDNqSlI4aTdjTCtzempjMFdQUVBFRUFDcVZTbVdncjFycnE5YjZxb045MWMyRGZWdUgrcmNNOWs4TUQrd2JxKzBiRzl3L1Zudlc1c0d1dUxWL1BhWlgxcjUweWhWZ0JJQXVjY3VCOFZzT2pCYzlSWSs0OWVoY3MrMFlNRHdJQm1IV1d1MS8rZTVNMFZOUUNnSUFXVDUzZlA3MGttTWdxVlFFQUtLMEs1Vi8rTTY1b3FlZ0xBUUFnbnoyMkp3REFIaVNBRUNLUnF2OTEvODlYZlFVbElnQVFJcVBQenh6Y3RFSndIeWZBRUNFeWFYRzN4NTVvdWdwS0JjQmdBanYvZXFaWmFjLzh2OEpBUFMrZjN0czlvNUpqLzd5VkFJQVBlNngrZnI3dm42MjZDa29Jd0dBWHJiU2JMM2pLNmU4K2NQVEVnRG9XZTFLNVYySEp4ODY3OFovbnA0QVFNLzZ3UDFUWDNEc0Z6K2FBRUJ2K3Z2dm5MUHJBeitlQUVBUCt0akRNeCs0ZjZyb0tTZzc1d0ZBci9ud3Q1LzRLMXMrc0E0Q0FMMmoxYTY4Nyt0bi92Vzc1NHNlaE80Z0FOQWpadXZOZHgyZXZPdTBCNzVZTHdHQVh2REF6TXJiN2o1bHJ6Y3VpZ0JBZDJ1MUt4OTk4TnpmZkd1NjBYTE1MeGRIQUtDTG5WaHMvUEU5azErYlhpNTZFTHFTQUVCWFdtdTFQL3JRekFlUFRLODJmZVBQTXlRQTBIM3VQYnYwcDE4NzgraGN2ZWhCNkc0Q0FOM2trYm42Qis2Zit1SXBHenl3QVFRQXVzT0p4Y2FISG5qaTAwZG5YZXRsb3dnQWxOM1IrZnFIdjMzdTN4K2ZhN2E5OXJPUkJBREs2L0NacFk4OVBIUEg1SUx2K3VrRUFZRFNPVjl2M3ZiNDNDY2ZPZitJeTd4MGtnQkFXYXkxMm5lZldicjE2T3p0SnhjODFjVWxJQUJRc0hxcmZmak0wdWVQejk5K2NuNis0ZXhHTGgwQmdHS2NYR3pjZFhyeHpzbkZlODR1T2JPWFFnZ0FYRHJIRnhyM1RTMTlkV3I1dnFtbEV6WnVvMmdDQUozU2FsY21seG9Qbmw4OU1yTnk1TnpLa1ptVm1kVm0wVVBCOXdrQWJJeHpxODNqQy9VVGk0MlRpNDJqOC9Ydnp0WWZuYXV2TkwyM1Eza0pBRHhWcTExcHR0dmYrN25SYXE4MjIwdHJyWlZtZTNtdHRkQm96ZGFiYzQzbWJMMTFmclU1dmJKMmRubHRhbmx0YW1YTnBteDBuZXJFeEVUUk13QlFnTDZpQndDZ0dBSUFFRW9BQUVJSkFFQW9BUUFJSlFBQW9RUUFJSlFBQUlRU0FJQlFBZ0FRU2dBQVFna0FRQ2dCQUFnbEFBQ2hCQUFnbEFBQWhCSUFnRkFDQUJCS0FBQkNDUUJBS0FFQUNDVUFBS0VFQUNDVUFBQ0VFZ0NBVUFJQUVFb0FBRUlKQUVBb0FRQUlKUUFBb1FRQUlKUUFBSVFTQUlCUUFnQVFTZ0FBUWdrQVFDZ0JBQWdsQUFDaEJBQWdsQUFBaEJJQWdGQUNBQkJLQUFCQ0NRQkFLQUVBQ0NVQUFLRUVBQ0NVQUFDRUVnQ0FVQUlBRUVvQUFFSUpBRUFvQVFBSUpRQUFvUVFBSUpRQUFJUVNBSUJRQWdBUVNnQUFRZ2tBUUNnQkFBZ2xBQUNoQkFBZ2xBQUFoQklBZ0ZBQ0FCQktBQUJDQ1FCQUtBRUFDQ1VBQUtFRUFDQ1VBQUNFRWdDQVVBSUFFRW9BQUVJSkFFQW9BUUFJSlFBQW9RUUFJSlFBQUlRU0FJQlFBZ0FRU2dBQVFna0FRQ2dCQUFnbEFBQ2hCQUFnbEFBQWhCSUFnRkFDQUJCS0FBQkNDUUJBS0FFQUNDVUFBS0VFQUNDVUFBQ0VFZ0NBVUFJQUVFb0FBRUlKQUVBb0FRQUlKUUFBb1FRQUlKUUFBSVFTQUlCUUFnQVFTZ0FBUWdrQVFDZ0JBQWdsQUFDaEJBQWdsQUFBaEJJQWdGQUNBQkJLQUFCQ0NRQkFLQUVBQ0NVQUFLRUVBQ0NVQUFDRUVnQ0FVQUlBRUVvQUFFSUpBRUFvQVFBSUpRQUFvUVFBSUpRQUFJUVNBSUJRQWdBUVNnQUFRZ2tBUUNnQkFBZ2xBQUNoQkFBZ2xBQUFoQklBZ0ZBQ0FCQktBQUJDQ1FCQUtBRUFDQ1VBQUtFRUFDQ1VBQUNFRWdDQVVBSUFFRW9BQUVJSkFFQW9BUUFJSlFBQW9RUUFJSlFBQUlRU0FJQlEvd016clZYYjkwS0tBQUFBQUFCSlJVNUVya0pnZ2c9PSIsICJzaXplcyI6ICI1MTJ4NTEyIiwgInR5cGUiOiAiaW1hZ2UvcG5nIiwgInB1cnBvc2UiOiAiYW55IG1hc2thYmxlIn0sIHsic3JjIjogImRhdGE6aW1hZ2Uvc3ZnK3htbDtiYXNlNjQsUEhOMlp5QjRiV3h1Y3owaWFIUjBjRG92TDNkM2R5NTNNeTV2Y21jdk1qQXdNQzl6ZG1jaUlIWnBaWGRDYjNnOUlqQWdNQ0F4TURBZ01UQXdJajQ4Y21WamRDQjNhV1IwYUQwaU1UQXdJaUJvWldsbmFIUTlJakV3TUNJZ2NuZzlJakl5SWlCbWFXeHNQU0lqTVRReE5ERTBJaTgrUEhSbGVIUWdlRDBpTlRBaUlIazlJalk0SWlCbWIyNTBMWE5wZW1VOUlqVXlJaUIwWlhoMExXRnVZMmh2Y2owaWJXbGtaR3hsSWlCbWFXeHNQU0lqUlRnMlFUTkNJaUJtYjI1MExXWmhiV2xzZVQwaWMyRnVjeTF6WlhKcFppSWdabTl1ZEMxM1pXbG5hSFE5SWprd01DSSswSkU4TDNSbGVIUStQQzl6ZG1jKyIsICJzaXplcyI6ICJhbnkiLCAidHlwZSI6ICJpbWFnZS9zdmcreG1sIn1dfQ==">
 <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxODAgMTgwIj48cmVjdCB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgcng9IjQwIiBmaWxsPSIjMTQxNDE0Ii8+PHRleHQgeD0iOTAiIHk9IjEyNCIgZm9udC1zaXplPSI5NCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI0U4NkEzQiIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI5MDAiPtCRPC90ZXh0Pjwvc3ZnPg==">
 <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxODAgMTgwIj48cmVjdCB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgcng9IjQwIiBmaWxsPSIjMTQxNDE0Ii8+PHRleHQgeD0iOTAiIHk9IjEyNCIgZm9udC1zaXplPSI5NCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI0U4NkEzQiIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI5MDAiPtCRPC90ZXh0Pjwvc3ZnPg==">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+/* Тема ставится до первой отрисовки — без вспышки. Тёмная по умолчанию. */
+function applyTheme(){
+  var p='dark';try{p=localStorage.getItem('sintra_theme')||'dark';}catch(e){}
+  var t=p==='auto'?(window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'):p;
+  document.documentElement.setAttribute('data-theme',t);
+  var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',t==='light'?'#F5F4EE':'#1F1E1D');
+}
+applyTheme();
+try{matchMedia('(prefers-color-scheme: light)').addEventListener('change',applyTheme);}catch(e){}
+</script>
 <style>
+/* ══════════════════════════════════════════════════════════
+   СИНТРА — «Тёплый Claude», октябрь 2026
+   Тёмная тема по умолчанию, светлая — в меню аккаунта.
+   Шрифт системный: на iPhone это SF Pro, цифры — SF Pro Rounded.
+   Ничего не грузится из сети: PWA открывается мгновенно и офлайн.
+   Кегли в rem — работает системная настройка крупного шрифта.
+   Анимации только transform/opacity — без пересчёта раскладки.
+   ══════════════════════════════════════════════════════════ */
 
-
-/* ══════════════════════════════════════════
-   БЮДЖЕТ — Dark Theme (always dark)
-   ══════════════════════════════════════════ */
-
-/* ── TOKENS ─────────────────────────────── */
 :root{
-  /* Фоны уведены в тон акцента (тиловый 197°), светлота сохранена
-     до десятых — подтон меняет характер, но не трогает контрасты.
-     Проверено: все пары текст-фон изменились не больше чем на 0.03. */
-  --bg:     #161413;
-  --card:   #201F1D;
-  --card2:  #252525;
-  --t:      #F0EEE6;  /* холодный белый из палитры Mercedes, был #F0F0F0 */
-  --t2:     #B0B0B0;
-  --mt:     #9A958D;  /* серый из палитры Mercedes; был #919191, контрасты выше */
-  --br:     #2F2E2D;
-  --br2:    #383838;
-  /* Акцент — book cloth Anthropic, тёплые нейтрали как в приложении Claude
-     (решение Антона 06.09.2026, после двух неудачных попыток).
-     Урок из них: гармония зависит не только от угла между тонами, но и от
-     НАСЫЩЕННОСТИ. Прежний оранжевый #E86A3B спорил не тоном, а яркостью —
-     насыщенность 16.8 против 11.3 здесь. Приглушённая терракота не тянет
-     внимание и уживается с зелёным и красным.
-     Второе: фоны должны быть ТЁПЛЫМИ. На холодном фоне тёплый акцент
-     спорит с подложкой; у Claude весь нейтральный ряд тёплый.
-     Зелёный и красный НЕ трогаем: они несут смысл. */
-  --accent: #CC785C;     /* book cloth; тёмный текст на заливке 5.28 */
-  --on-accent: #241812;  /* тёплый тёмный, а не белый: белый дал бы 3.28 */
-  --accent-tx: #D4A27F;  /* Anthropic tan КАК текст на тёмном: 6.38-8.11 */
-  --gd:     #4EC187;  /* приглушён 06.09: был #30C97C, насыщенность 16.7 —
-                         громче акцента (11.3). Тон сохранён, в нём смысл.
-                         Красный НЕ трогаем: гашение сближает его с терракотой,
-                         его яркость и отличает тревогу от кнопки. */
-  --rd:     #FF4F47;
-  --rl:     rgba(255,79,71,.12);
-  --wbg:    rgba(245,200,66,.07);
-  --wbr:    rgba(245,200,66,.35);
-  --sh:     0 1px 0 rgba(255,255,255,.03), 0 2px 12px rgba(0,0,0,.4);
-  --sh2:    0 12px 44px rgba(0,0,0,.7), 0 2px 8px rgba(0,0,0,.5);
-
-  /* Всплывающие панели чуть светлее карточек — так они «лежат сверху»,
-     а не сливаются с фоном. Дальше от глубины зависит вся читаемость меню. */
-  --pop:    #2D2924;
-
-  /* Единая шкала скруглений. Раньше радиусы гуляли от 8 до 24 без системы,
-     и интерфейс выглядел собранным из разных наборов. */
-  --r1: 10px;   /* мелкое: кнопки в строке, чипы. Было 12: сведено с 8/9/10 */
-  --r2: 16px;   /* среднее: поля ввода, кнопки */
-  --r3: 22px;   /* крупное: карточки, меню */
-  --ease: cubic-bezier(.2,.9,.3,1.15);
+  --bg:#1F1E1D;        /* фон */
+  --s1:#2A2927;        /* карточка, окно */
+  --s2:#33322F;        /* нажатие, кнопка второго плана */
+  --s3:#3A3936;        /* активный сегмент, линии */
+  --sunk:#1F1E1D;      /* утопленное внутри карточки */
+  --t:#F5F4EE;         /* текст */
+  --mt:#A6A39A;        /* приглушённый текст, 5.8:1 на карточке */
+  --ac:#D97757;        /* акцент — заливка */
+  --ac-h:#E3896B;
+  --on-ac:#1F1209;     /* текст на акценте, 5.9:1 */
+  --ac-tx:#E08A6C;     /* акцент как текст */
+  --ac-bg:rgba(217,119,87,.14);
+  --gd:#6CC08C;        /* в плюсе */
+  --rd:#FF5A4F;        /* перерасход — яркий намеренно */
+  --rd-bg:rgba(255,90,79,.12);
+  --dock:rgba(48,48,46,.92);
+  --scrim:rgba(10,9,8,.62);
+  --toast:#F5F4EE;--toast-t:#1F1E1D;--toast-ac:#A64B2A;
+  --sh:0 10px 30px rgba(0,0,0,.45);
+  --font:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  --num:ui-rounded,'SF Pro Rounded',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --r1:12px;--r2:18px;--r3:22px;--r4:28px;--r5:36px;
+  --ease:cubic-bezier(.32,.72,0,1);  /* как у системных листов iOS */
+  color-scheme:dark;
+}
+:root[data-theme="light"]{
+  --bg:#F5F4EE;--s1:#FFFFFF;--s2:#EFEDE6;--s3:#E4E1D8;--sunk:#F5F4EE;
+  --t:#1F1E1D;--mt:#68645C;
+  --ac:#D97757;--ac-h:#CF6B4B;--on-ac:#1F1209;--ac-tx:#A9502F;--ac-bg:rgba(217,119,87,.14);
+  --gd:#25804C;--rd:#D7362B;--rd-bg:rgba(215,54,43,.09);
+  --dock:rgba(255,255,255,.9);--scrim:rgba(20,18,16,.32);
+  --toast:#1F1E1D;--toast-t:#F5F4EE;--toast-ac:#F0A285;
+  --sh:0 10px 30px rgba(60,40,20,.14);
+  color-scheme:light;
 }
 
-/* Появление всплывающих панелей с лёгким «доводом» — статичное
-   возникновение из ниоткуда и читается как несовременное */
-@keyframes pop{
-  from{opacity:0;transform:scale(.95) translateY(-6px);}
-  to  {opacity:1;transform:none;}
-}
-
-/* ── RESET ───────────────────────────────── */
-html{font-size:100%;}
-/* ШКАЛА. Кегли только из ряда 11 13 15 18 22 28 34 46 (в rem: делить на 16).
-   Начертания только 500 / 700 / 900. Радиусы только --r1 --r2 --r3, плюс
-   99px для капсул и 50% для кругов. Отступы кратны 4.
-   Было 24 кегля и 6 начертаний — вес перестал означать важность.
-   Спорные случаи округляются ВВЕРХ: шкала не должна мельчить текст.
-   Проверяет `pw tools/audit-ui.js`, раздел «разнобой оформления». */  /* якорь для rem: даёт системной настройке размера текста подействовать */
+/* ── База ─────────────────────────────── */
+html{font-size:100%;-webkit-text-size-adjust:100%;}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-/* height:100% обрезало всё, что не влезло в один экран, и страница
-   переставала скроллиться — поэтому только минимальная высота */
-html,body{
-  min-height:100%;
-  background:var(--bg);
-  color:var(--t);
-  font-family:'Manrope',-apple-system,sans-serif;
-  -webkit-font-smoothing:antialiased;
-  overflow-x:hidden;
-}
-button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
-input,select{font-family:inherit;color:var(--t);}
-select option{background:var(--card2);}
-
-/* ── ФОКУС КЛАВИАТУРЫ ────────────────────────
-   Раньше в четырёх местах стояло outline:none, а :focus-visible не было
-   вовсе — с внешней клавиатуры было не видно, где ты находишься. Обводка
-   показывается ТОЛЬКО при ходе с клавиатуры: :focus-visible не срабатывает
-   на касание пальцем, поэтому на телефоне ничего не меняется. */
-:focus-visible{
-  outline:2px solid var(--accent-tx);
-  outline-offset:2px;
-  border-radius:var(--r1);
-}
-/* поля ввода гасят системную обводку ради своего вида — возвращаем её
-   именно для клавиатуры, иначе ввод сумм становится слепым */
-input:focus-visible,select:focus-visible,textarea:focus-visible{
-  outline:2px solid var(--accent-tx);
-  outline-offset:1px;
-}
-
-/* ── УМЕНЬШИТЬ ДВИЖЕНИЕ ──────────────────────
-   Системная настройка «Reduce Motion» ставится людьми с укачиванием и
-   чувствительностью к анимации. 13 переходов и 7 анимаций её не замечали.
-   Не убираем эффекты совсем — сводим к мгновенным, чтобы не сломать
-   логику, завязанную на окончание перехода. */
+html,body{min-height:100%;background:var(--bg);color:var(--t);}
+body{font-family:var(--font);font-size:0.9375rem;line-height:1.35;-webkit-font-smoothing:antialiased;overscroll-behavior-y:none;}
+button,input,select,textarea{font:inherit;color:inherit;background:none;border:0;}
+button{cursor:pointer;touch-action:manipulation;}
+button:disabled{opacity:.45;cursor:default;}
+input,select,textarea{outline:none;}
+b{font-weight:600;}
+.num,.am,.big,.amt{font-family:var(--num);font-variant-numeric:tabular-nums;}
+.gd{color:var(--gd);}.rd{color:var(--rd);}.mt{color:var(--mt);}.ac{color:var(--ac-tx);}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px;border-radius:10px;}
+input:focus-visible,select:focus-visible,textarea:focus-visible{outline:none;}
 @media (prefers-reduced-motion: reduce){
-  *,*::before,*::after{
-    animation-duration:0.01ms !important;
-    animation-iteration-count:1 !important;
-    transition-duration:0.01ms !important;
-    scroll-behavior:auto !important;
-  }
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;}
 }
 
-/* ── APP ─────────────────────────────────── */
-#app{min-height:100vh;padding-bottom:env(safe-area-inset-bottom,24px);}
+#app{max-width:520px;margin:0 auto;min-height:100vh;padding-bottom:calc(104px + env(safe-area-inset-bottom,0px));}
+.pg{padding:0 16px;}
 
-/* ── HEADER ──────────────────────────────── */
-.hdr{
-  position:sticky;top:0;z-index:100;
-  background:var(--bg);
-  border-bottom:1px solid var(--br);
-  padding-top:env(safe-area-inset-top,0px);
-}
-.hdr-r1{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 8px;}
-.hdr-r2{display:flex;gap:2px;padding:0 12px 8px;}
+/* ── Шапка ─────────────────────────────── */
+.hdr{position:relative;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:calc(env(safe-area-inset-top,0px) + 8px) 16px 4px;min-height:64px;}
+.ttl{display:flex;align-items:center;gap:6px;min-height:44px;font-size:1.75rem;font-weight:700;letter-spacing:-.02em;line-height:1.1;min-width:0;}
+.ttl svg{flex:none;color:var(--mt);}
+.ttl span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hdr-r{display:flex;align-items:center;gap:8px;position:relative;flex:none;}
+.perchip{display:flex;align-items:center;gap:4px;height:36px;padding:0 10px 0 12px;border-radius:99px;background:var(--s1);font-size:0.8125rem;font-weight:500;color:var(--t);}
+.perchip svg{color:var(--mt);}
+.av{position:relative;width:44px;height:44px;border-radius:50%;background:var(--s1);font-weight:600;display:grid;place-items:center;flex:none;}
+.sync-dot{position:absolute;right:0;bottom:0;width:12px;height:12px;border-radius:50%;box-shadow:0 0 0 3px var(--bg);}
+.sync-dot.s-saved{background:var(--gd);}
+.sync-dot.s-saving{background:var(--mt);animation:pulse 1s ease infinite;}
+.sync-dot.s-error{background:var(--rd);}
+.sync-dot.s-offline{background:#E8B44A;}
+@keyframes pulse{50%{opacity:.35}}
+.cur-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;width:calc(100% - 32px);min-height:44px;margin:4px 16px 0;padding:0 16px;border-radius:var(--r2);background:var(--ac-bg);font-size:0.875rem;text-align:left;}
+.cur-go{color:var(--ac-tx);font-weight:600;white-space:nowrap;}
 
-.logo{font-size:1.125rem;font-weight:900;letter-spacing:-.4px;margin:0;}  /* margin:0 — логотип стал h1 */
-.logo span{color:var(--accent-tx);}  /* --accent-tx, а не --accent: заливочный цвет как ТЕКСТ давал 3.9 */
+/* ── Нижнее меню ────────────────────────── */
+.dock{position:fixed;z-index:120;left:50%;transform:translateX(-50%);bottom:max(12px,env(safe-area-inset-bottom,0px));
+  width:calc(100% - 32px);max-width:488px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:6px;
+  border-radius:99px;background:var(--dock);-webkit-backdrop-filter:blur(20px) saturate(1.4);backdrop-filter:blur(20px) saturate(1.4);box-shadow:var(--sh);}
+.nb{position:relative;display:flex;align-items:center;justify-content:center;gap:6px;height:48px;border-radius:99px;color:var(--mt);font-size:0.875rem;font-weight:500;transition:background .2s,color .2s;}
+.nb.on{background:var(--ac);color:var(--on-ac);font-weight:600;}
+.tbadge{width:7px;height:7px;border-radius:50%;background:var(--rd);flex:none;}
+.nb.on .tbadge{background:var(--on-ac);}
 
+/* ── Карточки ───────────────────────────── */
+.card{background:var(--s1);border-radius:var(--r3);overflow:hidden;}
+.hero{margin-top:8px;background:var(--s1);border-radius:var(--r4);padding:18px 20px 16px;}
+.hero-top{display:flex;justify-content:space-between;align-items:baseline;gap:4px 12px;flex-wrap:wrap;font-size:0.875rem;color:var(--mt);}
+.big{font-size:3.25rem;font-weight:600;letter-spacing:-.02em;line-height:1;margin-top:10px;white-space:nowrap;}
+.big.md{font-size:2.75rem;}
+.bar{height:6px;border-radius:99px;background:var(--sunk);overflow:hidden;margin-top:16px;}
+.bar>i{display:block;height:100%;border-radius:99px;background:var(--gd);transition:width .5s var(--ease);}
+.bar>i.rd{background:var(--rd);}
+.pills{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:16px;}
+.pills.two{grid-template-columns:repeat(2,minmax(0,1fr));}
+.pill{background:var(--sunk);border-radius:16px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;min-width:0;}
+.pill span{font-size:0.75rem;color:var(--mt);}
+.pill b{font-family:var(--num);font-variant-numeric:tabular-nums;font-size:1rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.note{display:flex;align-items:flex-start;gap:8px;margin-top:8px;padding:10px 12px;border-radius:16px;background:var(--sunk);font-size:0.875rem;color:var(--mt);}
+.note svg{flex:none;margin-top:1px;}
+.note b{color:var(--t);}
+.note.rd{background:var(--rd-bg);color:var(--t);}
 
-/* ── HEADER RIGHT GROUP ──────────────────── */
-.hdr-right{display:flex;align-items:center;gap:8px;}
-.hdr-left{display:flex;align-items:center;gap:8px;min-width:0;}
-/* Полоса «вы смотрите прошлый период» — своей строкой во всю ширину,
-   поэтому ни на что не наезжает и не ломает первый ряд шапки */
-.cur-bar{
-  display:flex;align-items:center;justify-content:space-between;gap:8px;
-  width:100%;padding:8px 16px;
-  font-size:0.8125rem;font-weight:700;
-  background:rgba(204,120,92,.13);color:var(--accent);
-  border-top:1px solid rgba(204,120,92,.22);
-}
-.cur-bar span:first-child{color:var(--t2);font-weight:700;}
-.cur-go{white-space:nowrap;}
-.balbtn{
-  font-size:0.8125rem;font-weight:700;
-  padding:8px 12px;border-radius:99px;min-height:44px;   /* было 32-34px */
-  display:flex;align-items:center;gap:4px;
-  max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-.balbtn.gd{color:var(--gd);background:rgba(48,201,124,.13);}
-.balbtn.rd{color:var(--rd);background:rgba(255,79,71,.13);}
-.balbtn.nt{color:var(--t2);background:var(--card);border:1px solid var(--br2);}
-.balbtn .cv{font-size:0.6875rem;opacity:.5;}
+/* ── Строка ввода ────────────────────────── */
+.ask{margin-top:12px;display:flex;align-items:center;gap:4px;height:60px;padding:0 8px;border-radius:99px;background:var(--s1);box-shadow:inset 0 0 0 1px var(--s3);transition:box-shadow .15s;}
+.ask:focus-within{box-shadow:inset 0 0 0 1.5px var(--ac);}
+.ask-ctx{display:flex;align-items:center;gap:4px;height:44px;padding:0 8px 0 10px;border-radius:99px;background:var(--sunk);flex:none;color:var(--mt);}
+.ask-ctx .e{font-size:1.125rem;line-height:1;}
+.ask-ctx .d{font-size:0.8125rem;font-weight:600;color:var(--ac-tx);}
+.ask-in{flex:1;min-width:0;height:44px;padding:0 8px;font-size:1.0625rem;caret-color:var(--ac);}
+.ask-in::placeholder{color:var(--mt);}
+.ask-go{width:44px;height:44px;border-radius:50%;background:var(--ac);color:var(--on-ac);display:grid;place-items:center;flex:none;transition:transform .15s,background .2s;}
+.ask-go:active{transform:scale(.92);}
+.ask-go.ok{background:var(--gd);}
+.ask-hint{display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 12px;padding:8px 20px 0;font-size:0.875rem;color:var(--mt);min-height:0;}
+.ask-hint:empty{display:none;}
+.ask-hint b{color:var(--t);font-family:var(--num);}
+.ask-hint b.gd{color:var(--gd);}.ask-hint b.rd{color:var(--rd);}
 
-.nb{
-  font-size:0.8125rem;font-weight:700;
-  padding:8px 12px;border-radius:99px;
-  min-height:44px;display:inline-flex;align-items:center;   /* было 32px по высоте */
-  color:var(--mt);transition:all .15s;
-  position:relative;
-}
-.nb.on{color:var(--t);background:var(--card);}
+/* ── Списки ─────────────────────────────── */
+.dh{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:22px 4px 8px;min-height:44px;}
+.dh-t{font-size:1.25rem;font-weight:700;letter-spacing:-.01em;}
+.dh-t small{font-size:0.8125rem;font-weight:400;color:var(--mt);margin-left:6px;letter-spacing:0;}
+.dh-s{font-family:var(--num);font-variant-numeric:tabular-nums;color:var(--mt);font-size:0.9375rem;}
+.dh-acts{display:flex;gap:8px;}
+.grp{background:var(--s1);border-radius:var(--r3);padding:4px 0;overflow:hidden;}
+.tx{display:flex;align-items:center;gap:12px;width:100%;min-height:60px;padding:6px 16px 6px 12px;text-align:left;transition:background .15s;}
+.tx:active{background:var(--s2);}
+@media (hover:hover){.tx:hover{background:var(--s2);}}
+.tx.fresh{animation:fresh 1.6s ease-out;}
+@keyframes fresh{0%,40%{background:var(--ac-bg);}100%{background:transparent;}}
+.em{width:40px;height:40px;border-radius:50%;background:var(--sunk);display:grid;place-items:center;font-size:1.125rem;flex:none;}
+.tx-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;}
+.nm{font-size:1rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sub{font-size:0.8125rem;color:var(--mt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.am{font-size:1.0625rem;font-weight:600;white-space:nowrap;display:flex;align-items:center;gap:6px;}
+.amc{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex:none;}
+.of{font-size:0.75rem;color:var(--mt);white-space:nowrap;display:flex;gap:6px;align-items:center;}
+.rep{width:13px;height:13px;color:var(--mt);flex:none;}
+.mini{height:4px;border-radius:99px;background:var(--sunk);overflow:hidden;margin-top:7px;}
+.mini>i{display:block;height:100%;border-radius:99px;background:var(--gd);}
+.cmp{font-size:0.75rem;font-weight:600;}
+.cmp.up{color:var(--rd);}.cmp.down{color:var(--gd);}
+.no-tx{padding:28px 16px;text-align:center;color:var(--mt);}
+.tft{display:flex;justify-content:space-between;padding:12px 4px;font-size:0.875rem;color:var(--mt);}
+.tft b{color:var(--t);font-family:var(--num);}
 
-/* overdraft badge on tab */
-.tbadge{
-  position:absolute;top:5px;right:8px;
-  width:7px;height:7px;border-radius:50%;
-  background:var(--rd);
-  border:2px solid var(--bg);
-}
-
-/* ── DROPDOWN ────────────────────────────── */
-.drop{
-  position:absolute;top:calc(100% + 8px);right:0;
-  background:var(--pop);
-  border-radius:var(--r3);
-  box-shadow:var(--sh2);
-  border:1px solid var(--br2);
-  min-width:264px;overflow:hidden;
-  transform-origin:top right;
-  animation:pop .17s var(--ease);z-index:200;
-}
-.di{flex-shrink:0;opacity:.8;}
-/* Текущий период с галочкой — первая строка, как в Sintra */
-.drop-cur{
-  display:flex;align-items:center;gap:8px;
-  width:100%;padding:12px 16px 8px;text-align:left;min-height:44px;   /* было 42px */
-  font-size:0.9375rem;font-weight:700;color:var(--t);
-}
-.drop-ck{color:var(--accent-tx);font-size:0.9375rem;font-weight:900;}
-.drop-stats{
-  padding:2px 0;
-  border-top:1px solid var(--br2);border-bottom:1px solid var(--br2);
-}
-.drop-r{
-  display:flex;justify-content:space-between;align-items:center;gap:12px;
-  padding:4px 16px;font-size:0.8125rem;font-weight:500;
-}
-.drop-r label{color:var(--mt);}
-.drop-r b{font-weight:700;white-space:nowrap;}
-.drop-acts{display:flex;flex-direction:column;}
-/* Пункт меню — иконка + текст в общей колонке. Ширина иконки (15px) + gap
-   (9px) фиксируют, где начинается текст: 16+15+9 = 40px — под это же
-   выравниваются вложенные строки архива, чтобы не городить второй отступ */
-.drop-act{
-  display:flex;align-items:center;gap:8px;
-  width:100%;padding:12px 16px;text-align:left;min-height:44px;   /* было 41px */
-  font-size:0.9375rem;font-weight:500;color:var(--t);
-}
-.drop-act:hover{background:rgba(255,255,255,.05);}
-.drop-act:active{background:rgba(255,255,255,.09);}
-.drop-act.acc{color:var(--accent-tx);}
-.drop-arch{
-  display:flex;align-items:center;gap:8px;
-  width:100%;padding:12px 16px;text-align:left;min-height:44px;   /* было 41px */
-  font-size:0.9375rem;font-weight:500;color:var(--t);
-}
-.drop-arch:hover{background:rgba(255,255,255,.05);}
-.drop-arch span:nth-child(2){flex:1;}
-.drop-cnt{font-size:0.8125rem;font-weight:700;color:var(--mt);}
-.drop-chev{display:flex;color:var(--mt);transition:transform .18s var(--ease);}
-.drop-chev.up{transform:rotate(180deg);}
-.drop-item{
-  display:flex;align-items:center;gap:8px;
-  width:100%;padding:8px 16px 8px 40px;text-align:left;
-  font-size:0.8125rem;font-weight:500;color:var(--t2);
-  background:rgba(0,0,0,.16);
-}
-.drop-item span:first-child{flex:1;}
-.drop-item:hover{color:var(--t);}
-.drop-csv{padding-left:16px;color:var(--t);}
-.drop-now{font-size:0.6875rem;font-weight:700;color:var(--gd);}
-/* Периоды, которые ещё не закончились, стоят отдельными строками над архивом:
-   архив — это прошедшее. Метка уходит вправо, поэтому название тянется */
-.drop-per span:nth-child(2){flex:1;}
-.drop-soon{font-size:0.6875rem;font-weight:700;color:var(--mt);}
-.newmo-banner{
-  display:flex;align-items:center;justify-content:space-between;gap:12px;
-  background:rgba(204,120,92,.12);border:1px solid rgba(204,120,92,.3);
-  border-radius:var(--r2);padding:12px 16px;margin:12px 16px 0;
-}
-/* ── ТОП ТРАТ ──────────────────────────────── */
-.ts-card{margin-top:12px;padding:16px;}
-.ts-ttl{display:flex;align-items:baseline;justify-content:space-between;gap:8px;
-  font-size:0.9375rem;font-weight:700;color:var(--t);margin-bottom:12px;}
-.ts-tot{font-size:0.8125rem;font-weight:700;color:var(--mt);white-space:nowrap;}
-.ts-row{margin-bottom:12px;}
-.ts-row:last-child{margin-bottom:0;}
-.ts-hd{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:4px;}
-.ts-nm{font-size:0.9375rem;font-weight:700;color:var(--t);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.ts-am{font-size:0.9375rem;font-weight:700;color:var(--t);white-space:nowrap;}
-.ts-bar{height:6px;border-radius:99px;background:var(--br);overflow:hidden;}
-.ts-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),#E0A182);}
-.ts-sub{font-size:0.6875rem;font-weight:700;color:var(--mt);margin-top:4px;}
-
-/* ── СВОДКА ЗА ПЕРИОД ──────────────────────── */
-.rchips{display:flex;gap:4px;margin-bottom:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
-.rchips::-webkit-scrollbar{display:none;}
-.rchip{
-  flex-shrink:0;padding:8px 12px;border-radius:99px;
-  min-height:44px;display:inline-flex;align-items:center;   /* было 34px */
-  font-size:0.8125rem;font-weight:700;white-space:nowrap;
-  background:var(--card);color:var(--t2);border:1px solid var(--br2);
-  transition:background .15s,color .15s;
-}
-.rchip.on{background:var(--accent);color:var(--on-accent);border-color:var(--accent);}
-.st-row{margin-bottom:12px;}
-.st-row:last-child{margin-bottom:0;}
-.st-hd{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
-.st-em{font-size:0.9375rem;line-height:1;flex-shrink:0;}
-.st-nm{flex:1;min-width:0;font-size:0.9375rem;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.st-am{font-size:0.9375rem;font-weight:700;white-space:nowrap;flex-shrink:0;}
-.st-bar{height:6px;border-radius:99px;background:var(--br);overflow:hidden;}
-.st-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),#E0A182);}
-.st-sub{font-size:0.6875rem;font-weight:700;color:var(--mt);margin-top:4px;}
-/* Вся строка сводки — одна кнопка: зона нажатия во всю ширину, пальцем
-   не промахнёшься. Внешний вид не меняется, поэтому сбрасываем стиль кнопки. */
-.st-btn{display:block;width:100%;padding:0;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;}
-.st-ar{font-size:0.75rem;color:var(--mt);flex-shrink:0;margin-left:2px;}
-.st-row.on{background:var(--br);border-radius:12px;padding:8px;margin:0 -8px 12px;}
-.sd{margin-top:8px;border-top:1px solid var(--br2);}
-.sd-row{display:flex;align-items:baseline;gap:8px;padding:6px 0;border-bottom:1px solid var(--br2);font-size:0.8125rem;}
-.sd-row:last-child{border-bottom:0;padding-bottom:0;}
-.sd-dt{flex:0 0 58px;color:var(--mt);font-size:0.6875rem;font-weight:700;}
-.sd-nm{flex:1;min-width:0;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.sd-am{font-weight:700;white-space:nowrap;}
-
-/* ── СРАВНЕНИЕ С ПРОШЛЫМ МЕСЯЦЕМ ───────────── */
-.cmp{margin-left:4px;font-size:0.6875rem;font-weight:700;}
-.cmp.up{color:var(--rd);}
-.cmp.down{color:var(--gd);}
-
-/* ── ПОВТОРЯЮЩИЕСЯ КАТЕГОРИИ ───────────────── */
-/* Слот под значок — фиксированной ширины и рендерится ВСЕГДА, пустым,
-   если категория не повторяется. С space-between и одним ребёнком (когда
-   значка нет) сумма падала к левому краю — теперь выравнивание не зависит
-   от того, есть значок или нет. Gap вдвое меньше прежнего. */
-.recur-slot{width:12px;flex-shrink:0;display:flex;justify-content:center;}
-.recur-b{font-size:0.6875rem;opacity:.65;line-height:1;}
-.t-amw{display:flex;align-items:center;justify-content:flex-start;gap:2px;}
-.chkrow{display:flex;align-items:flex-start;gap:8px;cursor:pointer;min-height:44px;
-  padding:12px 12px;margin-top:8px;border-radius:var(--r1);
-  background:var(--card2);border:1px solid var(--br2);}
-.chkrow input{width:28px;height:28px;   /* было 20px; вся строка тоже нажимаема */flex-shrink:0;margin:0;accent-color:var(--accent);cursor:pointer;}
-.chkrow span{display:flex;flex-direction:column;gap:2px;}
-.chkrow b{font-size:0.9375rem;font-weight:700;color:var(--t);}
-.chkrow i{font-size:0.8125rem;font-weight:500;color:var(--mt);font-style:normal;line-height:1.35;}
-.newmo-txt{font-size:0.8125rem;font-weight:700;color:var(--t);}
-.newmo-banner .btn{padding:8px 12px;font-size:0.8125rem;white-space:nowrap;}
-
-/* ── PAGE ────────────────────────────────── */
-/* Нижний отступ с запасом под домашнюю полоску iPhone — без него
-   последняя строка списка упиралась в самый край экрана */
-.pg{
-  padding:12px 12px calc(28px + env(safe-area-inset-bottom,0px));
-  max-width:520px;margin:0 auto;
-}
-.ph{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px;}
-.ph-acts{display:flex;gap:4px;flex-shrink:0;}
-/* Заголовок держим в одну строку: перенос «Плановые / расходы» раздувал
-   блок по высоте и выталкивал кнопки */
-.ptl{font-size:1.125rem;font-weight:900;letter-spacing:-.3px;white-space:nowrap;}
-/* Кнопка-иконка: подпись «Перевести» съедала ширину, значка достаточно */
-.ib{
-  width:44px;height:44px;flex-shrink:0;   /* было 38px */
-  display:flex;align-items:center;justify-content:center;
-  border-radius:var(--r1);font-size:0.9375rem;
-  background:var(--card2);color:var(--t);border:1.5px solid var(--br2);
-  transition:transform .12s;
-}
-.ib:active{transform:scale(.94);}
-.mt10{margin-top:8px;}
-
-/* ── STAT CARD (Incomes tab) ─────────────── */
-.stat-card{
-  background:var(--card);
-  border-radius:var(--r3);
-  padding:12px 12px 12px;
-  margin-bottom:8px;
-  box-shadow:var(--sh);
-  border:1px solid var(--br);
-}
-.srow-lbl{font-size:0.6875rem;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--mt);margin-bottom:4px;}
-.srow-big{font-size:1.75rem;font-weight:900;letter-spacing:-.7px;margin-bottom:2px;}
-.srow-divider{height:1px;background:var(--br2);margin:8px 0 4px;}
-.srow{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:4px 0;font-size:0.8125rem;font-weight:700;border-bottom:1px solid var(--br);}
-/* «На картах сейчас» — главное из этой пары, поэтому крупнее соседних строк;
-   ожидаемые поступления под ней намеренно приглушены: это ещё не деньги. */
-.srow-cash{font-size:0.9375rem;}
-.srow-pend{color:var(--mt);font-size:0.75rem;}
-.srow-pend b{font-weight:700;color:var(--mt);}
-.srow b{white-space:nowrap;}
-.srow:last-child{border-bottom:none;}
-.srow span{color:var(--t2);}
-.gd{color:var(--gd);}
-.rd{color:var(--rd);}
-
-/* ── CARD ────────────────────────────────── */
-.card{
-  background:var(--card);
-  border-radius:var(--r3);
-  box-shadow:var(--sh);
-  overflow:visible;
-  border:1px solid var(--br);
-}
-
-/* ── TABLE ───────────────────────────────── */
-.tbl{width:100%;border-collapse:collapse;table-layout:fixed;}
-.tbl thead th{
-  padding:8px 12px;
-  font-size:0.6875rem;font-weight:700;
-  text-transform:uppercase;letter-spacing:.6px;
-  color:var(--mt);text-align:left;
-  border-bottom:1px solid var(--br2);
-}
-.tbl tbody td{
-  padding:8px 12px;
-  border-bottom:1px solid var(--br);
-  font-size:0.9375rem;vertical-align:middle;
-}
-.tbl tbody tr:last-child td{border-bottom:none;}
-.tbl tfoot .tft td{
-  padding:12px 12px;font-size:0.8125rem;font-weight:700;
-  color:var(--mt);border-top:1px solid var(--br2);
-}
-
-/* emoji inline */
-/* Название в одну строку с многоточием: перенос на вторую строку
-   раздувал таблицу по высоте и ломал выравнивание правой колонки */
-.t-nm{display:flex;align-items:center;gap:8px;font-weight:700;font-size:0.9375rem;line-height:1.3;min-width:0;}
-.t-tx{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
-.t-em{font-size:1.125rem;line-height:1;flex-shrink:0;}
-/* Левый край, а не правый: значок (если есть) и сумма всегда начинаются
-   в одной точке колонки — цифры разной длины продлеваются вправо, а не
-   «плавают» по горизонтали от строки к строке, как было при text-align:right */
-.t-am{font-size:0.9375rem;font-weight:700;text-align:left;white-space:nowrap;}
-.t-dt{font-size:0.6875rem;font-weight:700;color:var(--mt);margin-top:2px;padding-left:26px;}
-.t-dt.wait{color:var(--accent);}
-/* Строка ожидаемого дохода приглушена целиком: сумма в ней уже учтена
-   в общем остатке, но на карте её ещё нет. */
-.t-wait .t-nm,.t-wait .t-am{opacity:.55;}
-.t-sub{font-size:0.6875rem;font-weight:500;color:var(--mt);margin-top:0px;white-space:nowrap;}
-/* Колонка действий: фиксированная ширина и нулевые боковые отступы —
-   кнопка сама себе даёт площадь, поэтому стоит на одном месте во всех строках */
-.t-ax{width:46px;padding:0 8px 0 0!important;text-align:right;}
-
-/* column widths */
-.tbl th:nth-child(1),.tbl td:nth-child(1){width:auto;}
-.tbl th:nth-child(2),.tbl td:nth-child(2){width:118px;}
-.tbl th:nth-child(3),.tbl td:nth-child(3){width:46px;overflow:visible;}
-
-/* overdraft row */
-.row-ov{background:var(--rl);}
-.row-ov td{border-bottom-color:rgba(255,79,71,.2);}
-.ov-tag{display:flex;align-items:center;gap:8px;margin-top:4px;font-size:0.8125rem;font-weight:700;color:var(--rd);}
-.ov-btn{font-size:0.6875rem;font-weight:700;color:var(--accent);background:rgba(204,120,92,.15);border-radius:var(--r1);padding:2px 8px;}
-
-/* ── DOTS MENU ───────────────────────────────
-   Кнопка с фиксированным квадратом 32×32: текстовые «•••» разъезжались
-   от строки к строке, потому что ширина зависела от шрифта и трекинга. */
-.dots{
-  width:44px;height:44px;flex-shrink:0;   /* было 32px */
-  display:flex;align-items:center;justify-content:center;
-  border-radius:var(--r1);color:var(--mt);
-  transition:background .16s,color .16s;
-}
-.dots svg{display:block;fill:currentColor;}
-.dots:hover{background:rgba(255,255,255,.06);color:var(--t2);}
-.dots.on{background:rgba(255,255,255,.09);color:var(--t);}
-
-.ctx{
-  position:absolute;right:0;top:calc(100% + 6px);
-  background:var(--pop);
-  border-radius:var(--r3);
-  box-shadow:var(--sh2);
-  border:1px solid var(--br2);
-  overflow:hidden;min-width:238px;
-  z-index:300;
-  transform-origin:top right;
-  animation:pop .17s cubic-bezier(.2,.9,.3,1.15);
-}
-.ctx button{
-  display:block;width:100%;padding:16px 16px;
-  font-size:0.9375rem;font-weight:500;text-align:left;
-  color:var(--t);
-}
-/* Разделители только между смысловыми группами, а не после каждой строки —
-   сплошная сетка линий и делала меню похожим на таблицу */
-.ctx button.ctx-sep{border-top:1px solid var(--br2);}
-.ctx button.ctx-lines{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding-top:12px;padding-bottom:12px;}
-.ctx-t{font-size:0.9375rem;font-weight:500;color:var(--t);}
-.ctx-s{font-size:0.8125rem;font-weight:500;color:var(--mt);line-height:1.35;}
-.ctx button:hover{background:rgba(255,255,255,.05);}
-.ctx button:active{background:rgba(255,255,255,.09);}
-.ctx button.del{color:var(--rd);}
-/* У нижних строк места под меню нет — раскрываем его вверх, иначе
-   часть пунктов оказывалась за краем экрана и доскроллить было нельзя */
-@keyframes popup{
-  from{opacity:0;transform:scale(.95) translateY(6px);}
-  to  {opacity:1;transform:none;}
-}
-.ctx.up{
-  top:auto;bottom:calc(100% + 6px);
-  transform-origin:bottom right;
-  animation:popup .17s var(--ease);
-}
-
-/* ── WARN BANNER ─────────────────────────── */
-.warn{
-  background:var(--wbg);
-  border:1px solid var(--wbr);
-  border-radius:var(--r2);padding:12px 16px;margin-bottom:12px;
-}
-.warn-t{font-size:0.9375rem;font-weight:700;color:#D4A800;margin-bottom:2px;}
-.warn-s{font-size:0.8125rem;font-weight:500;color:#9A8030;}
-
-/* ── КАРТОЧКА ДНЯ ────────────────────────── */
-.hero{
-  background:linear-gradient(158deg,#252220 0%,#1B1917 100%);
-  border:1px solid var(--br2);
-  border-radius:var(--r3);
-  padding:12px 12px 12px;
-  margin-bottom:8px;
-  box-shadow:var(--sh);
-}
-/* Заголовок и «N дней» — одна строка, один стиль: обе части читаются как
-   единая шапка блока, а не как подпись + случайно прибившееся число */
-.hero-top{
-  display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:2px 8px;
-  font-size:0.75rem;font-weight:700;letter-spacing:.7px;
-  text-transform:uppercase;color:var(--mt);
-}
-/* На узком экране «N дней» уходит строкой целиком, а не рвёт обе части */
-.hero-top>span{white-space:nowrap;}
-.hero-big{
-  font-size:1.75rem;font-weight:900;letter-spacing:-1px;
-  line-height:1.05;margin-top:2px;
-}
-.hero-big.gd{color:var(--gd);}
-.hero-big.rd{color:var(--rd);}
-.hero-bar{
-  height:6px;border-radius:99px;background:#2A2A2A;
-  overflow:hidden;margin-top:8px;
-}
-.hero-fill{height:100%;border-radius:99px;transition:width .4s cubic-bezier(.4,0,.2,1);}
-.hero-fill.gd{background:linear-gradient(90deg,var(--gd),#74D9A4);}
-.hero-fill.rd{background:linear-gradient(90deg,var(--rd),#FF8A85);}
-/* Тонкая строка под полосой: слева сколько ушло сегодня, справа — что
-   добавится завтра. Симметрично и мельче большой цифры сверху. */
-.hero-sub{
-  display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 8px;margin-top:8px;
-  font-size:0.8125rem;font-weight:500;color:var(--mt);
-}
-.hero-sub b{color:var(--t2);font-weight:700;}
-/* Уточнение под тонкой строкой: категорийные траты дня и причина нулевой
-   нормы. Своей строкой на всю ширину, а не хвостом внутри «потрачено» —
-   на 375 px хвост переносился и рвал пару «сегодня / завтра» пополам.
-   Тише основных цифр: это пояснение, а не третий показатель. */
-.hero-sub .hs-c{flex-basis:100%;color:var(--mt);font-weight:500;opacity:.7;}
-
-/* ── HISTORY / QA ────────────────────────── */
-.qa{
-  background:var(--card);
-  border-radius:var(--r3);padding:8px;
-  margin-bottom:8px;
-  box-shadow:var(--sh);
-  border:1px solid var(--br);
-  position:relative;
-}
-.qa-row{display:flex;align-items:center;gap:8px;}
-.qa-in{
-  flex:1;border:1.5px solid var(--br2);border-radius:var(--r2);
-  padding:12px 12px;font-size:0.9375rem;font-weight:700;
-  background:var(--card2);color:var(--t);outline:none;min-width:0;
-  transition:border-color .15s;
-}
-.qa-in:focus{border-color:var(--accent);}
-.qa-in::placeholder{color:var(--mt);font-weight:700;font-size:0.9375rem;}
-.qa-go{
-  background:var(--accent);color:var(--on-accent);
-  border-radius:var(--r2);
-  width:48px;height:48px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  font-size:1.375rem;font-weight:900;
-  transition:transform .12s,opacity .12s;
-}
-.qa-go:active{transform:scale(.92);}
-.qa-go.ok{background:var(--gd);}
-
-/* второй ряд: куда и когда — мелким, не мешает главному полю */
-.qa-meta{display:flex;gap:8px;margin-top:8px;}
-.qa-chip{
-  flex:1;min-width:0;
-  display:flex;align-items:center;gap:8px;
-  border:1.5px solid var(--br2);border-radius:var(--r1);
-  padding:8px 12px;min-height:44px;   /* было 38px */font-size:0.8125rem;font-weight:700;
-  background:var(--card2);color:var(--t2);
-  transition:border-color .16s,color .16s;
-}
-.qa-chip-em{font-size:0.9375rem;line-height:1;flex-shrink:0;}
-.qa-chip-tx{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left;}
-.qa-chip-ar{font-size:0.6875rem;color:var(--mt);flex-shrink:0;}
-.qa-chip.pick{color:var(--accent-tx);border-color:rgba(204,120,92,.45);}
-.qa-chip.on{border-color:var(--accent);}
-.qa-cal{
-  border:1.5px solid var(--br2);border-radius:var(--r1);
-  padding:8px 12px;min-height:44px;   /* было 38px */background:var(--card2);color:var(--t2);
-  display:flex;align-items:center;gap:4px;
-  font-size:0.8125rem;font-weight:700;flex-shrink:0;
-  transition:border-color .16s,color .16s;
-}
-.qa-cal.on{border-color:var(--accent);color:var(--accent);}
-
-/* ── СПИСОК КАТЕГОРИЙ ────────────────────── */
-.crow{
-  display:flex;align-items:center;gap:12px;
-  width:100%;padding:12px 12px;border-radius:var(--r2);
-  font-size:0.9375rem;font-weight:500;color:var(--t);text-align:left;
-}
-.crow+.crow{margin-top:2px;}
-.crow:hover{background:rgba(255,255,255,.05);}
-.crow.sel{background:rgba(204,120,92,.14);}
-.crow-em{font-size:1.125rem;line-height:1;flex-shrink:0;width:22px;text-align:center;}
-.crow-nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.crow-am{font-size:0.8125rem;font-weight:700;color:var(--t2);white-space:nowrap;flex-shrink:0;}
-.crow-am.gd{color:var(--gd);}
-.crow-am.rd{color:var(--rd);}
-
-/* ── CALENDAR / CATEGORY POPUP ───────────── */
-.cpop{
-  background:var(--pop);
-  border-radius:var(--r3);
-  box-shadow:var(--sh2);
-  border:1px solid var(--br2);
-  padding:8px;margin-top:8px;
-  z-index:300;position:relative;
-  pointer-events:auto;
-  max-height:min(58vh,420px);overflow-y:auto;
-  -webkit-overflow-scrolling:touch;
-  transform-origin:top center;
-  animation:pop .17s var(--ease);
-}
-.cq{display:flex;gap:8px;margin-bottom:8px;}
-.copt{
-  flex:1;display:flex;align-items:center;gap:8px;
-  padding:8px 12px;border-radius:var(--r2);
-  border:1.5px solid var(--br2);background:var(--bg);
-  cursor:pointer;font-size:0.8125rem;font-weight:700;color:var(--t);
-}
-.copt.sel{border-color:var(--accent);background:rgba(204,120,92,.1);}
-.cic{
-  width:30px;height:30px;border-radius:var(--r1);
-  display:flex;align-items:center;justify-content:center;
-  font-size:0.8125rem;font-weight:900;color:var(--on-accent);flex-shrink:0;
-}
-.ctd{background:var(--accent);}
-.cyd{background:var(--mt);}
-.cck{margin-left:auto;color:var(--accent);font-size:0.9375rem;font-weight:900;}
-.cmonth{font-size:0.8125rem;font-weight:700;color:var(--mt);margin:4px 2px 8px;text-transform:capitalize;}
-.cgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
-.cdh{font-size:0.6875rem;font-weight:700;text-align:center;color:var(--mt);padding:2px 0;}
-.cday{
-  width:100%;aspect-ratio:1;border-radius:var(--r1);
-  font-size:0.8125rem;font-weight:700;
-  background:none;border:none;cursor:pointer;color:var(--t);
-}
-.cday:hover:not(.cfut){background:var(--br2);}
-.cday.ctd{background:rgba(204,120,92,.18);color:var(--accent);}
-.cday.csel{background:var(--accent);color:var(--on-accent);}
-.cday.cfut{color:var(--mt);cursor:default;pointer-events:none;opacity:.35;}
-
-/* ── TX LIST ─────────────────────────────── */
-.no-tx{text-align:center;padding:48px 20px;color:var(--mt);font-size:0.9375rem;font-weight:700;}
-.dg{
-  background:var(--card);
-  border-radius:var(--r3);margin-bottom:8px;
-  overflow:visible;
-  box-shadow:var(--sh);
-  border:1px solid var(--br);
-}
-.dh{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:8px 12px 8px;
-  border-bottom:1px solid var(--br2);
-}
-/* Без capitalize: он ломает русскую дату — «11 Августа» вместо «11 августа» */
-.dt{font-size:0.8125rem;font-weight:700;color:var(--mt);}
-.ds{font-size:0.8125rem;font-weight:700;color:var(--t2);}
-.txr{
-  display:flex;align-items:center;gap:12px;
-  padding:8px 12px;
-  /* visible divider between transactions */
-  border-bottom:1px solid var(--br);
-  animation:fi .18s ease;
-}
-.txr:last-child{border-bottom:none;}
-/* кружок с эмодзи категории — взгляд цепляется за него быстрее, чем за текст.
-   Без обводки: рамка вокруг каждой иконки дробила список на клетки */
-.txe{
-  width:34px;height:34px;border-radius:50%;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  font-size:0.9375rem;line-height:1;
-  background:rgba(255,255,255,.055);
-}
-.txe.day{background:rgba(204,120,92,.13);}
-.txi{flex:1;min-width:0;}
-.txn{font-size:0.9375rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.txc{font-size:0.8125rem;font-weight:500;color:var(--mt);margin-top:2px;}
-.txa{font-size:0.9375rem;font-weight:700;flex-shrink:0;color:var(--t);white-space:nowrap;}
-.txd{flex-shrink:0;}
-/* подсветка только что добавленной траты — глазу нужно подтверждение */
-@keyframes flash{0%{background:rgba(48,201,124,.22);}100%{background:transparent;}}
-.txr.fresh{animation:flash 1.1s ease-out;}
-
-/* ── BUTTONS ─────────────────────────────── */
-.btn{border-radius:var(--r2);padding:12px 20px;min-height:44px;font-size:0.9375rem;font-weight:700;cursor:pointer;transition:opacity .12s,transform .12s;}
+/* ── Кнопки ─────────────────────────────── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:52px;padding:0 22px;border-radius:99px;font-size:1rem;font-weight:600;white-space:nowrap;transition:transform .15s,background .2s;}
 .btn:active{transform:scale(.97);}
-.btn:hover{opacity:.85;}
-.btn:active{opacity:.65;}
-.bp{background:var(--accent);color:var(--on-accent);}
-.bs{background:var(--card2);color:var(--t);border:1.5px solid var(--br2);}
-.bd{background:rgba(255,79,71,.12);color:var(--rd);}
-.sm{font-size:0.8125rem;padding:8px 16px;border-radius:var(--r1);}
+.bp{background:var(--ac);color:var(--on-ac);}
+.bs{background:var(--s2);color:var(--t);}
+.bd{color:var(--rd);height:48px;}
+.bd.armed{background:var(--rd);color:#fff;}
+.btn.sm{height:40px;padding:0 14px 0 10px;font-size:0.875rem;}
+.btn.wide{width:100%;}
+.ib{width:40px;height:40px;border-radius:50%;background:var(--s1);display:grid;place-items:center;flex:none;}
+.ib.ac{background:var(--ac);color:var(--on-ac);}
+.lnk{color:var(--ac-tx);font-weight:600;min-height:44px;display:inline-flex;align-items:center;}
 
-/* ── MODAL ───────────────────────────────── */
-.overlay{
-  position:fixed;inset:0;
-  background:rgba(0,0,0,.62);
-  backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
-  z-index:500;display:flex;align-items:flex-end;justify-content:center;
-  animation:fi .18s ease;
-}
-.modal{
-  background:var(--card);
-  border-radius:28px 28px 0 0;
-  width:100%;max-width:480px;
-  max-height:92vh;overflow-y:auto;
-  padding-bottom:max(24px,env(safe-area-inset-bottom,24px));
-  /* с «доводом» вместо линейного выезда — шторка ощущается физичной */
-  animation:su .28s var(--ease);
-  border:1px solid var(--br2);
-  border-bottom:none;
-}
-.mdrag{width:38px;height:4px;background:var(--br2);border-radius:2px;margin:8px auto 0;}
-.mbody{padding:16px 16px;}
-.mhd{
-  font-size:1.125rem;font-weight:900;margin-bottom:16px;
-  display:flex;align-items:center;justify-content:space-between;
-}
-.mcl{font-size:1.375rem;font-weight:500;color:var(--mt);line-height:1;
-  min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;}
-  /* было 20x24 — самая мелкая цель в приложении, и это «закрыть» */
-.f{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
-.f label{font-size:0.6875rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--mt);}
-.fhint{display:block;margin-top:4px;font-size:0.75rem;font-weight:500;font-style:normal;color:var(--mt);line-height:1.35;}
-.inp{
-  border:1.5px solid var(--br2);border-radius:var(--r1);
-  padding:12px 12px;font-size:0.9375rem;font-weight:700;
-  color:var(--t);background:var(--card2);outline:none;width:100%;
-}
-.inp:focus{border-color:var(--accent);}
-.inp::placeholder{color:var(--mt);}
+/* ── Предупреждения ─────────────────────── */
+.warn{margin-top:12px;padding:14px 16px;border-radius:var(--r2);background:var(--rd-bg);}
+.warn-t{font-weight:600;}
+.warn-s{font-size:0.875rem;color:var(--mt);margin-top:2px;}
+.ov-btn{margin-top:6px;height:36px;padding:0 12px;border-radius:99px;background:var(--rd);color:#fff;font-size:0.8125rem;font-weight:600;}
+.newmo{margin-top:8px;padding:18px 18px 16px;border-radius:var(--r4);background:var(--ac-bg);}
+.newmo-t{font-size:1.125rem;font-weight:700;}
+.newmo-s{font-size:0.9375rem;color:var(--mt);margin:4px 0 14px;}
+
+/* ── Сегменты ───────────────────────────── */
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:2px;padding:3px;border-radius:var(--r2);background:var(--s1);}
+.sheet .seg,.hero .seg{background:var(--sunk);}
+.seg button{height:44px;border-radius:15px;font-size:0.875rem;font-weight:500;color:var(--mt);transition:background .2s,color .2s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 6px;}
+.seg button.on{background:var(--s3);color:var(--t);font-weight:600;}
+
+/* ── Листы (окна снизу) ─────────────────── */
+.overlay,.bk-cal,.bk-drop{position:fixed;inset:0;background:var(--scrim);z-index:400;animation:fade .2s ease;}
+.bk-menu{position:fixed;inset:0;z-index:150;}
+.bk-drop.clear{background:transparent;animation:none;}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.modal,.sheet{position:fixed;z-index:401;left:max(8px,calc(50% - 252px));right:max(8px,calc(50% - 252px));bottom:max(8px,env(safe-area-inset-bottom,0px));
+  max-height:calc(100vh - env(safe-area-inset-top,0px) - 24px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
+  background:var(--s1);border-radius:var(--r5);padding:8px 16px 20px;box-shadow:0 -10px 40px rgba(0,0,0,.35);}
+.overlay .modal{animation:up .38s var(--ease);}
+.sheet.in{animation:up .38s var(--ease);}
+@keyframes up{from{transform:translateY(105%)}to{transform:none}}
+.mdrag{width:40px;height:5px;border-radius:99px;background:var(--s3);margin:0 auto;}
+.mhd{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:56px;font-size:1.25rem;font-weight:700;padding-left:4px;}
+.mcl{width:40px;height:40px;border-radius:50%;background:var(--s2);display:grid;place-items:center;color:var(--mt);flex:none;font-size:0;}
+.max{display:flex;flex-direction:column;gap:6px;margin-top:20px;}
+.max .btn{width:100%;}
+.lbl{display:block;padding:16px 6px 6px;font-size:0.8125rem;color:var(--mt);}
+.f{display:flex;flex-direction:column;min-width:0;flex:1;}
+.f>label{padding:14px 6px 6px;font-size:0.8125rem;color:var(--mt);}
 .ir{display:flex;gap:8px;}
-/* min-width:0 обязателен: без него flex-элемент не сжимается меньше
-   собственного контента, а нативный input[type=date] на iOS достаточно
-   широкий — два поля рядом наезжали друг на друга */
-.ir .f{flex:1;min-width:0;}
-.ir .inp{width:100%;min-width:0;}
-.max{display:flex;gap:8px;margin-top:8px;}
-.max .btn{flex:1;}
-.sgs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:16px;}
-.sg{
-  font-size:0.8125rem;font-weight:700;padding:8px 12px;border-radius:var(--r1);
-  min-height:44px;display:inline-flex;align-items:center;   /* было 34px */
-  background:var(--card2);border:1.5px solid var(--br2);color:var(--t2);
-}
-.sg:hover{border-color:var(--accent);color:var(--t);}
+.inp{width:100%;height:52px;padding:0 16px;border-radius:16px;background:var(--sunk);font-size:1rem;caret-color:var(--ac);box-shadow:inset 0 0 0 1px transparent;transition:box-shadow .15s;-webkit-appearance:none;appearance:none;}
+.inp:focus{box-shadow:inset 0 0 0 1.5px var(--ac);}
+.inp::placeholder{color:var(--mt);}
+select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23A6A39A' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;padding-right:40px;}
+input[type="date"].inp{display:flex;align-items:center;}
+.amt-l{text-align:center;padding:12px 0 0;}
+.inp.amt{height:72px;text-align:center;font-size:2.5rem;font-weight:600;letter-spacing:-.02em;background:transparent;}
+.inp.emo{text-align:center;font-size:1.375rem;padding:0;}
+.fhint{display:block;font-style:normal;font-size:0.8125rem;color:var(--mt);padding:6px 6px 0;}
+.sgs{display:flex;gap:8px;overflow-x:auto;padding:4px 0 2px;margin:0 -16px;padding-left:16px;padding-right:16px;scrollbar-width:none;}
+.sgs::-webkit-scrollbar{display:none;}
+.sg{flex:none;height:40px;padding:0 14px;border-radius:99px;background:var(--sunk);font-size:0.875rem;white-space:nowrap;}
+.sg:active{background:var(--s3);}
+.chkrow{display:flex;align-items:center;gap:12px;min-height:60px;margin-top:12px;padding:8px 14px 8px 16px;border-radius:16px;background:var(--sunk);cursor:pointer;}
+.chkrow span{flex:1;display:flex;flex-direction:column;gap:2px;}
+.chkrow b{font-weight:500;}
+.chkrow i{font-style:normal;font-size:0.8125rem;color:var(--mt);}
+.chkrow input{order:2;-webkit-appearance:none;appearance:none;width:51px;height:31px;border-radius:99px;background:var(--s3);position:relative;flex:none;cursor:pointer;transition:background .2s;}
+.chkrow input::after{content:"";position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.25);transition:transform .25s var(--ease);}
+.chkrow input:checked{background:var(--gd);}
+.chkrow input:checked::after{transform:translateX(20px);}
+.pprev,.trprev{margin-top:10px;padding:0 6px;font-size:0.875rem;color:var(--mt);}
+.pprev b,.trprev b{color:var(--t);font-family:var(--num);}
+.trprev:empty,.pprev:empty{display:none;}
+.trprow{display:flex;justify-content:space-between;gap:12px;padding:6px 0;}
+.trprow span:last-child{font-family:var(--num);white-space:nowrap;}
+.trpday{border-top:1px solid var(--s3);margin-top:4px;padding-top:10px;}
+.auth-err{color:var(--rd);font-size:0.875rem;padding:8px 6px 0;}
+.auth-err:empty{display:none;}
+.acts2{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:8px;margin-top:12px;}
+.acts2 .btn{flex-direction:column;gap:0;height:auto;min-height:52px;padding:6px 12px;font-size:0.9375rem;white-space:normal;line-height:1.15;text-align:center;padding:0 12px;}
 
-/* ── PLANNED PREVIEW ─────────────────────── */
-.pprev{font-size:0.8125rem;font-weight:700;color:var(--mt);padding:4px 2px;min-height:22px;margin-bottom:4px;}
+/* Список выбора в листе */
+.opt{display:flex;align-items:center;gap:12px;width:100%;min-height:54px;padding:0 12px 0 8px;border-radius:var(--r2);text-align:left;}
+.opt:active{background:var(--s2);}
+.opt.sel{background:var(--s2);}
+.opt-n{flex:1;min-width:0;font-size:1rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.opt-a{font-family:var(--num);font-variant-numeric:tabular-nums;font-size:1rem;font-weight:600;white-space:nowrap;}
+.opt-k{width:22px;flex:none;color:var(--ac);display:grid;place-items:center;}
+.done{margin-top:12px;}
 
-/* ── TRANSFER PREVIEW ────────────────────── */
-.trprev{margin-bottom:12px;}
-.trpbox{background:var(--card2);border-radius:13px;padding:12px 12px;border:1px solid var(--br2);}
-.trprow{
-  display:flex;justify-content:space-between;align-items:center;
-  font-size:0.8125rem;font-weight:700;padding:4px 0;gap:8px;
-  border-bottom:1px solid var(--br);
-}
-.trprow:last-child{border-bottom:none;}
-.trprow span:first-child{color:var(--mt);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.trprow b{font-weight:700;}
-/* цена решения в пересчёте на день — выделяем, это главная строка */
-.trpday{margin-top:2px;border-top:1px solid var(--br2);border-bottom:none;padding-top:8px;}
-.trpday span:first-child{color:var(--t2);font-weight:700;}
+/* Календарь в листе */
+.cmonth{padding:14px 6px 6px;font-size:0.8125rem;color:var(--mt);}
+.cgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;}
+.cdh{text-align:center;font-size:0.6875rem;color:var(--mt);padding:4px 0;}
+.cday{height:44px;border-radius:12px;font-family:var(--num);font-size:1rem;}
+.cday:active{background:var(--s2);}
+.cday.ctd{color:var(--ac-tx);font-weight:700;}
+.cday.csel{background:var(--ac);color:var(--on-ac);}
+.cday:disabled{opacity:.3;}
 
-/* ── BACKDROPS ───────────────────────────── */
-/* behind header: lets dropdown stay clickable */
-.bk-drop{position:fixed;inset:0;z-index:90;background:transparent;}
-/* above header: closes ctx menus */
-.bk-menu{position:fixed;inset:0;z-index:180;background:transparent;}
-/* below calendar popup */
-.bk-cal{position:fixed;inset:0;z-index:149;background:transparent;}
+/* ── Меню периода (лист) и аккаунта ─────── */
+.drop{position:fixed;z-index:401;left:max(8px,calc(50% - 252px));right:max(8px,calc(50% - 252px));bottom:max(8px,env(safe-area-inset-bottom,0px));
+  max-height:calc(100vh - env(safe-area-inset-top,0px) - 24px);overflow-y:auto;background:var(--s1);border-radius:var(--r5);padding:8px 12px 16px;
+  box-shadow:0 -10px 40px rgba(0,0,0,.35);animation:up .38s var(--ease);}
+.drop-h{display:flex;flex-direction:column;padding:12px 8px 12px;}
+.drop-t{font-size:1.25rem;font-weight:700;}
+.drop-s{font-size:0.875rem;color:var(--mt);}
+.drop-stats{background:var(--sunk);border-radius:var(--r2);padding:4px 14px;}
+.drop-r{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0;font-size:0.9375rem;}
+.drop-r+.drop-r{border-top:1px solid var(--s2);}
+.drop-r label{color:var(--mt);}
+.drop-r b{font-family:var(--num);font-variant-numeric:tabular-nums;white-space:nowrap;}
+.drop-r.tot{font-weight:600;}
+.drop-r.tot label{color:var(--t);}
+.drop-acts{display:flex;flex-direction:column;margin-top:8px;}
+.drop-act,.drop-item,.drop-arch{display:flex;align-items:center;gap:12px;width:100%;min-height:52px;padding:0 10px;border-radius:var(--r2);text-align:left;font-size:1rem;}
+.drop-act:active,.drop-item:active,.drop-arch:active{background:var(--s2);}
+.drop-act span:first-of-type,.drop-arch span:first-of-type,.drop-item span:first-of-type{flex:1;}
+.drop-item{padding-left:46px;font-size:0.9375rem;color:var(--mt);}
+.drop-act.acc{color:var(--ac-tx);font-weight:600;}
+.di{flex:none;width:22px;height:22px;color:var(--mt);}
+.drop-act.acc .di{color:var(--ac-tx);}
+.drop-now,.drop-soon,.drop-cnt{font-size:0.8125rem;color:var(--mt);}
+.drop-soon{color:var(--ac-tx);}
+.drop-chev{display:grid;place-items:center;transition:transform .2s;}
+.drop-chev.up{transform:rotate(180deg);}
+.usr-menu{position:absolute;z-index:401;top:52px;right:0;width:260px;background:var(--s1);border-radius:var(--r3);padding:8px;box-shadow:var(--sh);animation:pop .22s var(--ease);transform-origin:top right;}
+@keyframes pop{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+.usr-menu-email{padding:8px 10px 10px;font-size:0.8125rem;color:var(--mt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.usr-menu .lbl{padding:4px 10px 6px;}
+.usr-menu .seg{background:var(--sunk);}
+.usr-menu .seg button{font-size:0.8125rem;}
+.usr-menu-item{display:flex;align-items:center;width:100%;min-height:48px;padding:0 10px;border-radius:14px;color:var(--rd);margin-top:6px;}
+.usr-menu-item:active{background:var(--s2);}
 
-/* ── CTX WRAP ────────────────────────────── */
-/* wrapper provides position:relative so ctx doesn't clip inside table */
-.ctx-wrap{position:relative;display:inline-flex;align-items:center;justify-content:flex-end;}
+/* ── Тост ───────────────────────────────── */
+.toast{position:fixed;z-index:130;left:50%;transform:translateX(-50%);bottom:calc(max(12px,env(safe-area-inset-bottom,0px)) + 72px);
+  width:calc(100% - 32px);max-width:488px;display:flex;align-items:center;gap:12px;min-height:56px;padding:0 6px 0 18px;border-radius:var(--r3);
+  background:var(--toast);color:var(--toast-t);box-shadow:var(--sh);animation:tin .35s var(--ease);}
+@keyframes tin{from{opacity:0;transform:translate(-50%,16px)}to{opacity:1;transform:translate(-50%,0)}}
+.toast-t{flex:1;min-width:0;font-size:0.9375rem;}
+.toast-t b{font-family:var(--num);}
+.toast-u{height:44px;padding:0 14px;border-radius:99px;color:var(--toast-ac);font-weight:700;}
 
-/* ── WIZARD ──────────────────────────────── */
-.wz{max-width:520px;margin:0 auto;padding:20px 12px 48px;}
-.wzstar{font-size:2.125rem;text-align:center;color:var(--accent);margin-bottom:8px;}
-.wztt{font-size:1.75rem;font-weight:900;text-align:center;margin-bottom:8px;}
-.wzdc{list-style:none;margin-bottom:16px;}
-.wzdc li{display:flex;align-items:flex-start;gap:8px;font-size:0.9375rem;font-weight:700;padding:4px 0;color:var(--t2);}
-.wzdc span{flex-shrink:0;}
-.wzcard{background:var(--card);border-radius:20px;padding:16px;box-shadow:var(--sh);margin-bottom:12px;border:1px solid var(--br);}
-.wzper{font-size:0.8125rem;font-weight:700;padding:8px 0;border-bottom:1px solid var(--br2);margin-bottom:12px;color:var(--t2);}
-.wzpb{font-size:0.8125rem;font-weight:700;color:var(--accent);}
-.wzinfo{font-size:0.9375rem;font-weight:700;color:var(--t2);margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--br2);}
-.wznum{font-size:2.875rem;font-weight:900;color:var(--accent);margin-bottom:4px;}
-.wzlbl{font-size:0.9375rem;font-weight:700;color:var(--mt);margin-bottom:16px;}
-.wzadd{font-size:0.8125rem;font-weight:700;color:var(--accent);padding:8px 0;display:block;}
-.wztot{display:flex;justify-content:space-between;font-size:0.9375rem;font-weight:700;padding-top:8px;border-top:1px solid var(--br2);margin-top:8px;color:var(--t2);}
-.wztot .am{color:var(--accent);font-weight:900;}
-.wznav{display:flex;justify-content:space-between;align-items:center;}
-.wzbk{font-size:0.9375rem;font-weight:700;color:var(--mt);}
-.mb12{margin-bottom:12px;}
-.chips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;}
-.chip{font-size:0.8125rem;font-weight:700;padding:8px 12px;border-radius:var(--r1);background:var(--card2);border:1.5px solid var(--br2);color:var(--t2);}
-.chip.pkd{border-color:var(--accent);background:rgba(204,120,92,.1);color:var(--accent);}
-.cl{list-style:none;margin-top:12px;}
-.cl li{font-size:0.8125rem;font-weight:700;color:var(--mt);padding:4px 0 4px 12px;position:relative;}
-.cl li::before{content:'·';position:absolute;left:4px;}
-/* Wizard table */
-.wt{width:100%;border-collapse:collapse;}
-.wt th{font-size:0.6875rem;font-weight:700;text-transform:uppercase;color:var(--mt);padding:8px 4px;border-bottom:1px solid var(--br2);}
-.wt td{padding:8px 4px;border-bottom:1px solid var(--br);}
-.wt tr:last-child td{border-bottom:none;}
-.wri{display:flex;align-items:center;gap:4px;}
-.wem{width:38px;border:1.5px solid var(--br2);border-radius:var(--r1);padding:8px 4px;font-size:1.125rem;text-align:center;background:var(--bg);}
-.wnm{flex:1;border:1.5px solid var(--br2);border-radius:var(--r1);padding:8px 8px;font-size:0.9375rem;font-weight:700;background:var(--bg);outline:none;}
-.wam{width:90px;border:1.5px solid var(--br2);border-radius:var(--r1);padding:8px 8px;font-size:0.9375rem;font-weight:700;background:var(--bg);text-align:right;outline:none;}
-.wdl{color:var(--rd);font-size:1.375rem;font-weight:500;padding:4px 8px;}
+/* ── Сводка ─────────────────────────────── */
+.share{display:flex;gap:3px;height:10px;margin:14px 16px 4px;}
+.share>i{display:block;height:100%;border-radius:99px;min-width:6px;}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;padding:8px 16px;font-size:0.75rem;color:var(--mt);}
+.legend span{display:inline-flex;align-items:center;gap:6px;}
+.legend i{width:8px;height:8px;border-radius:50%;display:inline-block;}
+.st-ar{color:var(--mt);flex:none;display:grid;place-items:center;transition:transform .2s;}
+.st-ar.up{transform:rotate(180deg);}
+.sd{margin:0 12px 8px 64px;border-left:2px solid var(--s3);}
+.sd-row{display:flex;gap:10px;padding:6px 0 6px 12px;font-size:0.875rem;}
+.sd-dt{color:var(--mt);width:56px;flex:none;}
+.sd-nm{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sd-am{font-family:var(--num);font-weight:600;white-space:nowrap;}
 
-/* ── EMPTY ───────────────────────────────── */
-.empty{text-align:center;padding:72px 20px;}
+/* ── Мастер ─────────────────────────────── */
+.wz{padding:0 16px calc(120px + env(safe-area-inset-bottom,0px));}
+.wzsteps{display:flex;gap:6px;padding:4px 0 18px;}
+.wzsteps i{flex:1;height:4px;border-radius:99px;background:var(--s3);}
+.wzsteps i.on{background:var(--ac);}
+.wztt{font-size:1.75rem;font-weight:700;letter-spacing:-.02em;line-height:1.15;}
+.wzdc{list-style:none;margin:10px 0 16px;display:flex;flex-direction:column;gap:6px;font-size:0.9375rem;color:var(--mt);}
+.wzdc li{display:flex;gap:8px;align-items:baseline;}
+.wzcard{background:var(--s1);border-radius:var(--r4);padding:16px;}
+.wzper{display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-size:0.9375rem;color:var(--mt);margin-bottom:12px;}
+.wzper b{color:var(--t);}
+.wzpb{color:var(--ac-tx);font-weight:600;min-height:36px;}
+.wzinfo{font-size:0.9375rem;color:var(--mt);margin-bottom:12px;}
+.wzinfo b{color:var(--t);font-family:var(--num);}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+.chip{height:40px;padding:0 14px;border-radius:99px;background:var(--sunk);font-size:0.875rem;white-space:nowrap;transition:background .15s;}
+.chip.pkd{background:var(--ac-bg);box-shadow:inset 0 0 0 1.5px var(--ac);}
+.wrows{display:flex;flex-direction:column;gap:8px;}
+.wri{display:flex;gap:6px;align-items:center;}
+.wem{width:48px;height:48px;border-radius:14px;background:var(--sunk);text-align:center;font-size:1.25rem;flex:none;}
+.wnm{flex:1;min-width:0;height:48px;padding:0 12px;border-radius:14px;background:var(--sunk);font-size:0.9375rem;}
+.wam{width:104px;height:48px;padding:0 12px;border-radius:14px;background:var(--sunk);text-align:right;font-family:var(--num);font-size:1rem;flex:none;}
+.wem:focus,.wnm:focus,.wam:focus{box-shadow:inset 0 0 0 1.5px var(--ac);}
+.wdl{width:36px;height:48px;color:var(--mt);flex:none;display:grid;place-items:center;}
+.wzadd{color:var(--ac-tx);font-weight:600;min-height:44px;margin-top:4px;}
+.wztot{display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--s3);margin-top:8px;padding-top:12px;font-size:0.9375rem;color:var(--mt);}
+.wztot .am{color:var(--t);font-size:1.125rem;}
+.wznum{font-size:3.5rem;font-weight:600;letter-spacing:-.02em;line-height:1;color:var(--gd);text-align:center;margin-top:8px;}
+.wzlbl{text-align:center;color:var(--mt);margin-top:8px;}
+.cl{list-style:none;margin-top:16px;display:flex;flex-direction:column;gap:8px;font-size:0.9375rem;}
+.cl li{display:flex;gap:10px;padding:10px 12px;border-radius:14px;background:var(--sunk);}
+.wznav{position:fixed;z-index:120;left:50%;transform:translateX(-50%);bottom:max(12px,env(safe-area-inset-bottom,0px));width:calc(100% - 32px);max-width:488px;display:flex;gap:8px;}
+.wznav .btn{flex:1;}
+.wznav .wzbk{flex:0 0 auto;}
 
-/* ── ANIMATIONS ──────────────────────────── */
-@keyframes fi{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:scale(1)}}
-@keyframes su{from{transform:translateY(100%)}to{transform:translateY(0)}}
-
-/* ── AUTH SCREEN ─────────────────────────── */
-.auth-wrap{
-  min-height:100vh;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  padding:24px 20px;background:var(--bg);
-}
-.auth-logo{
-  font-size:1.75rem;font-weight:900;letter-spacing:-.5px;
-  color:var(--t);margin-bottom:4px;
-}
-.auth-logo span{color:var(--accent);}
-.auth-sub{font-size:0.9375rem;font-weight:700;color:var(--mt);margin-bottom:24px;}
-.auth-card{
-  background:var(--card);border:1px solid var(--br);
-  border-radius:22px;padding:24px 20px;
-  width:100%;max-width:380px;
-  box-shadow:var(--sh2);
-}
-
-.auth-err{
-  font-size:0.8125rem;font-weight:700;color:var(--rd);
-  min-height:18px;margin-bottom:8px;
-}
-.auth-link{
-  display:block;width:100%;text-align:center;
-  font-size:0.8125rem;font-weight:700;color:var(--mt);
-  padding:8px 0;margin-top:4px;
-  cursor:pointer;
-}
-.auth-link:hover{color:var(--accent);}
-/* Loading spinner */
-.auth-spin{
-  width:36px;height:36px;border-radius:50%;
-  border:3px solid var(--br2);
-  border-top-color:var(--accent);
-  animation:spin .7s linear infinite;
-  margin:20px auto;
-}
+/* ── Пустой экран, вход, загрузка ───────── */
+.empty{min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px;padding:0 24px;}
+.empty-mk{width:72px;height:72px;border-radius:24px;background:var(--s1);display:grid;place-items:center;color:var(--ac);font-size:2rem;margin-bottom:8px;}
+.empty-t{font-size:1.5rem;font-weight:700;}
+.empty-s{color:var(--mt);margin-bottom:12px;max-width:300px;}
+#auth-screen{min-height:100vh;align-items:center;justify-content:center;padding:24px 16px;}
+.auth-wrap{width:100%;max-width:400px;margin:0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80vh;}
+.auth-logo{width:72px;height:72px;border-radius:24px;background:var(--s1);display:grid;place-items:center;color:var(--ac);font-size:2rem;}
+.auth-name{font-size:1.75rem;font-weight:700;margin-top:16px;}
+.auth-sub{color:var(--mt);margin:4px 0 24px;}
+.auth-card{width:100%;background:var(--s1);border-radius:var(--r4);padding:8px 16px 16px;}
+.auth-card .btn{margin-top:20px;}
+.auth-link{width:100%;min-height:44px;margin-top:8px;color:var(--ac-tx);font-size:0.9375rem;font-weight:500;}
+.auth-spin{width:28px;height:28px;margin-top:24px;border-radius:50%;border:3px solid var(--s3);border-top-color:var(--ac);animation:spin .8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* ── USER BAR (in header) ────────────────── */
-.usr-bar{
-  display:flex;align-items:center;gap:8px;
-  padding:4px 8px 4px 4px;
-  border-radius:99px;
-  background:var(--card2);border:1px solid var(--br2);
-  font-size:0.8125rem;font-weight:700;color:var(--mt);
-  cursor:pointer;
+/* ── Узкие экраны (iPhone SE, 320) ──────── */
+@media (max-width:360px){
+  .big{font-size:2.5rem;}
+  .big.md{font-size:2.25rem;}
+  .hero{padding:16px 16px 14px;}
+  .hero-top{font-size:0.8125rem;}
+  .pills{gap:6px;}
+  .pill{padding:8px;}
+  .pill span{font-size:0.6875rem;}
+  .pill b{font-size:0.875rem;}
+  .acts2 .btn{font-size:0.875rem;}
+  .nb{font-size:0.8125rem;}
+  .ttl{font-size:1.5rem;}
+  .wam{width:88px;}
 }
-.usr-av{
-  width:44px;height:44px;border-radius:50%;   /* было 28px — нижний предел, не норма */
-  background:var(--accent);color:var(--on-accent);
-  display:flex;align-items:center;justify-content:center;
-  font-size:0.8125rem;font-weight:900;flex-shrink:0;
-  cursor:pointer;border:none;
-  transition:opacity .15s;
-}
-.usr-av:hover{opacity:.8;}
-.usr-menu{position:absolute;top:calc(100% + 6px);right:0;background:var(--card2);border-radius:var(--r2);box-shadow:var(--sh2);border:1px solid var(--br2);min-width:200px;overflow:hidden;z-index:200;animation:fi .12s ease;}
-.usr-menu-email{padding:12px 12px;font-size:0.8125rem;font-weight:700;color:var(--mt);border-bottom:1px solid var(--br);word-break:break-all;}
-.usr-menu-item{display:block;width:100%;padding:12px 12px;text-align:left;font-size:0.9375rem;font-weight:700;color:var(--rd);}
-.usr-menu-item:hover{background:rgba(255,79,71,.08);}
-.usr-bar:hover{border-color:var(--br);}
 
-/* ── SYNC INDICATOR ──────────────────────── */
-.sync-dot{
-  width:8px;height:8px;border-radius:50%;
-  flex-shrink:0;display:inline-block;
-  transition:background .25s;
+/* ══ v3: иконки категорий, выпадающие меню сверху вниз, чипы ввода ══ */
+:root{
+  --c-ac:#E08A6C;--c-clay:#E39A78;--c-amber:#E3B04B;--c-green:#6CC08C;--c-blue:#73A9E6;
+  --c-teal:#52BAB2;--c-rose:#EA7D93;--c-plum:#B590E2;--c-slate:#9DA9BA;--c-gray:#A6A39A;
+  --pop:#33322F;
 }
-.sync-dot.s-saved  {background:var(--gd);}
-.sync-dot.s-saving {background:var(--mt);animation:pulse 1s ease infinite;}
-.sync-dot.s-error  {background:var(--rd);}
-.sync-dot.s-offline{background:#F5C842;}
-@keyframes pulse{50%{opacity:.35}}
+:root[data-theme="light"]{
+  --c-ac:#B95A39;--c-clay:#B5603E;--c-amber:#9A6A0C;--c-green:#23784A;--c-blue:#2C68AE;
+  --c-teal:#16766F;--c-rose:#B63A57;--c-plum:#7450AE;--c-slate:#55627A;--c-gray:#68645C;
+  --pop:#FFFFFF;
+}
+.ic-ac{--ic:var(--c-ac)}.ic-clay{--ic:var(--c-clay)}.ic-amber{--ic:var(--c-amber)}.ic-green{--ic:var(--c-green)}
+.ic-blue{--ic:var(--c-blue)}.ic-teal{--ic:var(--c-teal)}.ic-rose{--ic:var(--c-rose)}.ic-plum{--ic:var(--c-plum)}
+.ic-slate{--ic:var(--c-slate)}.ic-gray{--ic:var(--c-gray)}
+.ico{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;flex:none;color:var(--ic,var(--mt));
+  background:var(--sunk);background:color-mix(in srgb,var(--ic,var(--mt)) 17%,transparent);}
+.ico.sm{width:24px;height:24px;background:none;}
+.ico-x{font-size:1.125rem;background:var(--sunk);}
+.ico-x.sm{font-size:0.9375rem;}
 
+/* Шапка: остаток на сегодня на всех вкладках */
+.ttlw{display:flex;align-items:center;gap:4px;min-width:0;}
+.back{width:40px;height:44px;margin-left:-10px;display:grid;place-items:center;color:var(--ac-tx);flex:none;}
+.balchip{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;min-height:44px;padding:4px 14px;border-radius:16px;background:var(--s1);line-height:1.15;}
+.balchip-k{font-size:0.6875rem;color:var(--mt);}
+.balchip-v{font-family:var(--num);font-variant-numeric:tabular-nums;font-size:1rem;font-weight:600;white-space:nowrap;}
 
-/* ── AUTH SCREEN (static DOM) ───────────── */
-#auth-screen{
-  display:none;
-  min-height:100vh;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  padding:24px 20px;
-  background:var(--bg);
+/* Нижнее меню — три вкладки */
+.dock{grid-template-columns:repeat(3,minmax(0,1fr));}
+
+/* Выпадающие меню: раскрываются от того, на что нажал, сверху вниз */
+.bk-drop,.bk-cal{background:rgba(0,0,0,.28);}
+:root[data-theme="light"] .bk-drop,:root[data-theme="light"] .bk-cal{background:rgba(20,18,16,.14);}
+.bk-drop.clear{background:transparent;}
+@keyframes drop{from{opacity:0;transform:translateY(-8px) scale(.97)}to{opacity:1;transform:none}}
+.drop{position:absolute;z-index:401;top:calc(100% + 2px);left:16px;right:16px;bottom:auto;
+  max-height:calc(100vh - 120px);overflow-y:auto;overscroll-behavior:contain;
+  background:var(--pop);border-radius:var(--r3);padding:6px 8px 8px;box-shadow:var(--sh);
+  animation:drop .22s var(--ease);transform-origin:top left;}
+.drop-cur{display:flex;align-items:center;gap:10px;width:100%;min-height:48px;padding:0 10px;border-radius:var(--r1);font-size:1rem;font-weight:600;text-align:left;}
+.drop-ck{color:var(--ac-tx);display:grid;place-items:center;width:22px;}
+.drop-stats{background:var(--sunk);margin:4px 2px 4px;}
+:root[data-theme="light"] .drop-stats{background:var(--bg);}
+.drop-act,.drop-item,.drop-arch{min-height:48px;border-radius:var(--r1);}
+.drop-acts{margin-top:4px;}
+.usr-menu{background:var(--pop);animation:drop .22s var(--ease);transform-origin:top right;}
+
+/* Строка ввода: поле + чипы «категория» и «день» — всегда видно, куда уйдёт трата */
+.qa{position:relative;}
+.ask{padding:0 8px 0 20px;}
+.ask-in{padding:0;}
+.qa-meta{position:relative;display:flex;gap:8px;margin-top:8px;}
+.qchip{display:flex;align-items:center;gap:6px;height:44px;padding:0 10px 0 8px;border-radius:99px;background:var(--s1);font-size:0.875rem;min-width:0;color:var(--t);transition:background .15s,box-shadow .15s;}
+.qchip svg{flex:none;color:var(--mt);}
+.qc-cat{flex:1 1 auto;}
+.qc-day{flex:0 0 auto;padding-left:12px;}
+.qc-t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}
+.qc-a{font-family:var(--num);font-variant-numeric:tabular-nums;font-weight:600;color:var(--gd);white-space:nowrap;margin-left:auto;}
+.qc-a.rd{color:var(--rd);}
+.qchip.open{box-shadow:inset 0 0 0 1.5px var(--ac);}
+.qchip.hot{background:var(--ac-bg);box-shadow:inset 0 0 0 1.5px var(--ac);color:var(--t);font-weight:600;}
+.qchip.hot svg{color:var(--ac-tx);}
+.pop{position:absolute;z-index:401;top:calc(100% + 6px);left:0;right:0;max-height:min(62vh,520px);overflow-y:auto;overscroll-behavior:contain;
+  background:var(--pop);border-radius:var(--r3);padding:6px;box-shadow:var(--sh);animation:drop .22s var(--ease);transform-origin:top center;}
+.pop .opt{min-height:52px;padding:0 10px 0 6px;}
+.pop .opt:active,.pop .opt.sel{background:var(--s3);}
+:root[data-theme="light"] .pop .opt.sel{background:var(--s2);}
+.cq{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding:2px;}
+.cq-b{display:flex;align-items:center;gap:10px;min-height:52px;padding:0 12px 0 8px;border-radius:var(--r2);background:var(--sunk);font-size:0.9375rem;font-weight:500;text-align:left;}
+:root[data-theme="light"] .cq-b{background:var(--bg);}
+.cq-b svg{margin-left:auto;color:var(--ac-tx);}
+.cq-b.on{box-shadow:inset 0 0 0 1.5px var(--ac);}
+.cq-n{width:32px;height:32px;border-radius:10px;background:var(--s3);display:grid;place-items:center;font-family:var(--num);font-weight:600;}
+:root[data-theme="light"] .cq-n{background:var(--s2);}
+.pop .cmonth{padding:12px 8px 4px;}
+.ask-hint{padding:8px 16px 0;}
+
+/* Строки */
+.tx.wait .nm,.tx.wait .am{opacity:.7;}
+.mini.ac>i{background:var(--ac);}
+.tx-t .mini{margin-top:6px;margin-bottom:3px;}
+.kvs{margin-top:12px;border-top:1px solid var(--s3);}
+:root[data-theme="light"] .kvs{border-top-color:var(--s2);}
+.kv{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:9px 0 0;font-size:0.9375rem;}
+.kv span{color:var(--mt);}
+.kv b{font-family:var(--num);font-variant-numeric:tabular-nums;white-space:nowrap;}
+.kv.pend{padding-top:2px;font-size:0.8125rem;}
+.kv.pend b{font-weight:500;color:var(--mt);}
+
+/* Окна: иконка категории выбирается из набора */
+.icob{display:grid;place-items:center;padding:0;}
+.icg{display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:4px;margin-top:8px;padding:8px;border-radius:var(--r2);background:var(--sunk);}
+.icg[hidden]{display:none;}
+:root[data-theme="light"] .icg{background:var(--bg);}
+.icg-b{height:52px;border-radius:14px;display:grid;place-items:center;}
+.icg-b.on{box-shadow:inset 0 0 0 1.5px var(--ac);background:var(--s1);}
+.sg{display:inline-flex;align-items:center;gap:4px;padding:0 14px 0 8px;}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:0 14px 0 8px;}
+.acts2 .btn svg{display:none;}
+
+/* Мастер: строка в две линии — на 320 px всё помещается */
+.wrows{gap:8px;}
+.wrow{background:var(--sunk);border-radius:var(--r2);padding:6px;}
+:root[data-theme="light"] .wrow{background:var(--bg);}
+.wrow-t,.wrow-b{display:flex;align-items:center;gap:6px;}
+.wrow-b{margin-top:6px;}
+.wico{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;flex:none;}
+.wico.open{box-shadow:inset 0 0 0 1.5px var(--ac);}
+.wrow .wnm,.wrow .wam{background:var(--s1);}
+.wrow .wnm{flex:1;min-width:0;}
+.wrow .wam{flex:1;min-width:0;width:auto;text-align:left;}
+.wrow .icg{background:var(--s1);margin:6px 0 0;}
+.wrc{display:flex;align-items:center;gap:6px;height:48px;padding:0 12px;border-radius:14px;background:var(--s1);color:var(--mt);font-size:0.8125rem;font-weight:500;white-space:nowrap;flex:none;}
+.wrc.on{background:var(--ac-bg);color:var(--t);box-shadow:inset 0 0 0 1.5px var(--ac);}
+.wrc.on svg{color:var(--ac-tx);}
+@media (max-width:360px){
+  .qchip{font-size:0.8125rem;}
+  .qc-a{display:none;}
+  .balchip{padding:4px 10px;}
+  .wrc{padding:0 10px;}
 }
-/* ── iOS PWA FIXES ───────────────────────── */
-/* Запрет зума при фокусе на input (iOS) */
-input, select, textarea {
-  font-size:0.9375rem !important;
-  -webkit-text-size-adjust:100%;
-}
-/* Запрет выделения текста при долгом тапе */
-.auth-card, .qa, .hdr {
-  -webkit-touch-callout:none;
-  -webkit-user-select:none;
-}
-/* Разрешить выделение в полях ввода */
-input, textarea {
-  -webkit-user-select:text;
-  user-select:text;
-}
+
 </style>
 </head>
 <body>
 <!-- iOS PWA fix: форма всегда в DOM, не создаётся через innerHTML -->
 <div id="auth-screen" style="display:none">
   <div class="auth-wrap">
-    <div class="auth-logo">✦ <span>Б</span>юджет</div>
+    <div class="auth-logo" aria-hidden="true">✦</div>
+    <div class="auth-name">Бюджет</div>
     <div class="auth-sub" id="auth-title">Личный финансовый трекер</div>
     <div class="auth-card">
       <div class="f"><label>Email</label>
@@ -956,7 +553,7 @@ input, textarea {
           onkeydown="if(event.key==='Enter')authSubmit()">
       </div>
       <div id="au-err" class="auth-err"></div>
-      <button type="button" class="btn bp" style="width:100%" onclick="authSubmit()" id="au-btn">Войти</button>
+      <button type="button" class="btn bp wide" onclick="authSubmit()" id="au-btn">Войти</button>
       <button type="button" class="auth-link" id="au-toggle" onclick="toggleAuthMode()"></button>
     </div>
   </div>
@@ -2273,30 +1870,27 @@ function render(){
      не даём тихо "жить в прошлом месяце", предлагаем создать новый */
   var td=today();
   if(b.dateTo<td && !S.budgets.some(function(x){return x.dateFrom<=td&&x.dateTo>=td;})){
-    pg='<div class="newmo-banner">'+
-      '<div class="newmo-txt">Период «'+fmtSh(b.dateFrom)+' — '+fmtSh(b.dateTo)+'» закончился</div>'+
-      '<button type="button" class="btn bp" onclick="newBdg()">+ Создать бюджет на '+monthNameNext(b.dateTo)+'</button>'+
-    '</div>'+pg;
+    pg='<section class="newmo">'+
+      '<div class="newmo-t">Период «'+fmtSh(b.dateFrom)+' — '+fmtSh(b.dateTo)+'» закончился</div>'+
+      '<div class="newmo-s">Повторяющиеся доходы и категории перенесутся в новый бюджет сами.</div>'+
+      '<button type="button" class="btn bp wide" onclick="newBdg()">+ Создать бюджет на '+monthNameNext(b.dateTo)+'</button>'+
+    '</section>'+pg;
   }
-  /* Z-INDEX LAYERS:
-     bk-drop  z:90  = behind header(z:100), dropdown stays clickable
-     bk-menu  z:180 = above header, covers page for ctx menus
-     bk-cal   z:149 = below cpop(z:300)
-     modal    z:500 */
+  /* Слои: страница — обычный поток; нижнее меню 120; тост 130;
+     затемнение 400; выпадающие меню и окна 401. */
   var showMenuBk = (txMenu||incMenu||plnMenu)&&!qaDrop&&!catPick;
   app.innerHTML=
     ((drop||usrMenu)?'<div class="bk-drop" onclick="closeBk()" aria-hidden="true"></div>':'')+
     rHeader(b)+
     '<main class="pg" role="main">'+pg+'</main>'+
+    rDock(b)+
     (modal?rModal(b):'')+
     (showMenuBk?'<div class="bk-menu" onclick="closeBk()"></div>':'')+
     ((qaDrop||catPick)?'<div class="bk-cal" onclick="closeQaCal()"></div>':'');
   bindMain(b);
   fixMenus();
-  /* Модалка перевода открывается с уже подставленной суммой (кнопка «Покрыть»),
-     а updTrPrev висит только на onchange/oninput — без этого вызова расклад
-     «откуда → куда» появлялся лишь после того, как поле кто-то тронет. */
   if(modal&&modal.type==='transfer')updTrPrev();
+  updQAHint();
 }
 
 /* Разворачиваем открытое меню вверх, если снизу не помещается.
@@ -2314,51 +1908,153 @@ function fixMenus(){
 }
 
 /* ── HEADER ──────────────────────────────────── */
+/* ── Иконки интерфейса: тонкая линия, цвет от текста ── */
+function SV(p,s,w){return '<svg width="'+(s||20)+'" height="'+(s||20)+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="'+(w||2.4)+'" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+p+'</svg>';}
+var IP={
+  chev:'<path d="M6 9l6 6 6-6"/>',
+  left:'<path d="M15 5l-7 7 7 7"/>',
+  up:'<path d="M12 19V5"/><path d="M5 12l7-7 7 7"/>',
+  check:'<path d="M5 12.5l4.5 4.5L19 7"/>',
+  x:'<path d="M6 6l12 12M18 6L6 18"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  swap:'<path d="M7 4L3 8l4 4"/><path d="M3 8h14"/><path d="M17 12l4 4-4 4"/><path d="M21 16H7"/>',
+  rep:'<path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  alert:'<path d="M12 8v5"/><path d="M12 16.5h.01"/><circle cx="12" cy="12" r="9"/>',
+  cal:'<rect x="3" y="4.5" width="18" height="16.5" rx="2.5"/><path d="M16 2.5v4M8 2.5v4M3 10h18"/>'
+};
+function REP(){return '<svg class="rep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Каждый месяц">'+IP.rep+'</svg>';}
+
+/* ── Иконки категорий: один набор, один стиль, свой цвет у каждой группы.
+   В данных по-прежнему лежит эмодзи — меняется только показ. Старые записи,
+   второе устройство и выгрузка в CSV ничего не замечают. Эмодзи без пары
+   в наборе показывается как есть. */
+var ICONS=[
+  {e:'🗓',c:'ac',n:'Дневные',x:1,p:'<path d="M20 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h13a2 2 0 0 0 2-2v-1.5"/><path d="M21 10h-4.5a2 2 0 0 0 0 4H21z"/>'},
+  {e:'✨',c:'amber',n:'Непредвиденные',p:'<path d="M11 3.5l1.7 4.8 4.8 1.7-4.8 1.7L11 16.5l-1.7-4.8L4.5 10l4.8-1.7z"/><path d="M18.5 14.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z"/>'},
+  {e:'🏠',c:'clay',n:'Жильё',p:'<path d="M3 10.5L12 3l9 7.5"/><path d="M5 9v11.5h14V9"/><path d="M10 20.5v-6h4v6"/>'},
+  {e:'🔥',c:'clay',n:'Коммуналка',p:'<path d="M12 3c.8 3.2 5.5 5.6 5.5 10.5a5.5 5.5 0 0 1-11 0c0-2.6 1.4-4.3 2.6-5.3.3 1.6 1 2.6 2.1 3.1.6-3.1-.3-5.6.8-8.3z"/>'},
+  {e:'🔧',c:'clay',n:'Ремонт',p:'<path d="M14.5 3.5a5 5 0 0 0-4.3 7.1L3.7 17.1a1.9 1.9 0 0 0 2.7 2.7l6.5-6.5a5 5 0 0 0 7.1-4.3l-3.1 3.1-2.9-.6-.6-2.9z"/>'},
+  {e:'🚿',c:'teal',n:'Вода',p:'<path d="M12 3s6 6.4 6 11a6 6 0 0 1-12 0c0-4.6 6-11 6-11z"/><path d="M9.5 15a2.5 2.5 0 0 0 2.5 2.5"/>'},
+  {e:'🌐',c:'teal',n:'Интернет',p:'<path d="M2.5 9a14 14 0 0 1 19 0"/><path d="M5.8 12.5a9.3 9.3 0 0 1 12.4 0"/><path d="M9.1 16a4.6 4.6 0 0 1 5.8 0"/><path d="M12 19.5h.01"/>'},
+  {e:'📱',c:'teal',n:'Телефон',p:'<rect x="6" y="2.5" width="12" height="19" rx="2.8"/><path d="M10.5 18.2h3"/>'},
+  {e:'📺',c:'teal',n:'Подписки',p:'<rect x="3" y="4.5" width="18" height="12.5" rx="2.5"/><path d="M8.5 21h7M12 17v4"/>'},
+  {e:'📋',c:'teal',n:'Налоги',p:'<path d="M5.5 3h13v18l-2.2-1.4L14 21l-2-1.4-2 1.4-2.3-1.4L5.5 21z"/><path d="M9 8h6M9 12h6M9 16h3"/>'},
+  {e:'🛡',c:'teal',n:'Страховка',p:'<path d="M12 3l8 3v5.8c0 4.6-3.4 8.2-8 9.2-4.6-1-8-4.6-8-9.2V6z"/><path d="M8.8 12l2.2 2.2 4.2-4.4"/>'},
+  {e:'🛒',c:'amber',n:'Продукты',p:'<path d="M3 4h2.2l2.2 11h11l2.1-8H6.3"/><circle cx="9" cy="19.5" r="1.4"/><circle cx="17" cy="19.5" r="1.4"/>'},
+  {e:'🍔',c:'amber',n:'Еда вне дома',p:'<path d="M5 3v5a2.5 2.5 0 0 0 5 0V3"/><path d="M7.5 10.5V21"/><path d="M17 21V3c2 .8 3 3.6 3 7.2 0 2.7-1.2 4.3-3 4.3"/>'},
+  {e:'☕',c:'amber',n:'Кофе',p:'<path d="M4 9h13v4.5a6.5 6.5 0 0 1-6.5 6.5A6.5 6.5 0 0 1 4 13.5z"/><path d="M17 10.5h1.2a2.6 2.6 0 0 1 0 5.2H17"/><path d="M8 3v2.5M12 3v2.5"/>'},
+  {e:'🚕',c:'blue',n:'Транспорт',p:'<rect x="4.5" y="3" width="15" height="15" rx="3"/><path d="M4.5 11h15"/><path d="M8 14.5h.01M16 14.5h.01"/><path d="M7.5 18v2.5M16.5 18v2.5"/>'},
+  {e:'🚗',c:'blue',n:'Машина',p:'<path d="M4.5 12l2-5.5h11l2 5.5"/><rect x="3" y="12" width="18" height="5.5" rx="2"/><path d="M7.5 14.8h.01M16.5 14.8h.01"/><path d="M6 17.5V20M18 17.5V20"/>'},
+  {e:'✈',c:'blue',n:'Путешествия',p:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.4 2.5 3.7 5.5 3.7 9s-1.3 6.5-3.7 9c-2.4-2.5-3.7-5.5-3.7-9S9.6 5.5 12 3z"/>'},
+  {e:'💊',c:'rose',n:'Здоровье',p:'<path d="M20.5 9c0 5.4-8.5 11-8.5 11S3.5 14.4 3.5 9A4.6 4.6 0 0 1 12 6.4 4.6 4.6 0 0 1 20.5 9z"/><path d="M7 11.5h3l1.2-2.2 1.8 4.4 1.2-2.2H17"/>'},
+  {e:'💪',c:'rose',n:'Спорт',p:'<path d="M6.5 6.5v11M17.5 6.5v11M3.5 9.5v5M20.5 9.5v5M6.5 12h11"/>'},
+  {e:'✂',c:'rose',n:'Красота',p:'<circle cx="6" cy="6.5" r="2.6"/><circle cx="6" cy="17.5" r="2.6"/><path d="M8.2 8l11.3 9.5M8.2 16L19.5 6.5"/>'},
+  {e:'👔',c:'rose',n:'Одежда',p:'<path d="M8.5 3.5L3.5 6.5l2 4 2-1v11h9v-11l2 1 2-4-5-3a3.5 3.5 0 0 1-7 0z"/>'},
+  {e:'🎬',c:'plum',n:'Развлечения',p:'<rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M7.5 4v16M16.5 4v16M3 9h4.5M3 15h4.5M16.5 9H21M16.5 15H21"/>'},
+  {e:'🎁',c:'plum',n:'Подарки',p:'<rect x="3.5" y="8" width="17" height="4" rx="1"/><path d="M5 12v8.5h14V12M12 8v12.5"/><path d="M12 8C10.5 4.5 6.5 4.5 6.5 6.6 6.5 8 8.5 8 12 8zM12 8c1.5-3.5 5.5-3.5 5.5-1.4C17.5 8 15.5 8 12 8z"/>'},
+  {e:'🎮',c:'plum',n:'Игры',p:'<rect x="2.5" y="7" width="19" height="11" rx="5.5"/><path d="M7.5 10.5v4M5.5 12.5h4"/><path d="M15.5 11.5h.01M18 13.5h.01"/>'},
+  {e:'👶',c:'plum',n:'Дети',p:'<circle cx="12" cy="12" r="9"/><path d="M8.5 14a4 4 0 0 0 7 0"/><path d="M9.2 9.8h.01M14.8 9.8h.01"/>'},
+  {e:'🐾',c:'plum',n:'Питомцы',p:'<circle cx="5.5" cy="11" r="1.8"/><circle cx="9.2" cy="6.5" r="1.8"/><circle cx="14.8" cy="6.5" r="1.8"/><circle cx="18.5" cy="11" r="1.8"/><path d="M12 12.5c-3 0-5.2 3.6-5.2 5.6 0 1.6 1.6 2.4 3.2 1.9 1.4-.4 2.6-.4 4 0 1.6.5 3.2-.3 3.2-1.9 0-2-2.2-5.6-5.2-5.6z"/>'},
+  {e:'📚',c:'plum',n:'Учёба',p:'<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/>'},
+  {e:'💳',c:'slate',n:'Кредитка',p:'<rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 10h19"/><path d="M6.5 15h4"/>'},
+  {e:'💸',c:'slate',n:'Долг',p:'<circle cx="12" cy="12" r="9"/><path d="M8 12h8M13 8.8l3.2 3.2-3.2 3.2"/>'},
+  {e:'📦',c:'slate',n:'Покупки',p:'<path d="M3 7.5L12 3l9 4.5v9L12 21l-9-4.5z"/><path d="M3 7.5l9 4.5 9-4.5M12 12v9"/>'},
+  {e:'💻',c:'slate',n:'Техника',p:'<rect x="4" y="5" width="16" height="11" rx="2"/><path d="M2 19.5h20"/>'},
+  {e:'💰',c:'green',n:'Зарплата',p:'<rect x="2.5" y="6" width="19" height="12" rx="2.5"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/>'},
+  {e:'💵',c:'green',n:'Наличные',p:'<ellipse cx="10" cy="7" rx="6" ry="2.5"/><path d="M4 7v4c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5V7"/><path d="M8 13.4v3.1c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5v-4c0-1.2-1.8-2.1-4.2-2.4"/>'},
+  {e:'💼',c:'green',n:'Подработка',p:'<rect x="3" y="7" width="18" height="13" rx="2.5"/><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7"/><path d="M3 13h18"/>'},
+  {e:'🏦',c:'green',n:'Банк, накопления',p:'<path d="M3 9.5L12 4l9 5.5"/><path d="M5.5 10v8M9.8 10v8M14.2 10v8M18.5 10v8"/><path d="M3 20.5h18"/>'},
+  {e:'📈',c:'green',n:'Инвестиции',p:'<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>'},
+  {e:'📌',c:'gray',n:'Другое',p:'<path d="M3 12V4.5A1.5 1.5 0 0 1 4.5 3H12l9 9-9 9z"/><circle cx="7.6" cy="7.6" r="1.4"/>'}
+];
+var ICO_MAP={};
+(function(){
+  for(var i=0;i<ICONS.length;i++)ICO_MAP[ICONS[i].e]=ICONS[i];
+  /* похожие эмодзи — к той же иконке */
+  var al={'📅':'🗓','🚌':'🚕','🚇':'🚕','🚆':'🚕','🚖':'🚕','🍕':'🍔','🍽':'🍔','🥗':'🍔','🏡':'🏠','💡':'🔥','⚡':'🔥','☎':'📱','📞':'📱',
+    '❤':'💊','🏥':'💊','🩺':'💊','🏋':'💪','💄':'✂','👗':'👔','👕':'👔','🎉':'🎬','🎵':'🎬','🎟':'🎬','🍿':'🎬','🛍':'📦','🪙':'💵',
+    '💶':'💵','💷':'💵','💴':'💵','🤑':'💰','🧾':'📋','🛫':'✈','🌍':'✈','🌎':'✈','🗺':'✈','🐶':'🐾','🐱':'🐾','📖':'📚','🎓':'📚','🔁':'📺'};
+  for(var k in al)ICO_MAP[k]=ICO_MAP[al[k]];
+})();
+function icoOf(e){return ICO_MAP[String(e||'').replace(/️/g,'')];}
+/* Кружок с иконкой. cls: '' — 40px в строке, 'sm' — 22px в чипе */
+function ICO(e,cls){
+  var it=icoOf(e);
+  if(!it)return '<span class="ico ico-x'+(cls?' '+cls:'')+'" aria-hidden="true">'+esc(e||'•')+'</span>';
+  return '<span class="ico ic-'+it.c+(cls?' '+cls:'')+'" aria-hidden="true">'+SV(it.p,cls==='sm'?16:21,1.9)+'</span>';
+}
+function ICO_DAY(cls){return ICO('🗓',cls);}
+/* Сетка выбора иконки. Без перерисовки окна: набранное в полях не теряется */
+function rIcoGrid(cur,act){
+  var c=String(cur||'').replace(/️/g,''),h='';
+  for(var i=0;i<ICONS.length;i++){
+    var it=ICONS[i];if(it.x)continue;
+    h+='<button type="button" class="icg-b'+(icoOf(c)===it?' on':'')+'" onclick="'+act.replace('%E',it.e)+'" aria-label="'+it.n+'">'+ICO(it.e)+'</button>';
+  }
+  return h;
+}
+function icoTog(){var g=document.getElementById('ico-grid');if(g)g.hidden=!g.hidden;}
+function icoSet(e){var i=document.getElementById('me');if(i)i.value=e;icoSync();var g=document.getElementById('ico-grid');if(g)g.hidden=true;}
+function icoSync(){
+  var i=document.getElementById('me'),b=document.getElementById('me-btn');if(!i||!b)return;
+  b.innerHTML=ICO(i.value);
+  var g=document.getElementById('ico-grid');
+  if(g)g.innerHTML=rIcoGrid(i.value,'icoSet(\'%E\')');
+}
+var MN_NOM=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+var WD_NOM=['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
+/* Период целиком в календарном месяце — называем месяцем, иначе датами */
+function perTitle(b){
+  var f=new Date(b.dateFrom+'T00:00:00'),y=f.getFullYear(),m=f.getMonth();
+  if(b.dateFrom===firstDOM(y,m)&&b.dateTo===lastDOM(y,m))
+    return MN_NOM[m]+(y!==new Date().getFullYear()?' '+y:'');
+  return fmtSh(b.dateFrom)+' — '+fmtSh(b.dateTo);
+}
 function rHeader(b){
-  var bal=calcDayBal(b),pos=bal>=0,ov=hasOv(b);
+  var bal=calcDayBal(b),pos=bal>=0;
   var td=today(),notYet=b.dateFrom>td;
   var initials=currentUser&&currentUser.email?currentUser.email[0].toUpperCase():'?';
-  return '<div class="hdr" role="banner">'+
-    '<div class="hdr-r1">'+
-      '<div class="hdr-left">'+
-        '<h1 class="logo">✦ <span>Б</span>юджет</h1>'+
-      '</div>'+
-      '<div class="hdr-right">'+
-        '<span id="sync-dot" class="sync-dot s-'+syncState+'" title="Синхронизация"></span>'+
-        '<div style="position:relative">'+
-          /* На «Выписке» остаток уже крупно в карточке дня — дублировать его
-             в шапке незачем, там полезнее видеть период бюджета */
-          /* Период ещё не начался — дневного остатка нет, и «0 ₽ / день»
-             читается как поломка. Показываем период, как на «Выписке». */
-          '<button class="balbtn '+((tab==='history'||notYet)?'nt':(pos?'gd':'rd'))+'" onclick="togDrop()">'+
-            ((tab==='history'||notYet)?fmtSh(b.dateFrom)+' — '+fmtSh(b.dateTo):fmt(bal)+' / день')+
-            '<span class="cv"> ▾</span>'+
-          '</button>'+
-          (drop?rDrop(b,bal):'')+
-        '</div>'+
-        '<div style="position:relative">'+
-          '<button type="button" class="usr-av" title="Аккаунт" onclick="togUsr()">'+initials+'</button>'+
-          (usrMenu?rUsrMenu():'')+
-        '</div>'+
-      '</div>'+
+  var isH=tab==='history';
+  var names={incomes:'Доходы',planned:'Расходы',stats:'Сводка'};
+  var pt=esc(perTitle(b));
+  /* На «Выписке» остаток на сегодня крупно в карточке, в шапке — период.
+     На остальных вкладках в шапке остаток на сегодня: его надо видеть всегда. */
+  var left;
+  if(isH){
+    left='<button type="button" class="ttl" onclick="togDrop()" aria-haspopup="menu" aria-expanded="'+(drop?'true':'false')+'" aria-label="Период: '+pt+'. Меню периода"><span>'+pt+'</span>'+SV(IP.chev,18,2.6)+'</button>';
+  }else{
+    left='<div class="ttlw">'+
+      (tab==='stats'?'<button type="button" class="back" onclick="setTab(\'history\')" aria-label="Назад к выписке">'+SV(IP.left,22,2.4)+'</button>':'')+
+      '<h1 class="ttl"><span>'+names[tab]+'</span></h1></div>';
+  }
+  return '<header class="hdr" role="banner">'+left+
+    '<div class="hdr-r">'+
+      (isH?'':(notYet
+        ? '<button type="button" class="balchip" onclick="togDrop()" aria-haspopup="menu" aria-label="Период: '+pt+'. Меню периода"><span class="balchip-k">период</span><span class="balchip-v">'+pt+'</span></button>'
+        : '<button type="button" class="balchip" onclick="togDrop()" aria-haspopup="menu" aria-label="Осталось на сегодня '+fmt(bal)+'. Меню периода"><span class="balchip-k">на сегодня</span><span class="balchip-v '+(pos?'gd':'rd')+'">'+(pos?'':'−')+fmt(Math.abs(bal))+'</span></button>'))+
+      '<button type="button" class="av" onclick="togUsr()" aria-haspopup="menu" aria-label="Аккаунт и оформление">'+initials+
+        '<span id="sync-dot" class="sync-dot s-'+syncState+'" title="Синхронизация"></span></button>'+
+      (usrMenu?rUsrMenu():'')+
     '</div>'+
-    '<div class="hdr-r2">'+
-      '<button class="nb '+(tab==='incomes'?'on':'')+'" onclick="setTab(\'incomes\')">Доходы</button>'+
-      '<button class="nb '+(tab==='history'?'on':'')+'" onclick="setTab(\'history\')">Выписка</button>'+
-      '<button class="nb '+(tab==='planned'?'on':'')+'" onclick="setTab(\'planned\')">Расходы'+(ov?'<span class="tbadge"></span>':'')+
-      '</button>'+
-    '</div>'+
-    /* Отдельной строкой, а не рядом с логотипом: в первом ряду кнопка налезала
-       на точку синхронизации и сталкивала «Бюджет» на вторую строку */
-    (!isViewingCurrent(b)&&getCurrentBudget()
-      ? '<button type="button" class="cur-bar" onclick="goCurrent()">'+
-          /* Заранее созданный бюджет — не «прошлый». Полоса врала на нём
-             ровно наоборот, а именно она и объясняет, почему цифры чужие. */
-          '<span>'+(notYet?'Смотришь будущий период':'Смотришь прошлый период')+'</span>'+
-          '<span class="cur-go">К текущему →</span>'+
-        '</button>'
-      : '')+
-  '</div>';
+    (drop?rDrop(b,bal):'')+
+  '</header>'+
+  (!isViewingCurrent(b)&&getCurrentBudget()
+    ? '<button type="button" class="cur-bar" onclick="goCurrent()">'+
+        '<span>'+(notYet?'Смотришь будущий период':'Смотришь прошлый период')+'</span>'+
+        '<span class="cur-go">К текущему →</span>'+
+      '</button>'
+    : '');
+}
+/* Нижнее меню — три вкладки, как было. Сводка — в меню периода. */
+function rDock(b){
+  var ov=hasOv(b);
+  function it(t,l){
+    var on=tab===t;
+    return '<button type="button" class="nb'+(on?' on':'')+'" onclick="setTab(\''+t+'\')"'+(on?' aria-current="page"':'')+'>'+l+
+      (t==='planned'&&ov?'<span class="tbadge" role="img" aria-label="есть перерасход"></span>':'')+'</button>';
+  }
+  return '<nav class="dock" aria-label="Разделы">'+it('incomes','Доходы')+it('history','Выписка')+it('planned','Расходы')+'</nav>';
 }
 /* Меню периода. Раньше сюда вываливался весь список бюджетов и панель
    вытягивалась на пол-экрана. Теперь как в Sintra: текущий период с галочкой,
@@ -2373,148 +2069,139 @@ var ICO_CAL='<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="
 var ICO_DL='<path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 19h14"/>';
 var ICO_CHEV='<path d="M6 9l6 6 6-6"/>';
 
+/* Меню периода — выпадает сверху вниз от заголовка, как раньше */
 function rDrop(b,bal){
   var total=calcTotalBal(b),aid=b.id,td=today(),ovT=ovTotal(b);
-  /* Сумма будущих начислений нигде не показывалась — а именно она разъехалась
-     с котлом. На экране «осталось сегодня» + «ещё начислят» должно давать
-     общий остаток, и теперь это видно глазами, без консоли. */
+  /* «Осталось сегодня» + «ещё начислят» должно давать общий остаток —
+     видно глазами, без консоли */
   var futAcc=accrued(b,nextDay(td),b.dateTo);
   var sorted=S.budgets.slice().sort(function(a,c){return a.dateFrom.localeCompare(c.dateFrom);});
   var others=sorted.filter(function(x){return x.id!==aid;});
-
-  /* Архив — это прошедшее. Бюджет, который ещё не кончился (текущий, пока
-     смотрим другой период, и заранее созданный будущий), туда прятать нельзя:
-     созданный в августе октябрь лежал за свёрнутым «Архивом», и о нём просто
-     не знали. Такие периоды идут отдельными строками сразу под «Сводкой» —
-     по практике Антона их один, меню не разрастается. */
-  var ahead=others.filter(function(x){return x.dateTo>=td;});   /* по возрастанию: сначала текущий */
+  /* Незакончившиеся периоды — отдельными строками, прошедшие — в архиве */
+  var ahead=others.filter(function(x){return x.dateTo>=td;});
   var past =others.filter(function(x){return x.dateTo< td;});
   var lead='';
   for(var ai=0;ai<ahead.length;ai++){
     var a=ahead[ai];
-    lead+='<button class="drop-act drop-per" onclick="swBdg(\''+a.id+'\')">'+
+    lead+='<button type="button" class="drop-act drop-per" onclick="swBdg(\''+a.id+'\')">'+
       DI(ICO_CAL)+
       '<span>'+fmtSh(a.dateFrom)+' — '+fmtSh(a.dateTo)+'</span>'+
       (a.dateFrom<=td?'<span class="drop-now">сейчас</span>'
                      :'<span class="drop-soon">будущий</span>')+
     '</button>';
   }
-
   var arch='';
   if(past.length){
-    arch+='<button class="drop-arch" onclick="togArch()">'+
+    arch+='<button type="button" class="drop-arch" onclick="togArch()" aria-expanded="'+(archOpen?'true':'false')+'">'+
       DI(ICO_ARCH)+
       '<span>Архив бюджетов</span>'+
       '<span class="drop-cnt">'+past.length+'</span>'+
       '<span class="drop-chev'+(archOpen?' up':'')+'">'+DI(ICO_CHEV)+'</span>'+
     '</button>';
     if(archOpen){
-      /* Выгрузка — редкая операция, поэтому не отдельным пунктом наверху,
-         а внутри развёрнутого архива, куда заглядывают уже целенаправленно */
-      arch+='<button class="drop-item drop-csv" onclick="exportCSV()">'+DI(ICO_DL)+'<span>Экспортировать в CSV</span></button>';
-      for(var j=past.length-1;j>=0;j--){   /* новые сверху */
+      /* Выгрузка — редкая операция, поэтому внутри развёрнутого архива */
+      arch+='<button type="button" class="drop-item drop-csv" onclick="exportCSV()">'+DI(ICO_DL)+'<span>Экспортировать в CSV</span></button>';
+      for(var j=past.length-1;j>=0;j--){
         var y=past[j];
-        arch+='<button class="drop-item" onclick="swBdg(\''+y.id+'\')">'+
+        arch+='<button type="button" class="drop-item" onclick="swBdg(\''+y.id+'\')">'+
           '<span>'+fmtSh(y.dateFrom)+' — '+fmtSh(y.dateTo)+'</span>'+
         '</button>';
       }
     }
   } else {
-    /* Прошедших периодов нет — архива тоже. Выгрузка живёт внутри него,
-       поэтому в первый месяц она была недоступна вообще; выносим строкой. */
-    arch+='<button class="drop-act" onclick="exportCSV()">'+DI(ICO_DL)+'<span>Экспортировать в CSV</span></button>';
+    /* Прошедших периодов нет — архива тоже; выгрузку выносим строкой */
+    arch+='<button type="button" class="drop-act" onclick="exportCSV()">'+DI(ICO_DL)+'<span>Экспортировать в CSV</span></button>';
   }
-
-  return '<div class="drop">'+
-    '<button class="drop-cur" onclick="togDrop()">'+
-      '<span class="drop-ck">✓</span>'+
+  function row(l,v,cls,tot){return '<div class="drop-r'+(tot?' tot':'')+'"><label>'+l+'</label><b'+(cls?' class="'+cls+'"':'')+'>'+v+'</b></div>';}
+  return '<div class="drop" role="menu" aria-label="Меню периода">'+
+    '<button type="button" class="drop-cur" onclick="togDrop()">'+
+      '<span class="drop-ck">'+SV(IP.check,18,2.8)+'</span>'+
       '<span>'+fmtSh(b.dateFrom)+' — '+fmtSh(b.dateTo)+'</span>'+
     '</button>'+
-    '<button class="drop-act" onclick="openBdgEdit()">'+DI(ICO_GEAR)+'<span>Настройки бюджета</span></button>'+
+    '<button type="button" class="drop-act" onclick="openBdgEdit()">'+DI(ICO_GEAR)+'<span>Настройки бюджета</span></button>'+
     '<div class="drop-stats">'+
-      /* Период не начался — «осталось на сегодня» тут ноль по определению, и
-         показывать его значит показывать ноль там, где всё в порядке. */
+      /* Период не начался — «осталось на сегодня» тут ноль по определению */
       (b.dateFrom>td
-        ? '<div class="drop-r"><label>Начнётся</label><b>'+fmtSh(b.dateFrom)+'</b></div>'+
-          '<div class="drop-r"><label>Будет в день</label><b>'+fmt(b.dailyBudget)+'</b></div>'+
-          '<div class="drop-r"><label>Всего в бюджете</label><b style="color:'+(total>=0?'var(--gd)':'var(--rd)')+'">'+fmt(total)+'</b></div>'
-        : '<div class="drop-r"><label>Осталось на сегодня</label><b style="color:'+(bal>=0?'var(--gd)':'var(--rd)')+'">'+fmt(bal)+'</b></div>'+
-          '<div class="drop-r"><label>Прибавится завтра</label><b>'+fmt(b.dailyBudget)+'</b></div>'+
-          (ovT>0?'<div class="drop-r"><label>Съел перерасход</label><b style="color:var(--rd)">−'+fmt(ovT)+'</b></div>':'')+
-          (futAcc>0?'<div class="drop-r"><label>Ещё начислят до '+fmtSh(b.dateTo)+'</label><b>'+fmt(futAcc)+'</b></div>':'')+
-          '<div class="drop-r"><label>Общий остаток</label><b style="color:'+(total>=0?'var(--gd)':'var(--rd)')+'">'+fmt(total)+'</b></div>')+
+        ? row('Начнётся',fmtSh(b.dateFrom))+
+          row('Будет в день',fmt(b.dailyBudget))+
+          row('Всего в бюджете',fmt(total),total>=0?'gd':'rd',true)
+        : row('Осталось на сегодня',fmt(bal),bal>=0?'gd':'rd')+
+          row('Прибавится завтра',fmt(b.dailyBudget))+
+          (ovT>0?row('Съел перерасход','−'+fmt(ovT),'rd'):'')+
+          (futAcc>0?row('Ещё начислят до '+fmtSh(b.dateTo),fmt(futAcc)):'')+
+          row('Общий остаток',fmt(total),total>=0?'gd':'rd',true))+
     '</div>'+
     '<div class="drop-acts">'+
-      '<button class="drop-act" onclick="openStats()">'+DI(ICO_CHART)+'<span>Сводка по категориям</span></button>'+
+      '<button type="button" class="drop-act" onclick="openStats()">'+DI(ICO_CHART)+'<span>Сводка по категориям</span></button>'+
       lead+
       arch+
-      '<button class="drop-act acc" onclick="newBdg()">'+DI(ICO_PLUS)+'<span>Создать бюджет на будущее</span></button>'+
+      '<button type="button" class="drop-act acc" onclick="newBdg()">'+DI(ICO_PLUS)+'<span>Создать бюджет на будущее</span></button>'+
     '</div>'+
   '</div>';
-  /* Удаление бюджета намеренно не выводится в меню — функция delBdg()
-     осталась в коде нетронутой, но точку входа в UI убрали. */
+  /* Удаление бюджета намеренно не выводится в меню — delBdg() в коде остался. */
 }
 
 function rUsrMenu(){
   var email=currentUser&&currentUser.email?currentUser.email:'аккаунт';
-  return '<div class="usr-menu">'+
+  var p=themePref();
+  function o(v,l){return '<button type="button" class="'+(p===v?'on':'')+'" onclick="setTheme(\''+v+'\')" aria-pressed="'+(p===v?'true':'false')+'">'+l+'</button>';}
+  return '<div class="usr-menu" role="menu">'+
     '<div class="usr-menu-email">'+esc(email)+'</div>'+
+    '<div class="lbl">Оформление</div>'+
+    '<div class="seg">'+o('dark','Тёмная')+o('light','Светлая')+o('auto','Авто')+'</div>'+
     '<button type="button" class="usr-menu-item" onclick="signOut()">Выйти из аккаунта</button>'+
   '</div>';
 }
+/* Тема: тёмная по умолчанию. «Авто» — как в настройках iPhone. */
+function themePref(){try{return localStorage.getItem('sintra_theme')||'dark';}catch(e){return 'dark';}}
+function setTheme(v){try{localStorage.setItem('sintra_theme',v);}catch(e){}applyTheme();render();}
 
 /* ── CALENDAR POPUP ──────────────────────────── */
+/* ── Выбор дня: выпадает под чипом даты ── */
 function rCalPop(){
   var now=new Date(),y=now.getFullYear(),m=now.getMonth();
   var td=today(),yd=yesterday();
-  var MN=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
-  var DN=['ПН','ВТ','СР','ЧТ','ПТ','СБ','ВС'];
-  var h='<div class="cpop" onclick="event.stopPropagation()">';
-  // Quick options — use <button type="button">
-  h+='<div class="cq">';
+  var DN=['пн','вт','ср','чт','пт','сб','вс'];
   var ydO=new Date();ydO.setDate(ydO.getDate()-1);
-  h+='<button type="button" class="copt'+(qaDate==='yesterday'?' sel':'')+'" onclick="setQD(\'yesterday\')">'+
-    '<div class="cic cyd">'+ydO.getDate()+'</div><span>Вчера</span>'+(qaDate==='yesterday'?'<span class="cck">✓</span>':'')+
-  '</button>';
-  h+='<button type="button" class="copt'+(qaDate==='today'?' sel':'')+'" onclick="setQD(\'today\')">'+
-    '<div class="cic ctd">'+now.getDate()+'</div><span>Сегодня</span>'+(qaDate==='today'?'<span class="cck">✓</span>':'')+
-  '</button>';
-  h+='</div>';
-  // Grid header
-  h+='<div class="cmonth">'+MN[m]+' '+y+'</div>';
-  h+='<div class="cgrid">';
+  function q(v,num,l){
+    var on=qaDate===v;
+    return '<button type="button" class="cq-b'+(on?' on':'')+'" onclick="setQD(\''+v+'\')" aria-pressed="'+(on?'true':'false')+'"><span class="cq-n">'+num+'</span>'+l+(on?SV(IP.check,16,2.8):'')+'</button>';
+  }
+  var h='<div class="pop" onclick="event.stopPropagation()" role="dialog" aria-label="День траты">'+
+    '<div class="cq">'+q('yesterday',ydO.getDate(),'Вчера')+q('today',now.getDate(),'Сегодня')+'</div>'+
+    '<div class="cmonth">'+MN_NOM[m]+' '+y+'</div><div class="cgrid">';
   for(var di=0;di<7;di++)h+='<div class="cdh">'+DN[di]+'</div>';
   var first=new Date(y,m,1).getDay();first=first===0?6:first-1;
   var dim=new Date(y,m+1,0).getDate();
   for(var bl=0;bl<first;bl++)h+='<div></div>';
   for(var dd=1;dd<=dim;dd++){
     var ds=y+'-'+String(m+1).padStart(2,'0')+'-'+String(dd).padStart(2,'0');
-    var isTd=ds===td,isSel=qaDate==='custom'&&qaCustom===ds,isFut=ds>td;
-        h+='<button type="button" class="cday'+(isTd?' ctd':'')+(isSel?' csel':'')+(isFut?' cfut':'')+'"'+
+    var isTd=ds===td,isFut=ds>td;
+    var isSel=(qaDate==='custom'&&qaCustom===ds)||(qaDate==='today'&&isTd)||(qaDate==='yesterday'&&ds===yd);
+    h+='<button type="button" class="cday'+(isTd?' ctd':'')+(isSel?' csel':'')+'"'+
       (isFut?' disabled':' onclick="pickDay(\''+ds+'\')"')+'>'+dd+'</button>';
   }
-  h+='</div></div>';
-  return h;
+  return h+'</div></div>';
 }
 
 /* Список категорий для строки ввода. Показываем остаток по каждой —
    это ровно то, что нужно знать в момент выбора. */
+/* ── Выбор категории: выпадает под чипом, остаток видно сразу ── */
 function rCatPop(b){
-  var h='<div class="cpop" onclick="event.stopPropagation()">'+
-    '<button type="button" class="crow'+(qaSelVal===''?' sel':'')+'" onclick="pickCat(\'\')">'+
-      '<span class="crow-em">💳</span>'+
-      '<span class="crow-nm">Дневные расходы</span>'+
-      '<span class="crow-am">'+fmt(calcDayBal(b))+'</span>'+
-    '</button>';
-  for(var i=0;i<b.planned.length;i++){
-    var p=b.planned[i],rem=calcCatRem(b,p.id),neg=rem<0,v='p:'+p.id;
-    h+='<button type="button" class="crow'+(qaSelVal===v?' sel':'')+'" onclick="pickCat(\''+v+'\')">'+
-      '<span class="crow-em">'+(p.emoji||'📌')+'</span>'+
-      '<span class="crow-nm">'+esc(p.name)+'</span>'+
-      '<span class="crow-am '+(neg?'rd':'gd')+'">'+(neg?'−':'')+fmt(Math.abs(rem))+'</span>'+
-    '</button>';
+  function opt(v,ico,nm,am,cls){
+    var sel=qaSelVal===v;
+    return '<button type="button" class="opt'+(sel?' sel':'')+'" onclick="pickCat(\''+v+'\')" role="menuitemradio" aria-checked="'+(sel?'true':'false')+'">'+
+      ico+'<span class="opt-n">'+nm+'</span>'+
+      '<span class="opt-a '+cls+'">'+am+'</span>'+
+      '<span class="opt-k">'+(sel?SV(IP.check,18,2.8):'')+'</span></button>';
   }
-  return h+'</div>';
+  var db=calcDayBal(b);
+  var rows=opt('',ICO_DAY(),'Дневные расходы',(db<0?'−':'')+fmt(Math.abs(db)),db>=0?'gd':'rd');
+  for(var i=0;i<b.planned.length;i++){
+    var p=b.planned[i],rem=calcCatRem(b,p.id);
+    rows+=opt('p:'+p.id,ICO(p.emoji||'📌'),esc(p.name),(rem<0?'−':'')+fmt(Math.abs(rem)),rem>0?'gd':(rem<0?'rd':'mt'));
+  }
+  return '<div class="pop" onclick="event.stopPropagation()" role="menu" aria-label="Категория траты">'+rows+'</div>';
 }
 
 /* ── СВОДКА ЗА ПЕРИОД ──────────────────────────
@@ -2549,20 +2236,16 @@ function rStats(){
     var tx=S.txs[i];
     if(tx.date<R.from||tx.date>R.to)continue;
     var key=tx.category||'Дневные расходы';
-    var em=tx.category?(tx.categoryEmoji||'📌'):'💳';
+    var em=tx.category?(tx.categoryEmoji||'📌'):'🗓';
     if(!map[key])map[key]={name:key,emoji:em,sum:0,n:0,txs:[]};
     map[key].sum+=tx.amount;map[key].n++;map[key].txs.push(tx);
     total+=tx.amount;
   }
   var arr=[];for(var k in map)arr.push(map[k]);
   arr.sort(function(a,c){return c.sum-a.sum;});
-  /* Раскрытая категория запоминается по имени, а кнопка передаёт номер строки:
-     имя может содержать кавычки и апостроф, и в onclick оно бы сломало разметку.
-     Список пересобирается на каждой отрисовке, поэтому номер всегда свежий. */
+  /* Раскрытая категория запоминается по имени, кнопка передаёт номер строки */
   _statArr=arr;
-
-  /* Доход берём из бюджетов, целиком попавших в интервал: он задан планом,
-     а не транзакциями, поэтому дробить его по дням было бы враньём */
+  /* Доход — из бюджетов, целиком попавших в интервал */
   var inc=0,nb=0;
   for(var j=0;j<S.budgets.length;j++){
     var bd=S.budgets[j];
@@ -2571,14 +2254,12 @@ function rStats(){
       for(var q=0;q<bd.incomes.length;q++)inc+=bd.incomes[q].amount;
     }
   }
-
-  var chips='';
+  var seg='';
   var opts=[['cur','Период'],['3m','3 месяца'],['12m','Год'],['all','Всё время']];
   for(var c=0;c<opts.length;c++){
-    chips+='<button type="button" class="rchip'+(statRange===opts[c][0]?' on':'')+
-      '" onclick="setRange(\''+opts[c][0]+'\')">'+opts[c][1]+'</button>';
+    var on=statRange===opts[c][0];
+    seg+='<button type="button" class="'+(on?'on':'')+'" role="tab" aria-selected="'+(on?'true':'false')+'" onclick="setRange(\''+opts[c][0]+'\')">'+opts[c][1]+'</button>';
   }
-
   var max=arr.length?arr[0].sum:1;
   var rows='';
   for(var r=0;r<arr.length;r++){
@@ -2589,41 +2270,38 @@ function rStats(){
       /* Порядок как на «Выписке»: свежее сверху, внутри дня — по seq */
       var list=it.txs.slice().sort(function(a,c){
         return c.date.localeCompare(a.date)||((c.seq||0)-(a.seq||0));});
-      for(var q=0;q<list.length;q++){
+      for(var q2=0;q2<list.length;q2++){
         det+='<div class="sd-row">'+
-          '<span class="sd-dt">'+fmtSh(list[q].date)+'</span>'+
-          '<span class="sd-nm">'+esc(list[q].name)+'</span>'+
-          '<span class="sd-am">'+fmt(list[q].amount)+'</span>'+
+          '<span class="sd-dt">'+fmtSh(list[q2].date)+'</span>'+
+          '<span class="sd-nm">'+esc(list[q2].name)+'</span>'+
+          '<span class="sd-am">'+fmt(list[q2].amount)+'</span>'+
         '</div>';
       }
       det='<div class="sd">'+det+'</div>';
     }
-    rows+='<div class="st-row'+(open?' on':'')+'">'+
-      '<button type="button" class="st-btn" aria-expanded="'+(open?'true':'false')+'" onclick="togStat('+r+')">'+
-        '<div class="st-hd">'+
-          '<span class="st-em">'+it.emoji+'</span>'+
-          '<span class="st-nm">'+esc(it.name)+'</span>'+
-          '<span class="st-am">'+fmt(it.sum)+'</span>'+
-          '<span class="st-ar">'+(open?'▴':'▾')+'</span>'+
-        '</div>'+
-        '<div class="st-bar"><div class="st-fill" style="width:'+pct+'%"></div></div>'+
-        '<div class="st-sub">'+share+'% · '+it.n+'&nbsp;'+plurOps(it.n)+'</div>'+
+    rows+='<div class="st-row">'+
+      '<button type="button" class="tx" aria-expanded="'+(open?'true':'false')+'" onclick="togStat('+r+')">'+
+        ICO(it.emoji)+
+        '<span class="tx-t"><span class="nm">'+esc(it.name)+'</span>'+
+          '<span class="mini ac"><i style="width:'+pct+'%"></i></span>'+
+          '<span class="sub">'+share+'% · '+it.n+'&nbsp;'+plurOps(it.n)+'</span></span>'+
+        '<span class="am">'+fmt(it.sum)+'</span>'+
+        '<span class="st-ar'+(open?' up':'')+'">'+SV(IP.chev,16,2.6)+'</span>'+
       '</button>'+det+
     '</div>';
   }
-  if(!arr.length)rows='<div class="no-tx">За этот интервал трат нет</div>';
-
-  return '<div class="ph"><h2 class="ptl">Сводка</h2>'+
-      '<button type="button" class="btn bs sm" onclick="setTab(\'history\')">← Назад</button></div>'+
-    '<div class="rchips">'+chips+'</div>'+
-    '<div class="stat-card">'+
-      '<div class="srow-lbl">ПОТРАЧЕНО · '+esc(R.label)+'</div>'+
-      '<div class="srow-big">'+fmt(total)+'</div>'+
-      (nb?'<div class="srow-divider"></div>'+
-        '<div class="srow"><span>Доход за '+nb+'&nbsp;'+plurPeriods(nb)+'</span><b class="gd">'+fmt(inc)+'</b></div>'+
-        '<div class="srow"><span>Разница</span><b class="'+(inc-total>=0?'gd':'rd')+'">'+fmt(inc-total)+'</b></div>':'')+
-    '</div>'+
-    '<div class="card ts-card">'+rows+'</div>';
+  var diff=inc-total;
+  return '<div class="seg" role="tablist" aria-label="Интервал" style="margin-top:4px">'+seg+'</div>'+
+    '<section class="hero">'+
+      '<div class="hero-top"><span>Потрачено</span><span>'+esc(R.label)+'</span></div>'+
+      '<div class="big">'+fmt(total)+'</div>'+
+      (nb?'<div class="pills two">'+
+        '<div class="pill"><span>Доход за '+nb+'&nbsp;'+plurPeriods(nb)+'</span><b class="gd">'+fmt(inc)+'</b></div>'+
+        '<div class="pill"><span>Разница</span><b class="'+(diff>=0?'gd':'rd')+'">'+(diff>=0?'':'−')+fmt(Math.abs(diff))+'</b></div>'+
+      '</div>':'')+
+    '</section>'+
+    '<div class="dh"><span class="dh-t">По категориям</span></div>'+
+    (arr.length?'<section class="grp">'+rows+'</section>':'<div class="grp"><div class="no-tx">За этот интервал трат нет</div></div>');
 }
 /* Русское склонение в одном месте. Раньше эта же логика была написана
    дважды — для операций и для дней; третий вызов (для трат) заставил бы
@@ -2640,280 +2318,246 @@ function plurPeriods(n){var a=n%100,b=n%10;if(a>4&&a<21)return 'периодов
 
 /* ── HISTORY TAB ─────────────────────────────── */
 function rHistory(b){
-  /* Группируем сразу, без предварительной сортировки всего массива:
-     даты сортируем один раз (строки YYYY-MM-DD сравниваются лексикографически),
-     внутри дня — по seq. Даёт ~70% выигрыш на объёме в сотни трат. */
+  /* Группируем сразу, без предварительной сортировки всего массива */
   var txs=S.txs.filter(function(t){return t.budgetId===b.id;});
   var g={};
   for(var i=0;i<txs.length;i++){var tx=txs[i];(g[tx.date]||(g[tx.date]=[])).push(tx);}
   var dates=Object.keys(g).sort();dates.reverse();
   for(var di=0;di<dates.length;di++)g[dates[di]].sort(function(a,c){return (c.seq||0)-(a.seq||0);});
 
-  var dLbl=qaDate==='today'?'Сегодня':qaDate==='yesterday'?'Вчера':(qaCustom?fmtSh(qaCustom):'Дата');
-  /* Подпись на чипе категории */
-  var cLbl='Дневные', cEm='💳';
+  /* Чипы под строкой ввода всегда показывают, куда и на какой день уйдёт
+     трата. День не сбрасывается после записи: так удобно внести несколько
+     трат за вчера подряд — а подсвеченный чип не даёт об этом забыть. */
+  var notToday=qaDate!=='today';
+  var dLbl=qaDate==='today'?'Сегодня':qaDate==='yesterday'?'Вчера, '+_DF_SH.format(new Date(yesterday()+'T00:00:00')):(qaCustom?fmtSh(qaCustom):'Дата');
+  var cLbl='Дневные', cIco=ICO_DAY('sm'), cRem=calcDayBal(b);
   if(qaSelVal&&qaSelVal.indexOf('p:')===0){
     var cp=b.planned.filter(function(x){return x.id===qaSelVal.slice(2);})[0];
-    if(cp){cLbl=cp.name;cEm=cp.emoji||'📌';}else{qaSelVal='';}
+    if(cp){cLbl=cp.name;cIco=ICO(cp.emoji||'📌','sm');cRem=calcCatRem(b,cp.id);}else{qaSelVal='';}
   }
-
   var h=rHero(b)+
   '<div class="qa">'+
-    '<div class="qa-row">'+
-      '<input class="qa-in" id="qa-inp" placeholder="350 кофе" autocomplete="off" inputmode="text" value="'+esc(qaVal)+'" oninput="qaVal=qaAutoCap(this)">'+
-      '<button type="button" class="qa-go" id="qa-go" onclick="doQA()">→</button>'+
+    '<div class="ask">'+
+      '<input class="ask-in" id="qa-inp" placeholder="350 кофе" autocomplete="off" enterkeyhint="done" aria-label="Сумма и описание траты" value="'+esc(qaVal)+'" oninput="qaVal=qaAutoCap(this);updQAHint()">'+
+      '<button type="button" class="ask-go" id="qa-go" onclick="doQA()" aria-label="Записать трату">'+SV(IP.up,20,2.6)+'</button>'+
     '</div>'+
     '<div class="qa-meta">'+
-      /* Системный <select> на iOS открывает громоздкое колесо и не умеет
-         показывать остатки — свой список читается лучше и выглядит живее */
-      (b.planned.length?'<button type="button" class="qa-chip'+(qaSelVal?' pick':'')+(catPick?' on':'')+'" onclick="togCat(event)">'+
-        '<span class="qa-chip-em">'+cEm+'</span>'+
-        '<span class="qa-chip-tx">'+esc(cLbl)+'</span>'+
-        '<span class="qa-chip-ar">▾</span>'+
-      '</button>':'<span style="flex:1"></span>')+
-      '<button type="button" class="qa-cal'+(qaDrop?' on':'')+'" onclick="togCal(event)">'+
-        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>'+
-        '<span>'+dLbl+'</span>'+
-      '</button>'+
+      (b.planned.length
+        ? '<button type="button" class="qchip qc-cat'+(catPick?' open':'')+'" onclick="togCat(event)" aria-haspopup="menu" aria-expanded="'+(catPick?'true':'false')+'" aria-label="Категория: '+esc(cLbl)+'. Изменить">'+
+            cIco+'<span class="qc-t">'+esc(cLbl)+'</span><b class="qc-a '+(cRem<0?'rd':'')+'">'+(cRem<0?'−':'')+fmt(Math.abs(cRem))+'</b>'+SV(IP.chev,14,2.6)+'</button>'
+        : '<span style="flex:1"></span>')+
+      '<button type="button" class="qchip qc-day'+(notToday?' hot':'')+(qaDrop?' open':'')+'" onclick="togCal(event)" aria-haspopup="dialog" aria-expanded="'+(qaDrop?'true':'false')+'" aria-label="День: '+dLbl+'. Изменить">'+
+        SV(IP.cal,16,2.2)+'<span class="qc-t">'+dLbl+'</span>'+SV(IP.chev,14,2.6)+'</button>'+
+      (catPick?rCatPop(b):'')+
+      (qaDrop?rCalPop():'')+
     '</div>'+
-    (qaDrop?rCalPop():'')+
-    (catPick?rCatPop(b):'')+
+    '<div class="ask-hint" id="qa-hint" aria-live="polite"></div>'+
   '</div>';
 
   if(!dates.length){
-    return h+'<div class="no-tx">Расходов пока нет — хорошее начало 👏</div>';
+    return h+'<div class="grp" style="margin-top:22px"><div class="no-tx">Расходов пока нет — хорошее начало. Напиши «350 кофе» и нажми стрелку.</div></div>';
   }
+  var td=today(),yd=yesterday();
   for(var di2=0;di2<dates.length;di2++){
     var date=dates[di2],dt=g[date],sum=0;
     for(var si=0;si<dt.length;si++)sum+=dt[si].amount;
-    h+='<div class="dg"><div class="dh"><span class="dt">'+fmtDay(date)+'</span><span class="ds">'+fmt(sum)+'</span></div>';
+    var dObj=new Date(date+'T00:00:00');
+    var head=date===td?'Сегодня':date===yd?'Вчера':WD_NOM[dObj.getDay()];
+    h+='<div class="dh"><span class="dh-t">'+head+'<small>'+_DF_LONG.format(dObj)+'</small></span><span class="dh-s">'+fmt(sum)+'</span></div>'+
+      '<div class="grp">';
     for(var ti2=0;ti2<dt.length;ti2++){
       var t2=dt[ti2];
       var isDay=!t2.plannedCatId;
-      h+='<div class="txr'+(t2.id===freshTx?' fresh':'')+'">'+
-        '<div class="txe'+(isDay?' day':'')+'">'+(isDay?'💳':(t2.categoryEmoji||'📌'))+'</div>'+
-        '<div class="txi">'+
-          '<div class="txn">'+esc(t2.name)+'</div>'+
-          (t2.category?'<div class="txc">'+esc(t2.category)+'</div>':'')+
-        '</div>'+
-        '<div class="txa">'+fmt(t2.amount)+'</div>'+
-        '<div class="txd"><div class="ctx-wrap">'+
-          '<button type="button" aria-label="Действия с тратой" class="dots'+(txMenu===t2.id?' on':'')+'" onclick="togMenu(\'tx\',\''+t2.id+'\',event)"><svg width=\'16\' height=\'4\' viewBox=\'0 0 16 4\'><circle cx=\'2\' cy=\'2\' r=\'1.7\'/><circle cx=\'8\' cy=\'2\' r=\'1.7\'/><circle cx=\'14\' cy=\'2\' r=\'1.7\'/></svg></button>'+
-          (txMenu===t2.id?'<div class="ctx" onclick="event.stopPropagation()">'+
-            '<button onclick="editTx(\''+t2.id+'\')">Редактировать</button>'+
-            '<button class="del ctx-sep" onclick="delTx(\''+t2.id+'\')">Удалить</button>'+
-          '</div>':'')+
-        '</div></div>'+
-      '</div>';
+      /* Вся строка — кнопка правки. Высота фиксирована, при нажатии меняется
+         только фон: ничего не сдвигается. Если палец поехал — это прокрутка,
+         правка не откроется. */
+      h+='<button type="button" class="tx'+(t2.id===freshTx?' fresh':'')+'" onclick="editTx(\''+t2.id+'\')">'+
+        (isDay?ICO_DAY():ICO(t2.categoryEmoji||'📌'))+
+        '<span class="tx-t"><span class="nm">'+esc(t2.name)+'</span>'+
+          '<span class="sub">'+(isDay?'Дневные':esc(t2.category))+'</span></span>'+
+        '<span class="am">'+fmt(t2.amount)+'</span>'+
+      '</button>';
     }
     h+='</div>';
   }
   return h;
 }
+/* Подсказка под строкой ввода: как поняли запись и что станет с остатком.
+   Только показ — считает теми же функциями, что и экран. */
+function updQAHint(){
+  var el=document.getElementById('qa-hint');if(!el)return;
+  var inp=document.getElementById('qa-inp');var raw=inp?inp.value:'';
+  var p=raw.trim()?parseQA(raw):null;
+  var b=getAB();
+  if(!p||!p.amount||!b){el.innerHTML='';return;}
+  var left;
+  if(qaSelVal&&qaSelVal.indexOf('p:')===0){
+    var id=qaSelVal.slice(2),c=b.planned.filter(function(x){return x.id===id;})[0];
+    if(c)left=calcCatRem(b,id)-p.amount;
+  }
+  if(left===undefined)left=calcDayBal(b)-p.amount;
+  el.innerHTML='<span>«'+esc(p.name)+'» · <b>'+fmt(p.amount)+'</b></span>'+
+    '<span>останется <b class="'+(left<0?'rd':'gd')+'">'+(left<0?'−':'')+fmt(Math.abs(left))+'</b></span>';
+}
+/* Всплывашка «записано · отменить». Живёт в body, перерисовки её не трогают. */
+function showToast(html,undoId){
+  var old=document.getElementById('toast');if(old)old.remove();
+  var el=document.createElement('div');
+  el.id='toast';el.className='toast';el.setAttribute('role','status');
+  el.innerHTML='<span class="toast-t">'+html+'</span>'+
+    (undoId?'<button type="button" class="toast-u" onclick="undoTx(\''+undoId+'\')">Отменить</button>':'');
+  document.body.appendChild(el);
+  clearTimeout(showToast._t);
+  showToast._t=setTimeout(function(){var e=document.getElementById('toast');if(e)e.remove();},4500);
+}
 
 /* ── КАРТОЧКА ДНЯ ──────────────────────────────
    Главный экран должен за секунду отвечать на один вопрос:
    сколько я ещё могу потратить сегодня. Всё остальное — ниже. */
+/* ── КАРТОЧКА ДНЯ ──────────────────────────────
+   За секунду отвечает на один вопрос: сколько ещё можно потратить сегодня. */
 function rHero(b){
   var bal=calcDayBal(b), pos=bal>=0;
   var td=today();
-  /* Два разных числа, и путать их нельзя.
-     `spentToday` — только дневные (некатегорийные) траты: из них считается
-     полоса, потому что полоса про дневной запас, а не про весь день.
-     `catToday` — сегодняшние траты по плановым категориям. В расчёты не идёт,
-     только в подпись: 10 сентября 2026 экран показывал «сегодня потрачено
-     0 ₽» в день, когда в выписке за то же число стояло 125 647 ₽ ипотеки,
-     и это читалось как поломка. Считать их вместе тоже нельзя — полоса
-     при 377 ₽ остатка и 125 647 ₽ ипотеки обнулилась бы на ровном месте. */
+  /* Два разных числа: `spentToday` — только дневные траты (из них полоса),
+     `catToday` — сегодняшние траты по плановым категориям. Не сливать. */
   var spentToday=0,catToday=0;
   for(var i=0;i<S.txs.length;i++){
     var t=S.txs[i];
     if(t.budgetId!==b.id||t.date!==td)continue;
     if(t.plannedCatId)catToday+=t.amount;else spentToday+=t.amount;
   }
-  /* Полоса — это остаток, а не потраченное: с утра полная, убывает по мере
-     трат, как топливо в баке. Раньше было наоборот (пустая → заполняется
-     потраченным), и при 0 ₽ трат с утра бар выглядел «сломанным» — пустым
-     в момент, когда на самом деле всё хорошо и весь дневной запас на месте. */
+  /* Полоса — остаток, как топливо в баке: утром полная, убывает с тратами.
+     В минусе — красная на всю ширину: флаг «вышел из бюджета». */
   var startOfDay=bal+spentToday;
   var remPct=!pos?0:(startOfDay>0?Math.max(0,Math.min(100,Math.round(bal/startOfDay*100))):100);
   var left=daysBw(td,b.dateTo);
   var ended=b.dateTo<td;
+  function pill(l,v,cls){return '<div class="pill"><span>'+l+'</span><b'+(cls?' class="'+cls+'"':'')+'>'+v+'</b></div>';}
 
-  /* Период ещё не начался: начислений нет, поэтому «осталось на сегодня 0 ₽»,
-     пустая полоса и «завтра +норма» — три неверных утверждения подряд.
-     У такого бюджета другой вопрос: сколько в нём всего и когда он включится. */
+  /* Период ещё не начался: другой вопрос — сколько всего и когда включится */
   if(b.dateFrom>td){
     var till=daysBw(td,b.dateFrom), days=getDays(b.dateFrom,b.dateTo);
-    return '<div class="hero">'+
-      '<div class="hero-top">'+
-        '<span>Всего в бюджете</span>'+
-        '<span>'+(till>1?'начнётся через '+till+'\u00a0'+plurDays(till):'начнётся завтра')+'</span>'+
-      '</div>'+
-      '<div class="hero-big gd">'+fmt(calcTotalBal(b))+'</div>'+
-      '<div class="hero-bar"><div class="hero-fill gd" style="width:100%"></div></div>'+
-      '<div class="hero-sub">'+
-        '<span>в день <b>'+fmt(b.dailyBudget)+'</b></span>'+
-        '<span>'+days+'\u00a0'+plurDays(days)+' в периоде</span>'+
-      '</div>'+
-    '</div>';
+    return '<section class="hero" aria-label="Будущий бюджет">'+
+      '<div class="hero-top"><span>Всего в бюджете</span>'+
+        '<span>'+(till>1?'начнётся через '+till+' '+plurDays(till):'начнётся завтра')+'</span></div>'+
+      '<div class="big gd">'+fmt(calcTotalBal(b))+'</div>'+
+      '<div class="bar"><i style="width:100%"></i></div>'+
+      '<div class="pills two">'+pill('В день',fmt(b.dailyBudget))+pill('Дней в периоде',String(days))+'</div>'+
+    '</section>';
   }
-
-  /* Заголовок и остаток дней — одной строкой сверху; крупная цифра;
-     полоса; под ней тонкая строка «сегодня / завтра». Четыре ряда вместо
-     прежних пяти, и ничего не смешано в одну колонку как попало. */
-  return '<div class="hero">'+
-    '<div class="hero-top">'+
-      '<span>'+(ended?'Итог периода':'Осталось на сегодня')+'</span>'+
-      '<span>'+(ended?'период закрыт'
-        : left>0?left+'&nbsp;'+plurDays(left)+' до конца'
-        : 'последний день')+'</span>'+
+  var tail=ended?'период закрыт':left>0?left+' '+plurDays(left)+' до конца':'последний день';
+  var tomorrow=bal+b.dailyBudget;
+  return '<section class="hero" aria-label="'+(ended?'Итог периода':'Осталось на сегодня')+'">'+
+    '<div class="hero-top"><span>'+(ended?'Итог периода':'Осталось на сегодня')+'</span><span>'+tail+'</span></div>'+
+    '<div class="big '+(pos?'gd':'rd')+'">'+(pos?'':'−')+fmt(Math.abs(bal))+'</div>'+
+    '<div class="bar" role="img" aria-label="'+(pos?'Дневной запас: осталось '+remPct+'%':'Вышел из дневного бюджета')+'"><i class="'+(pos?'':'rd')+'" style="width:'+(pos?remPct:100)+'%"></i></div>'+
+    '<div class="pills'+(ended?' two':'')+'">'+
+      pill('Потрачено',fmt(spentToday))+
+      pill('По категориям',fmt(catToday))+
+      (ended?'':(pos
+        ? pill('Завтра','+'+fmt(b.dailyBudget),'gd')
+        : pill('Завтра будет',(tomorrow<0?'−':'')+fmt(Math.abs(tomorrow)),tomorrow<0?'rd':'')))+
     '</div>'+
-    '<div class="hero-big '+(pos?'gd':'rd')+'">'+fmt(bal)+'</div>'+
-    '<div class="hero-bar"><div class="hero-fill '+(pos?'gd':'rd')+'" style="width:'+(pos?remPct:100)+'%"></div></div>'+
-    '<div class="hero-sub">'+
-      '<span>сегодня потрачено <b>'+fmt(spentToday)+'</b></span>'+
-      (ended?'':'<span>завтра <b>+'+fmt(b.dailyBudget)+'</b></span>')+
-      (function(){
-        var n=[];
-        if(catToday)n.push('Потрачено по категориям <b>'+fmt(catToday)+'</b>');
-        if(!ended&&!b.dailyBudget)n.push('дневных до конца периода не осталось');
-        return n.length?'<span class="hs-c">'+n.join(' · ')+'</span>':'';
-      })()+
-    '</div>'+
-  '</div>';
+    (!pos&&!ended?'<div class="note rd">'+SV(IP.alert,16,2.4)+'<span>Перерасход <b>'+fmt(-bal)+'</b> спишется с завтрашней нормы '+fmt(b.dailyBudget)+'</span></div>':'')+
+    (!ended&&!b.dailyBudget?'<div class="note">'+SV(IP.alert,16,2.4)+'<span>Дневных до конца периода не осталось</span></div>':'')+
+  '</section>';
 }
 function plurDays(n){return plural(n,'день','дня','дней');}
 
 /* ── INCOMES TAB ─────────────────────────────── */
 function rIncomes(b){
   var ti=0;for(var i=0;i<b.incomes.length;i++)ti+=b.incomes[i].amount;
-  var tp=0;for(var j=0;j<b.planned.length;j++)tp+=b.planned[j].amount;
-  /* total = all income minus ALL spending (daily + planned categories) */
   var totalBal=calcTotalBal(b);
   var cashBal=calcCashBal(b), pend=incPending(b), td=today();
+  var pct=ti>0?Math.max(0,Math.min(100,totalBal/ti*100)):0;
+  function row(l,v,cls){return '<div class="kv"><span>'+l+'</span><b'+(cls?' class="'+cls+'"':'')+'>'+v+'</b></div>';}
+  /* «На картах сейчас» — только когда есть чего ждать; без ожидаемых
+     поступлений это то же число, что и общий остаток */
+  var cash='';
+  if(pend.length){
+    var run=cashBal;
+    cash=row('На картах сейчас',fmt(cashBal),cashBal>=0?'gd':'rd');
+    for(var p=0;p<pend.length;p++){
+      run+=pend[p].amount;
+      cash+='<div class="kv pend"><span>'+fmtSh(pend[p].date)+' · '+esc(pend[p].name)+'</span><b>+'+fmt(pend[p].amount)+' → '+fmt(run)+'</b></div>';
+    }
+  }
   var rows='';
   for(var k=0;k<b.incomes.length;k++){
     var inc=b.incomes[k];
     var waits=inc.date&&inc.date>td;
-    /* FIX #2: emoji inline with text using t-nm class */
-    rows+='<tr'+(waits?' class="t-wait"':'')+'>'+
-      '<td><div class="t-nm"><span class="t-em">'+(inc.emoji||'💰')+'</span><span class="t-tx">'+esc(inc.name)+'</span></div>'+
-        (inc.date?'<div class="t-dt'+(waits?' wait':'')+'">'+(waits?'придёт ':'пришёл ')+fmtSh(inc.date)+'</div>':'')+
-      '</td>'+
-      '<td class="t-am"><span class="t-amw"><span class="recur-slot">'+
-        (inc.recur?'<span class="recur-b" title="Повторяющийся — сумма переносится в новый месяц">🔁</span>':'')+
-        '</span>'+fmt(inc.amount)+'</span></td>'+
-      '<td class="t-ax"><div class="ctx-wrap">'+
-        '<button type="button" aria-label="Действия с доходом" class="dots'+(incMenu===inc.id?' on':'')+'" onclick="togMenu(\'inc\',\''+inc.id+'\',event)"><svg width=\'16\' height=\'4\' viewBox=\'0 0 16 4\'><circle cx=\'2\' cy=\'2\' r=\'1.7\'/><circle cx=\'8\' cy=\'2\' r=\'1.7\'/><circle cx=\'14\' cy=\'2\' r=\'1.7\'/></svg></button>'+
-        (incMenu===inc.id?'<div class="ctx" onclick="event.stopPropagation()">'+
-          '<button onclick="editInc(\''+inc.id+'\')">Редактировать</button>'+
-          '<button class="del ctx-sep" onclick="delInc(\''+inc.id+'\')">Удалить</button>'+
-        '</div>':'')+
-      '</div></td>'+
-    '</tr>';
+    rows+='<button type="button" class="tx'+(waits?' wait':'')+'" onclick="editInc(\''+inc.id+'\')">'+
+      ICO(inc.emoji||'💰')+
+      '<span class="tx-t"><span class="nm">'+esc(inc.name)+'</span>'+
+        (inc.date?'<span class="sub'+(waits?' ac':'')+'">'+(waits?'придёт ':'пришёл ')+fmtSh(inc.date)+'</span>':'')+'</span>'+
+      '<span class="am">'+(inc.recur?REP():'')+fmt(inc.amount)+'</span>'+
+    '</button>';
   }
-  /* Строка «на картах сейчас» показывается ТОЛЬКО когда есть чего ждать.
-     Без ожидаемых поступлений она равна общему остатку, и два одинаковых
-     числа подряд читаются как ошибка, а не как уточнение. */
-  var cashRows='';
-  if(pend.length){
-    var run=cashBal;
-    cashRows='<div class="srow srow-cash"><span>На картах сейчас</span>'+
-      '<b class="'+(cashBal>=0?'gd':'rd')+'">'+fmt(cashBal)+'</b></div>';
-    for(var p=0;p<pend.length;p++){
-      run+=pend[p].amount;
-      cashRows+='<div class="srow srow-pend">'+
-        '<span>'+fmtSh(pend[p].date)+' · '+esc(pend[p].name)+'</span>'+
-        '<b>+'+fmt(pend[p].amount)+' → '+fmt(run)+'</b></div>';
-    }
-  }
-
-  return '<div class="ph"><h2 class="ptl">Доходы</h2>'+
-    '<button type="button" class="btn bp sm" onclick="om(\'add-income\')">+ Добавить</button></div>'+
-  '<div class="stat-card">'+
-    '<div class="srow-lbl">ОБЩИЙ ОСТАТОК</div>'+
-    '<div class="srow-big '+(totalBal>=0?'gd':'rd')+'">'+fmt(totalBal)+'</div>'+
-    '<div class="srow-divider"></div>'+
-    cashRows+
-    '<div class="srow"><span>Всего доходов</span><b class="gd">'+fmt(ti)+'</b></div>'+
-    '<div class="srow"><span>Потрачено всего</span><b class="rd">−'+fmt(ti-totalBal)+'</b></div>'+
-    '<div class="srow"><span>Дневной бюджет</span><b>'+fmt(b.dailyBudget)+' /день</b></div>'+
-  '</div>'+
-  '<div class="card mt10"><table class="tbl">'+
-    '<thead><tr><th>Источник дохода</th><th>Сумма</th><th></th></tr></thead>'+
-    '<tbody>'+rows+'</tbody>'+
-    '<tfoot><tr class="tft"><td>Итого</td><td class="t-am">'+fmt(ti)+'</td><td></td></tr></tfoot>'+
-  '</table></div>';
+  return '<section class="hero" aria-label="Общий остаток">'+
+      '<div class="hero-top"><span>Общий остаток</span><span>до '+fmtSh(b.dateTo)+'</span></div>'+
+      '<div class="big md '+(totalBal>=0?'gd':'rd')+'">'+(totalBal<0?'−':'')+fmt(Math.abs(totalBal))+'</div>'+
+      '<div class="bar" role="img" aria-label="Осталось '+Math.round(pct)+'% дохода"><i style="width:'+pct.toFixed(1)+'%"></i></div>'+
+      '<div class="kvs">'+
+        cash+
+        row('Всего доходов',fmt(ti),'gd')+
+        row('Потрачено всего','−'+fmt(ti-totalBal))+
+        row('Дневной бюджет',fmt(b.dailyBudget)+' / день')+
+      '</div>'+
+    '</section>'+
+    '<div class="dh"><span class="dh-t">Источники<small>'+fmt(ti)+'</small></span>'+
+      '<button type="button" class="btn bp sm" onclick="om(\'add-income\')">'+SV(IP.plus,16,2.8)+'Добавить</button></div>'+
+    (b.incomes.length?'<div class="grp">'+rows+'</div>':'<div class="grp"><div class="no-tx">Доходов пока нет</div></div>');
 }
 
 /* ── PLANNED TAB ─────────────────────────────── */
 function rPlanned(b){
   var ov=hasOv(b);
-  var tot=0;for(var j=0;j<b.planned.length;j++)tot+=b.planned[j].amount;
-  var rows='';
+  var tot=0,sumRem=0;
+  for(var j=0;j<b.planned.length;j++){tot+=b.planned[j].amount;sumRem+=calcCatRem(b,b.planned[j].id);}
+  var rows='',ovList='';
   for(var k=0;k<b.planned.length;k++){
     var p=b.planned[k],rem=calcCatRem(b,p.id),neg=rem<0;
-    /* FIX #2: emoji inline */
-    rows+='<tr class="'+(neg?'row-ov':'')+'">'+
-      '<td><div class="t-nm"><span class="t-em">'+(p.emoji||'📌')+'</span><span class="t-tx">'+esc(p.name)+'</span></div>'+
-        /* FIX #4: inline overdraft badge per row */
-        (neg?'<div class="ov-tag">⚠️ перерасход <button type="button" class="ov-btn" onclick="openTr(\''+p.id+'\')">Покрыть</button></div>':'')+
-      '</td>'+
-      '<td class="t-am"><span class="t-amw"><span class="recur-slot">'+
-        (p.recur?'<span class="recur-b" title="Повторяющаяся — сумма переносится в новый месяц">🔁</span>':'')+
-        '</span><span class="'+(neg?'rd':'gd')+'">'+(neg?'−':'')+fmt(Math.abs(rem))+'</span></span>'+
-        '<div class="t-sub">из '+fmt(p.amount)+cmpPrev(b,p)+'</div>'+
-      '</td>'+
-      '<td class="t-ax"><div class="ctx-wrap">'+
-        '<button type="button" aria-label="Действия с категорией" class="dots'+(plnMenu===p.id?' on':'')+'" onclick="togMenu(\'pln\',\''+p.id+'\',event)"><svg width=\'16\' height=\'4\' viewBox=\'0 0 16 4\'><circle cx=\'2\' cy=\'2\' r=\'1.7\'/><circle cx=\'8\' cy=\'2\' r=\'1.7\'/><circle cx=\'14\' cy=\'2\' r=\'1.7\'/></svg></button>'+
-        (plnMenu===p.id?'<div class="ctx" onclick="event.stopPropagation()">'+
-          '<button onclick="editPln(\''+p.id+'\')">Редактировать</button>'+
-          '<button onclick="openTr(\''+p.id+'\')">Перераспределить</button>'+
-          (rem>0?'<button class="ctx-lines ctx-sep" onclick="moveRemToDaily(\''+p.id+'\')">'+
-            '<span class="ctx-t">Перевести остаток в дневные</span>'+
-            '<span class="ctx-s">Бюджет на каждый день увеличится на '+fmt(rem/Math.max(1,getDays(today()>b.dateFrom?today():b.dateFrom,b.dateTo)))+'</span>'+
-          '</button>':'')+
-          '<button class="del ctx-sep" onclick="delPln(\''+p.id+'\')">Удалить</button>'+
-        '</div>':'')+
-      '</div></td>'+
-    '</tr>';
+    var w=p.amount>0?Math.max(0,Math.min(100,rem/p.amount*100)):0;
+    if(neg)ovList+='<button type="button" class="ov-btn" onclick="openTr(\''+p.id+'\')">Покрыть «'+esc(p.name)+'»</button> ';
+    rows+='<button type="button" class="tx" onclick="editPln(\''+p.id+'\')">'+
+      ICO(p.emoji||'📌')+
+      '<span class="tx-t"><span class="nm">'+esc(p.name)+'</span><span class="mini"><i style="width:'+w.toFixed(1)+'%"></i></span></span>'+
+      '<span class="amc">'+
+        '<span class="am '+(neg?'rd':(rem>0?'gd':'mt'))+'">'+(p.recur?REP():'')+(neg?'−':'')+fmt(Math.abs(rem))+'</span>'+
+        '<span class="of">'+(neg?'перерасход из '+fmt(p.amount):'из '+fmt(p.amount))+cmpPrev(b,p)+'</span>'+
+      '</span>'+
+    '</button>';
   }
-  return '<div class="ph"><h2 class="ptl">Плановые расходы</h2>'+
-    '<div class="ph-acts">'+
-      /* «Перевести» раньше пряталось в меню категории — а это основной способ
-         добрать денег в категорию за счёт оставшихся дней */
-      (b.planned.length?'<button type="button" class="ib" title="Перевести" onclick="openTr(\'\')">⇄</button>':'')+
-      '<button type="button" class="btn bp sm" onclick="om(\'add-planned\')">+ Добавить</button>'+
-    '</div></div>'+
-  (ov?'<div class="warn">'+
-    '<div class="warn-t">⚠️ Есть категории с перерасходом</div>'+
-    '<div class="warn-s">Покрой перерасход из дневного бюджета или другой категории.</div>'+
-  '</div>':'')+
-  /* Планы съели весь доход — dailyBudget обнулился. Без пояснения это
-     выглядит как поломка, поэтому говорим прямо что произошло. */
-  (function(){
-    var ti=0,tp=0;
-    for(var q=0;q<b.incomes.length;q++)ti+=b.incomes[q].amount;
-    /* По факту, а не по лимитам: перерасход тоже съедает дневные,
-       и молчать о нём нельзя — норма из-за него и обнулилась. */
-    tp=ti-potOf(b);
-    if(tp<=ti)return '';
-    return '<div class="warn">'+
-      '<div class="warn-t">⚠️ Планы превышают доход на '+fmt(tp-ti)+'</div>'+
+  var ti=0;for(var q=0;q<b.incomes.length;q++)ti+=b.incomes[q].amount;
+  /* По факту, а не по лимитам: перерасход тоже съедает дневные */
+  var tp=ti-potOf(b);
+  var pct=tot>0?Math.max(0,Math.min(100,sumRem/tot*100)):0;
+  return '<section class="hero" aria-label="Остаток по категориям">'+
+      '<div class="hero-top"><span>Осталось в категориях</span><span>лимит '+fmt(tot)+'</span></div>'+
+      '<div class="big md'+(sumRem<0?' rd':'')+'">'+(sumRem<0?'−':'')+fmt(Math.abs(sumRem))+'</div>'+
+      '<div class="bar" role="img" aria-label="Осталось '+Math.round(pct)+'% лимитов"><i style="width:'+pct.toFixed(1)+'%"></i></div>'+
+    '</section>'+
+    (ov?'<div class="warn">'+
+      '<div class="warn-t">Есть категории с перерасходом</div>'+
+      '<div class="warn-s">Покрой перерасход из дневного бюджета или другой категории.</div>'+ovList+
+    '</div>':'')+
+    /* Планы съели весь доход — норма обнулилась. Говорим прямо. */
+    (tp>ti?'<div class="warn">'+
+      '<div class="warn-t">Планы превышают доход на '+fmt(tp-ti)+'</div>'+
       '<div class="warn-s">Дневной бюджет обнулён — на ежедневные траты денег не осталось. Уменьши лимиты категорий или добавь доход.</div>'+
-    '</div>';
-  })()+
-  '<div class="card"><table class="tbl">'+
-    '<thead><tr><th>Категория</th><th>Остаток</th><th></th></tr></thead>'+
-    '<tbody>'+rows+'</tbody>'+
-    '<tfoot><tr class="tft"><td>Итого лимит</td><td class="t-am">'+fmt(tot)+'</td><td></td></tr></tfoot>'+
-  '</table></div>'+
-  rTopSpend(b);
+    '</div>':'')+
+    '<div class="dh"><span class="dh-t">Категории</span><span class="dh-acts">'+
+      (b.planned.length?'<button type="button" class="ib" onclick="openTr(\'\')" aria-label="Перевести между категориями">'+SV(IP.swap,20,2.2)+'</button>':'')+
+      '<button type="button" class="btn bp sm" onclick="om(\'add-planned\')">'+SV(IP.plus,16,2.8)+'Добавить</button>'+
+    '</span></div>'+
+    (b.planned.length?'<div class="grp">'+rows+'</div>':'<div class="grp"><div class="no-tx">Категорий пока нет</div></div>')+
+    rTopSpend(b);
 }
 
 /* Топ трат за период. Показываем только когда есть что показывать —
    на пустом бюджете карточка не мозолит глаза. */
+/* Топ трат за период — только когда есть что показывать */
 function rTopSpend(b){
   var top=getTopSpend(b,3);
   if(!top.length)return '';
@@ -2925,84 +2569,110 @@ function rTopSpend(b){
   for(var i=0;i<top.length;i++){
     var it=top[i],pct=Math.round(it.amount/max*100);
     var share=spent>0?Math.round(it.amount/spent*100):0;
-    rows+='<div class="ts-row">'+
-      '<div class="ts-hd"><span class="ts-nm">'+(i+1)+'. '+it.emoji+' '+esc(it.name)+'</span>'+
-        '<span class="ts-am">'+fmt(it.amount)+'</span></div>'+
-      '<div class="ts-bar"><div class="ts-fill" style="width:'+pct+'%"></div></div>'+
-      '<div class="ts-sub">'+share+'% всех трат'+(it.limit!==null?' · лимит '+fmt(it.limit):'')+'</div>'+
+    rows+='<div class="tx">'+
+      ICO(it.emoji)+
+      '<span class="tx-t"><span class="nm">'+(i+1)+'. '+esc(it.name)+'</span>'+
+        '<span class="mini ac"><i style="width:'+pct+'%"></i></span>'+
+        '<span class="sub">'+share+'% всех трат'+(it.limit!==null?' · лимит '+fmt(it.limit):'')+'</span></span>'+
+      '<span class="am">'+fmt(it.amount)+'</span>'+
     '</div>';
   }
-  return '<div class="card ts-card">'+
-    '<div class="ts-ttl">'+(ended?'📊 Итоги периода':'📊 Топ трат')+
-      '<span class="ts-tot">'+fmt(spent)+(ti>0?' из '+fmt(ti):'')+'</span></div>'+
-    rows+
-  '</div>';
+  return '<div class="dh"><span class="dh-t">'+(ended?'Итоги периода':'Топ трат')+'</span>'+
+    '<span class="dh-s">'+fmt(spent)+(ti>0?' из '+fmt(ti):'')+'</span></div>'+
+    '<div class="grp">'+rows+'</div>';
 }
 
 /* ── MODALS ──────────────────────────────────── */
 function rModal(b){
   var m=modal,body='';
+  function close(){return '<button type="button" class="mcl" onclick="closeModal()" aria-label="Закрыть">'+SV(IP.x,18,2.6)+'</button>';}
+  function hd(t){return '<div class="mhd">'+t+close()+'</div>';}
+  function nf(v){return v===''||v==null?'':String(Math.round(v)).replace(/\B(?=(\d{3})+(?!\d))/g,' ');}
+  function amt(t,extra,val,ph){return '<label class="lbl amt-l" for="ma">'+t+'</label><input class="inp amt" id="ma" type="text" inputmode="decimal" oninput="'+extra+'" value="'+val+'" placeholder="'+(ph||'0')+'">';}
+  /* Иконка — кнопка с сеткой готового набора вместо ввода символа */
+  function icoRow(e,nm,ph,lbl){
+    return '<div class="ir">'+
+      '<div class="f" style="flex:0 0 64px"><label for="me-btn">Иконка</label>'+
+        '<button type="button" class="inp icob" id="me-btn" onclick="icoTog()" aria-label="Выбрать иконку">'+ICO(e)+'</button>'+
+        '<input type="hidden" id="me" value="'+esc(e)+'"></div>'+
+      '<div class="f"><label for="mn">'+lbl+'</label><input class="inp" id="mn" value="'+esc(nm)+'" placeholder="'+ph+'"></div>'+
+    '</div>'+
+    '<div class="icg" id="ico-grid" hidden>'+rIcoGrid(e,'icoSet(\'%E\')')+'</div>';
+  }
+  function sgs(list){
+    var s='';for(var i=0;i<list.length;i++)s+='<button type="button" class="sg" onclick="fillSg(\'me\',\''+esc(list[i].e)+'\',\'mn\',\''+esc(list[i].n)+'\');icoSync()">'+ICO(list[i].e,'sm')+list[i].n+'</button>';
+    return '<div class="lbl">Быстрый выбор</div><div class="sgs">'+s+'</div>';
+  }
+  function recur(on,t){
+    return '<label class="chkrow"><input type="checkbox" id="mr" role="switch"'+(on?' checked':'')+'>'+
+      '<span><b>'+t+'</b><i>Сумма перенесётся в новый месяц автоматически</i></span></label>';
+  }
 
   if(m.type==='add-income'||m.type==='edit-income'){
     var d=m.data||{name:'',emoji:'💰',amount:''};
-    var sg='';for(var i=0;i<IC.length;i++)sg+='<button type="button" class="sg" onclick="fillSg(\'me\',\''+esc(IC[i].e)+'\',\'mn\',\''+esc(IC[i].n)+'\')">'+IC[i].e+' '+IC[i].n+'</button>';
-    body='<div class="mhd">'+(m.type==='add-income'?'Добавить доход':'Изменить доход')+'<button type="button" class="mcl" onclick="closeModal()">×</button></div>'+
-      '<div class="sgs">'+sg+'</div>'+
-      '<div class="ir"><div class="f" style="flex:0 0 68px"><label for="me">Иконка</label><input class="inp" id="me" value="'+esc(d.emoji||'💰')+'" style="text-align:center;font-size:1.375rem" maxlength="4"></div>'+
-      '<div class="f"><label>Название</label><input class="inp" id="mn" value="'+esc(d.name)+'" placeholder="Зарплата"></div></div>'+
-      '<div class="f"><label>Сумма ₽</label><input class="inp" id="ma" type="text" inputmode="decimal" oninput="fmtInp(this)" value="'+(d.amount||'')+'" placeholder="0"></div>'+
+    body=hd(m.type==='add-income'?'Добавить доход':'Изменить доход')+
+      amt('Сумма, ₽','fmtInp(this)',nf(d.amount||''))+
+      sgs(IC)+
+      icoRow(d.emoji||'💰',d.name,'Зарплата','Название')+
       '<div class="f"><label for="mdi">Когда придёт</label>'+
         '<input class="inp" id="mdi" type="date" value="'+esc(d.date||'')+'" min="'+b.dateFrom+'" max="'+b.dateTo+'">'+
         '<i class="fhint">Пусто — деньги уже на руках. С датой видно, сколько на картах сейчас и сколько станет после прихода.</i></div>'+
-      '<label class="chkrow"><input type="checkbox" id="mr"'+(d.recur?' checked':'')+'>'+
-        '<span><b>Повторяющийся</b><i>Сумма перенесётся в новый месяц автоматически</i></span></label>'+
+      recur(d.recur,'Повторяющийся')+
       '<div class="max">'+
-        (m.type==='edit-income'?'<button type="button" class="btn bd" onclick="delInc(\''+d.id+'\')">Удалить</button>':'')+
         '<button type="button" class="btn bp" onclick="saveInc()">Сохранить</button>'+
+        (m.type==='edit-income'?'<button type="button" class="btn bd" onclick="armDel(this,\'inc\',\''+d.id+'\')">Удалить</button>':'')+
       '</div>';
   }
 
   if(m.type==='add-planned'||m.type==='edit-planned'){
     var dp=m.data||{name:'',emoji:'✨',amount:''};
-    var sgp='';for(var ei=0;ei<EC.length;ei++)sgp+='<button type="button" class="sg" onclick="fillSg(\'me\',\''+esc(EC[ei].e)+'\',\'mn\',\''+esc(EC[ei].n)+'\')">'+EC[ei].e+' '+EC[ei].n+'</button>';
-    body='<div class="mhd">'+(m.type==='add-planned'?'Добавить категорию':'Изменить категорию')+'<button type="button" class="mcl" onclick="closeModal()">×</button></div>'+
-      '<div class="sgs">'+sgp+'</div>'+
-      '<div class="ir"><div class="f" style="flex:0 0 68px"><label for="me">Иконка</label><input class="inp" id="me" value="'+esc(dp.emoji||'✨')+'" style="text-align:center;font-size:1.375rem" maxlength="4"></div>'+
-      '<div class="f"><label>Категория</label><input class="inp" id="mn" value="'+esc(dp.name)+'" placeholder="Коммуналка"></div></div>'+
-      '<div class="f"><label>Сумма ₽</label><input class="inp" id="ma" type="text" inputmode="decimal" oninput="fmtInp(this);updPlnPrev(this.value)" value="'+(dp.amount||'')+'" placeholder="0"></div>'+
-      '<div id="pln-prev" class="pprev"></div>'+
-      '<label class="chkrow"><input type="checkbox" id="mr"'+(dp.recur?' checked':'')+'>'+
-        '<span><b>Повторяющаяся</b><i>Сумма перенесётся в новый месяц автоматически</i></span></label>'+
+    var acts='';
+    if(m.type==='edit-planned'){
+      /* То, что раньше было в меню «⋯» у строки категории */
+      var prem=calcCatRem(b,dp.id);
+      var pdays=Math.max(1,getDays(today()>b.dateFrom?today():b.dateFrom,b.dateTo));
+      acts='<div class="acts2">'+
+        '<button type="button" class="btn bs" onclick="openTr(\''+dp.id+'\')">'+SV(IP.swap,18,2.2)+'<span>'+(prem<0?'Покрыть перерасход':'Перераспределить')+'</span></button>'+
+        (prem>0
+          ?'<button type="button" class="btn bs" onclick="closeModal();moveRemToDaily(\''+dp.id+'\')"><span>Остаток в дневные</span><span class="mt" style="font-size:.75rem;font-weight:500">бюджет на день +'+fmt(prem/pdays)+'</span></button>'
+          :'')+
+      '</div>';
+    }
+    body=hd(m.type==='add-planned'?'Добавить категорию':'Изменить категорию')+
+      amt('Лимит на месяц, ₽','fmtInp(this);updPlnPrev(this.value)',nf(dp.amount||''))+
+      '<div id="pln-prev" class="pprev" style="text-align:center"></div>'+
+      sgs(EC)+
+      icoRow(dp.emoji||'✨',dp.name,'Коммуналка','Категория')+
+      recur(dp.recur,'Повторяющаяся')+
+      acts+
       '<div class="max">'+
-        (m.type==='edit-planned'?'<button type="button" class="btn bd" onclick="delPln(\''+dp.id+'\')">Удалить</button>':'')+
         '<button type="button" class="btn bp" onclick="savePln()">Сохранить</button>'+
+        (m.type==='edit-planned'?'<button type="button" class="btn bd" onclick="armDel(this,\'pln\',\''+dp.id+'\')">Удалить</button>':'')+
       '</div>';
   }
 
   if(m.type==='edit-tx'){
     var tx=m.data;
-    var po='<option value="">Дневные расходы</option>';
+    var po='<option value="">Дневные расходы · '+fmt(calcDayBal(b))+'</option>';
     for(var oi=0;oi<b.planned.length;oi++){
       var op=b.planned[oi],or2=calcCatRem(b,op.id);
       var os=(or2<0?'−':'')+fmt(Math.abs(or2));
       po+='<option value="p:'+op.id+'"'+(tx.plannedCatId===op.id?' selected':'')+'>'+(op.emoji||'📌')+' '+esc(op.name)+' · '+os+'</option>';
     }
-    body='<div class="mhd">Изменить расход<button type="button" class="mcl" onclick="closeModal()">×</button></div>'+
-      '<div class="f"><label>Описание</label><input class="inp" id="mn" value="'+esc(tx.name)+'"></div>'+
-      '<div class="ir">'+
-        '<div class="f"><label>Сумма ₽</label><input class="inp" id="ma" type="text" inputmode="decimal" oninput="fmtInp(this)" value="'+tx.amount+'"></div>'+
-        '<div class="f"><label>Дата</label><input class="inp" id="md" type="date" value="'+tx.date+'" min="'+b.dateFrom+'" max="'+(today()<b.dateTo?today():b.dateTo)+'"></div>'+
-      '</div>'+
-      '<div class="f"><label>Категория</label><select class="inp" id="mc2">'+po+'</select></div>'+
+    body=hd('Изменить расход')+
+      amt('Сумма, ₽','fmtInp(this)',nf(tx.amount))+
+      '<div class="f"><label for="mn">Описание</label><input class="inp" id="mn" value="'+esc(tx.name)+'"></div>'+
+      '<div class="f"><label for="mc2">Категория</label><select class="inp" id="mc2">'+po+'</select></div>'+
+      '<div class="f"><label for="md">Дата</label><input class="inp" id="md" type="date" value="'+tx.date+'" min="'+b.dateFrom+'" max="'+(today()<b.dateTo?today():b.dateTo)+'"></div>'+
       '<div class="max">'+
-        '<button type="button" class="btn bd" onclick="delTx(\''+tx.id+'\')">Удалить</button>'+
         '<button type="button" class="btn bp" onclick="saveTx(\''+tx.id+'\')">Сохранить</button>'+
+        '<button type="button" class="btn bd" onclick="armDel(this,\'tx\',\''+tx.id+'\')">Удалить</button>'+
       '</div>';
   }
 
   if(m.type==='budget-edit'){
     var bd=m.data||{};
-    body='<div class="mhd">Даты бюджета<button type="button" class="mcl" onclick="closeModal()">×</button></div>'+
+    body=hd('Даты бюджета')+
       '<div class="ir">'+
         '<div class="f"><label for="be-from">С</label><input class="inp" type="date" id="be-from" value="'+bd.dateFrom+'"></div>'+
         '<div class="f"><label for="be-to">По</label><input class="inp" type="date" id="be-to" value="'+bd.dateTo+'"></div>'+
@@ -3025,19 +2695,17 @@ function rModal(b){
       tOpts+='<option value="'+trp.id+'"'+(preToId===trp.id?' selected':'')+'>'+(trp.emoji||'📌')+' '+esc(trp.name)+' · '+trS+'</option>';
     }
     _trCtx={pln:b.planned,bid:b.id,dayBal:dbal};
-    body='<div class="mhd">Перераспределить<button type="button" class="mcl" onclick="closeModal()">×</button></div>'+
-      '<div class="f"><label>Откуда</label><select class="inp" id="mf" onchange="updTrPrev()">'+fOpts+'</select></div>'+
-      '<div class="f"><label>Куда</label><select class="inp" id="mt" onchange="updTrPrev()">'+tOpts+'</select></div>'+
-      /* Без округления: Math.round(preAmt) подставлял 2623 вместо 2623.42,
-         перевод закрывал перерасход не полностью, и в категории оставалось
-         «−0 ₽» — сумма, которую невозможно ввести с экрана. */
-      '<div class="f"><label>Сумма ₽</label><input class="inp" id="ma" type="text" inputmode="decimal" oninput="fmtInp(this);updTrPrev()" value="'+(preAmt?Math.round(preAmt*100)/100:'')+'" placeholder="0"></div>'+
+    body=hd('Перераспределить')+
+      /* Без округления: Math.round(preAmt) оставлял в категории «−0 ₽» */
+      amt('Сумма, ₽','fmtInp(this);updTrPrev()',(preAmt?Math.round(preAmt*100)/100:''))+
+      '<div class="f"><label for="mf">Откуда</label><select class="inp" id="mf" onchange="updTrPrev()">'+fOpts+'</select></div>'+
+      '<div class="f"><label for="mt">Куда</label><select class="inp" id="mt" onchange="updTrPrev()">'+tOpts+'</select></div>'+
       '<div id="tr-prev" class="trprev"></div>'+
       '<div id="tr-err" class="auth-err"></div>'+
       '<div class="max"><button type="button" class="btn bp" onclick="doTr()">Перевести</button></div>';
   }
 
-  return '<div class="overlay" onclick="ovClick(event)"><div class="modal"><div class="mdrag"></div><div class="mbody">'+body+'</div></div></div>';
+  return '<div class="overlay" onclick="ovClick(event)"><div class="modal" role="dialog" aria-modal="true"><div class="mdrag"></div><div class="mbody">'+body+'</div></div></div>';
 }
 
 /* ── PLANNED PREVIEW ─────────────────────────── */
@@ -3166,79 +2834,91 @@ function wdTP(){var t=0;for(var i=0;i<wd.planned.length;i++)t+=pf(wd.planned[i].
 
 function rWiz(){if(wizStep===0)return rWz0();if(wizStep===1)return rWz1();return rWz2();}
 
+function rWzHead(step){
+  return '<header class="hdr" role="banner"><span class="ttl"><span>Новый бюджет</span></span></header>'+
+    '<div class="wz"><div class="wzsteps" role="img" aria-label="Шаг '+(step+1)+' из 3">'+
+      '<i class="on"></i><i'+(step>0?' class="on"':'')+'></i><i'+(step>1?' class="on"':'')+'></i></div>';
+}
+function wzOk(t){return '<li>'+(t[0]==='+'?'<span class="gd">'+SV(IP.check,16,2.8)+'</span>':'<span class="rd">'+SV(IP.x,16,2.8)+'</span>')+'<span>'+t.slice(1)+'</span></li>';}
+/* Строка мастера: иконка из набора, название, сумма, «каждый месяц».
+   «Каждый месяц» — та же отметка, что в окне дохода и категории:
+   сумма перенесётся в следующий бюджет сама. */
+var wzIcoAt='';
+function wzIco(a,i){wzIcoAt=(wzIcoAt===a+':'+i)?'':a+':'+i;render();}
+function wzIcoSet(a,i,e){wf(a,i,'emoji',e);wzIcoAt='';render();}
+function wzRc(a,i){var x=a==='inc'?wd.incomes[i]:wd.planned[i];if(x){x.recur=!x.recur;render();}}
+function rWzRow(a,ri,r,ph,defE,upd){
+  var e=r.emoji||defE,open=wzIcoAt===a+':'+ri;
+  return '<div class="wrow">'+
+    '<div class="wrow-t">'+
+      '<button type="button" class="wico'+(open?' open':'')+'" onclick="wzIco(\''+a+'\','+ri+')" aria-label="Иконка: выбрать">'+ICO(e)+'</button>'+
+      '<input class="wnm" value="'+esc(r.name)+'" placeholder="'+ph+'" oninput="wf(\''+a+'\','+ri+',\'name\',this.value)" aria-label="Название">'+
+      '<button type="button" class="wdl" onclick="'+(a==='inc'?'wzDI':'wzDP')+'('+ri+')" aria-label="Убрать строку">'+SV(IP.x,18,2.4)+'</button>'+
+    '</div>'+
+    (open?'<div class="icg">'+rIcoGrid(e,'wzIcoSet(\''+a+'\','+ri+',\'%E\')')+'</div>':'')+
+    '<div class="wrow-b">'+
+      '<input class="wam" type="text" inputmode="decimal" value="'+(r.amount||'')+'" placeholder="0 ₽" oninput="fmtInp(this);wf(\''+a+'\','+ri+',\'amount\',pf(this.value));'+upd+'()" aria-label="Сумма">'+
+      '<button type="button" class="wrc'+(r.recur?' on':'')+'" onclick="wzRc(\''+a+'\','+ri+')" aria-pressed="'+(r.recur?'true':'false')+'">'+SV(IP.rep,16,2.4)+'Каждый месяц</button>'+
+    '</div>'+
+  '</div>';
+}
 function rWz0(){
   var d=wd,ti=wdTI();
   var pk={};for(var pi=0;pi<d.incomes.length;pi++)pk[d.incomes[pi].name]=true;
-  var chips='';for(var ci=0;ci<IC.length;ci++)chips+='<button type="button" class="chip'+(pk[IC[ci].n]?' pkd':'')+'" onclick="wzTI(\''+esc(IC[ci].e)+'\',\''+esc(IC[ci].n)+'\')">'+IC[ci].e+' '+IC[ci].n+'</button>';
+  var chips='';for(var ci=0;ci<IC.length;ci++)chips+='<button type="button" class="chip'+(pk[IC[ci].n]?' pkd':'')+'" onclick="wzTI(\''+esc(IC[ci].e)+'\',\''+esc(IC[ci].n)+'\')">'+ICO(IC[ci].e,'sm')+IC[ci].n+'</button>';
   var rows='';
-  for(var ri=0;ri<d.incomes.length;ri++){
-    var r=d.incomes[ri];
-    rows+='<tr><td colspan="3"><div class="wri">'+
-      '<input class="wem" value="'+esc(r.emoji||'💰')+'" oninput="wf(\'inc\','+ri+',\'emoji\',this.value)" maxlength="4">'+
-      '<input class="wnm" value="'+esc(r.name)+'" placeholder="Название" oninput="wf(\'inc\','+ri+',\'name\',this.value)">'+
-    '</div></td>'+
-    '<td><input class="wam" type="text" inputmode="decimal" value="'+(r.amount||'')+'" placeholder="0" oninput="fmtInp(this);wf(\'inc\','+ri+',\'amount\',pf(this.value));updIT()"></td>'+
-    '<td><button type="button" class="wdl" onclick="wzDI('+ri+')">×</button></td></tr>';
-  }
-  return '<div class="hdr" role="banner"><div class="hdr-r1"><h1 class="logo">✦ <span>Б</span>юджет</h1></div></div>'+
-  '<div class="wz"><div class="wzstar">✦</div><div class="wztt">Деньги</div>'+
-  '<ul class="wzdc"><li><span style="color:var(--gd)">✓</span>Зарплата, авансы, остатки на картах.</li><li><span style="color:var(--rd)">✗</span>Депозиты и резервные счета.</li></ul>'+
+  for(var ri=0;ri<d.incomes.length;ri++)rows+=rWzRow('inc',ri,d.incomes[ri],'Название','💰','updIT');
+  return rWzHead(0)+
+  '<div class="wztt">Деньги</div>'+
+  '<ul class="wzdc">'+wzOk('+Зарплата, авансы, остатки на картах.')+wzOk('−Депозиты и резервные счета.')+'</ul>'+
   '<div class="wzcard">'+
-    '<div class="wzper">🗓 <b>'+fmtSh(d.dateFrom)+' — '+fmtSh(d.dateTo)+'</b> · '+getDays(d.dateFrom,d.dateTo)+' дней · <button type="button" class="wzpb" onclick="wzTD()">Изменить</button></div>'+
-    (d.showDates?'<div class="ir mb12"><div class="f"><label>С</label><input class="inp" type="date" id="wz-f" value="'+d.dateFrom+'" onchange="wzDts()"></div><div class="f"><label>По</label><input class="inp" type="date" id="wz-t" value="'+d.dateTo+'" onchange="wzDts()"></div></div>':'')+
+    '<div class="wzper">'+SV(IP.cal,16,2.2)+'<b>'+fmtSh(d.dateFrom)+' — '+fmtSh(d.dateTo)+'</b> · '+getDays(d.dateFrom,d.dateTo)+' дней · <button type="button" class="wzpb" onclick="wzTD()">Изменить</button></div>'+
+    (d.showDates?'<div class="ir" style="margin-bottom:12px"><div class="f"><label for="wz-f">С</label><input class="inp" type="date" id="wz-f" value="'+d.dateFrom+'" onchange="wzDts()"></div><div class="f"><label for="wz-t">По</label><input class="inp" type="date" id="wz-t" value="'+d.dateTo+'" onchange="wzDts()"></div></div>':'')+
     '<div class="chips">'+chips+'</div>'+
-    '<table class="wt"><thead><tr><th colspan="3">Статья дохода</th><th>Сумма</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>'+
+    '<div class="wrows">'+rows+'</div>'+
     '<button type="button" class="wzadd" onclick="wzAI()">+ Добавить</button>'+
-    '<div class="wztot"><span>Итого:</span><span class="am" id="wz-it">'+fmt(ti)+'</span></div>'+
+    '<div class="wztot"><span>Итого</span><span class="am" id="wz-it">'+fmt(ti)+'</span></div>'+
   '</div>'+
-  '<div class="wznav"><span></span><button type="button" id="wz-next0" class="btn bp" onclick="wzN(0)"'+(ti>0?'':' disabled')+'>Продолжить →</button></div></div>';
+  '<div class="wznav"><button type="button" id="wz-next0" class="btn bp" onclick="wzN(0)"'+(ti>0?'':' disabled')+'>Продолжить →</button></div></div>';
 }
 
 function rWz1(){
   var d=wd,ti=wdTI(),tp=wdTP(),avail=ti-tp,days=wdAccDays(d),daily=avail>0?avail/days:0;
   var pk={};for(var pi=0;pi<d.planned.length;pi++)pk[d.planned[pi].name]=true;
-  var chips='';for(var ci=0;ci<EC.length;ci++)chips+='<button type="button" class="chip'+(pk[EC[ci].n]?' pkd':'')+'" onclick="wzTP(\''+esc(EC[ci].e)+'\',\''+esc(EC[ci].n)+'\')">'+EC[ci].e+' '+EC[ci].n+'</button>';
+  var chips='';for(var ci=0;ci<EC.length;ci++)chips+='<button type="button" class="chip'+(pk[EC[ci].n]?' pkd':'')+'" onclick="wzTP(\''+esc(EC[ci].e)+'\',\''+esc(EC[ci].n)+'\')">'+ICO(EC[ci].e,'sm')+EC[ci].n+'</button>';
   var rows='';
-  for(var ri=0;ri<d.planned.length;ri++){
-    var r=d.planned[ri];
-    rows+='<tr><td colspan="3"><div class="wri">'+
-      '<input class="wem" value="'+esc(r.emoji||'✨')+'" oninput="wf(\'pln\','+ri+',\'emoji\',this.value)" maxlength="4">'+
-      '<input class="wnm" value="'+esc(r.name)+'" placeholder="Категория" oninput="wf(\'pln\','+ri+',\'name\',this.value)">'+
-    '</div></td>'+
-    '<td><input class="wam" type="text" inputmode="decimal" value="'+(r.amount||'')+'" placeholder="0" oninput="fmtInp(this);wf(\'pln\','+ri+',\'amount\',pf(this.value));updPT()"></td>'+
-    '<td><button type="button" class="wdl" onclick="wzDP('+ri+')">×</button></td></tr>';
-  }
-  return '<div class="hdr" role="banner"><div class="hdr-r1"><h1 class="logo">✦ <span>Б</span>юджет</h1></div></div>'+
-  '<div class="wz"><div class="wzstar">✦</div><div class="wztt">Плановые расходы</div>'+
-  '<ul class="wzdc"><li><span style="color:var(--gd)">✓</span>Аренда, счета, долги.</li><li><span style="color:var(--gd)">✓</span>10–15% дохода на непредвиденные.</li><li><span style="color:var(--rd)">✗</span>Кафе, такси — дневной бюджет.</li></ul>'+
+  for(var ri=0;ri<d.planned.length;ri++)rows+=rWzRow('pln',ri,d.planned[ri],'Категория','✨','updPT');
+  return rWzHead(1)+
+  '<div class="wztt">Плановые расходы</div>'+
+  '<ul class="wzdc">'+wzOk('+Аренда, счета, долги.')+wzOk('+10–15% дохода на непредвиденные.')+wzOk('−Кафе, такси — дневной бюджет.')+'</ul>'+
   '<div class="wzcard">'+
-    '<div class="wzinfo">Доход: <b>'+fmt(ti)+'</b> · Дневной: <b style="color:var(--accent)" id="wz-dl">'+fmt(daily)+'/день</b></div>'+
+    '<div class="wzinfo">Доход: <b>'+fmt(ti)+'</b> · Дневной: <b class="gd" id="wz-dl">'+fmt(daily)+'/день</b></div>'+
     '<div class="chips">'+chips+'</div>'+
-    '<table class="wt"><thead><tr><th colspan="3">Категория</th><th>Сумма</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>'+
+    '<div class="wrows">'+rows+'</div>'+
     '<button type="button" class="wzadd" onclick="wzAP()">+ Добавить</button>'+
-    '<div class="wztot"><span>Итого:</span><span class="am" id="wz-pt">'+fmt(tp)+'</span></div>'+
+    '<div class="wztot"><span>Итого</span><span class="am" id="wz-pt">'+fmt(tp)+'</span></div>'+
   '</div>'+
-  '<div class="wznav"><button type="button" class="wzbk" onclick="wizStep=0;render()">← Назад</button><button type="button" class="btn bp" onclick="wzN(1)">Продолжить →</button></div></div>';
+  '<div class="wznav"><button type="button" class="btn bs wzbk" onclick="wizStep=0;render()">← Назад</button><button type="button" class="btn bp" onclick="wzN(1)">Продолжить →</button></div></div>';
 }
 
 function rWz2(){
   var d=wd,ti=wdTI(),tp=wdTP(),avail=ti-tp,days=wdAccDays(d),daily=avail>0?avail/days:0;
-  return '<div class="hdr" role="banner"><div class="hdr-r1"><h1 class="logo">✦ <span>Б</span>юджет</h1></div></div>'+
-  '<div class="wz"><div class="wzstar">✦</div><div class="wztt">Твой дневной бюджет</div>'+
-  '<div class="wzcard" style="text-align:center;padding:24px 16px">'+
+  return rWzHead(2)+
+  '<div class="wztt">Твой дневной бюджет</div>'+
+  '<div class="wzcard" style="margin-top:16px">'+
     '<div class="wznum">'+fmt(daily)+'</div>'+
     '<div class="wzlbl">можно тратить каждый день</div>'+
     '<ul class="cl"><li>Трать на что угодно из дневного бюджета.</li><li>Накопилось — добавится завтра.</li><li>Ушли в минус — завтра меньше.</li></ul>'+
   '</div>'+
-  '<div class="wznav"><button type="button" class="wzbk" onclick="wizStep=1;render()">← Назад</button><button type="button" class="btn bp" onclick="wzCr()">Запустить →</button></div></div>';
+  '<div class="wznav"><button type="button" class="btn bs wzbk" onclick="wizStep=1;render()">← Назад</button><button type="button" class="btn bp" onclick="wzCr()">Запустить →</button></div></div>';
 }
 
 function rEmpty(){
-  return '<div class="hdr" role="banner"><div class="hdr-r1"><h1 class="logo">✦ <span>Б</span>юджет</h1></div></div>'+
+  return '<header class="hdr" role="banner"><span class="ttl"><span>Бюджет</span></span></header>'+
   '<div class="pg"><div class="empty">'+
-    '<div style="font-size:2.875rem;margin-bottom:12px">✦</div>'+
-    '<div style="font-size:1.375rem;font-weight:700;margin-bottom:8px">Нет бюджета</div>'+
-    '<div style="font-size:0.9375rem;color:var(--mt);font-weight:500;margin-bottom:20px">Создай бюджет на месяц — и начни контролировать деньги</div>'+
+    '<div class="empty-mk" aria-hidden="true">✦</div>'+
+    '<div class="empty-t">Нет бюджета</div>'+
+    '<div class="empty-s">Создай бюджет на месяц — и начни контролировать деньги</div>'+
     '<button type="button" class="btn bp" onclick="startWz()">+ Создать бюджет</button>'+
   '</div></div>';
 }
@@ -3247,8 +2927,8 @@ function rEmpty(){
 function bindEmpty(){window.startWz=function(){tab='wizard';wizStep=0;wd=initWD();render();};}
 
 function bindMain(b){
-  window.setTab    =function(t){tab=t;drop=false;render();};
-  window.openStats =function(){tab='stats';drop=false;render();};
+  window.setTab    =function(t){tab=t;drop=false;usrMenu=false;render();window.scrollTo(0,0);};
+  window.openStats =function(){tab='stats';drop=false;render();window.scrollTo(0,0);};
   /* Смена интервала пересобирает список — раскрытая категория в нём может
      и не встретиться, поэтому раскрытие снимается вместе с интервалом. */
   window.setRange  =function(r){statRange=r;statOpen='';render();};
@@ -3358,8 +3038,9 @@ function bindMain(b){
     try{ if(navigator.vibrate)navigator.vibrate(12); }catch(e){}
     save();render();
     var go=document.getElementById('qa-go');
-    if(go){go.classList.add('ok');go.textContent='✓';
-      setTimeout(function(){var g2=document.getElementById('qa-go');if(g2){g2.classList.remove('ok');g2.textContent='→';}},700);}
+    if(go){go.classList.add('ok');go.innerHTML=SV(IP.check,20,2.8);
+      setTimeout(function(){var g2=document.getElementById('qa-go');if(g2){g2.classList.remove('ok');g2.innerHTML=SV(IP.up,20,2.6);}},700);}
+    showToast(esc(p.name)+' · <b>'+fmt(p.amount)+'</b> записано'+(useDate!==today()?' на '+fmtSh(useDate):''),nid);
     setTimeout(function(){ if(freshTx===nid){freshTx=null;} },1400);
   };
 
@@ -3373,7 +3054,7 @@ function bindMain(b){
   window.editInc=function(id){var i=b.incomes.filter(function(x){return x.id===id;})[0];incMenu=null;modal={type:'edit-income',data:Object.assign({},i)};render();};
   /* Метка удаления обязательна: без неё второе устройство вернёт строку
      обратно при первом же слиянии — она там ещё жива и с прежним mod. */
-  window.delInc =function(id){if(!confirm('Удалить?'))return;incMenu=null;ripEnt('inc',id);b.incomes=b.incomes.filter(function(i){return i.id!==id;});recalcDaily(b);save();modal=null;render();};
+  window.delInc =function(id,ok){if(!ok&&!confirm('Удалить?'))return;incMenu=null;ripEnt('inc',id);b.incomes=b.incomes.filter(function(i){return i.id!==id;});recalcDaily(b);save();modal=null;render();};
   window.saveInc=function(){
     var n=((document.getElementById('mn')||{}).value||'').trim();
     var a=pf((document.getElementById('ma')||{}).value);
@@ -3396,14 +3077,14 @@ function bindMain(b){
     _pc={b:b,inc:b.incomes,pln:b.planned,eid:id,days:getDays(b.dateFrom,b.dateTo),curD:b.dailyBudget};
     modal={type:'edit-planned',data:Object.assign({},p)};render();
   };
-  window.delPln=function(id){
+  window.delPln=function(id,ok){
     /* Считаем привязанные траты — они станут дневными, иначе сломается баланс */
     var linked=S.txs.filter(function(t){return t.budgetId===b.id&&t.plannedCatId===id;});
     var msg=linked.length
       ?'Удалить категорию? '+linked.length+' '+plural(linked.length,'трата','траты','трат')
         +' '+(linked.length===1?'перейдёт':'перейдут')+' в «Дневные расходы».'
       :'Удалить категорию?';
-    if(!confirm(msg))return;
+    if(!ok&&!confirm(msg))return;
     plnMenu=null;
     for(var i=0;i<S.txs.length;i++){
       var t=S.txs[i];
@@ -3459,7 +3140,29 @@ function bindMain(b){
   };
 
   window.editTx=function(id){var tx=S.txs.filter(function(t){return t.id===id;})[0];txMenu=null;if(tx){modal={type:'edit-tx',data:Object.assign({},tx)};render();}};
-  window.delTx =function(id){if(!confirm('Удалить трату?'))return;ripEnt('tx',id);S.txs=S.txs.filter(function(t){return t.id!==id;});txMenu=null;save();modal=null;render();};
+  window.delTx =function(id,ok){if(!ok&&!confirm('Удалить трату?'))return;ripEnt('tx',id);S.txs=S.txs.filter(function(t){return t.id!==id;});txMenu=null;save();modal=null;render();};
+  /* Удаление в два касания вместо системного confirm: первое касание
+     «взводит» кнопку, второе удаляет. Через 3 секунды кнопка остывает. */
+  window.armDel=function(btn,kind,id){
+    if(!btn.classList.contains('armed')){
+      btn.dataset.t=btn.textContent;btn.classList.add('armed');
+      var msg='Нажми ещё раз — удалить';
+      if(kind==='pln'){var n=S.txs.filter(function(t){return t.budgetId===b.id&&t.plannedCatId===id;}).length;
+        if(n)msg='Ещё раз — удалить. '+n+' '+plural(n,'трата перейдёт','траты перейдут','трат перейдут')+' в дневные';}
+      btn.textContent=msg;
+      setTimeout(function(){if(btn.isConnected&&btn.classList.contains('armed')){btn.classList.remove('armed');btn.textContent=btn.dataset.t;}},3000);
+      return;
+    }
+    if(kind==='tx')window.delTx(id,true);
+    if(kind==='inc')window.delInc(id,true);
+    if(kind==='pln')window.delPln(id,true);
+  };
+  /* «Отменить» во всплывашке после записи — обычное удаление этой траты */
+  window.undoTx=function(id){
+    var e=document.getElementById('toast');if(e)e.remove();
+    if(!S.txs.some(function(t){return t.id===id;}))return;
+    ripEnt('tx',id);S.txs=S.txs.filter(function(t){return t.id!==id;});freshTx=null;save();render();
+  };
   window.saveTx=function(id){
     var tx=S.txs.filter(function(t){return t.id===id;})[0];if(!tx)return;
     /* Проверки ДО записи в трату: отклонённая правка не должна оставаться

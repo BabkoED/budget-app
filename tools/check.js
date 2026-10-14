@@ -172,7 +172,7 @@ function checkPlural(ok){
   r=await pg.evaluate(()=>({a:S.activeBudgetId,c:window.__CLOUD__.activeBudgetId}));
   ok('после сохранения активен сентябрь',r.a==='b-sep',r);
   ok('в облако уехал сентябрь',r.c==='b-sep',r);
-  const names=()=>pg.evaluate(()=>Array.from(document.querySelectorAll('.tbl tbody .t-tx')).map(e=>e.textContent.trim()));
+  const names=()=>pg.evaluate(()=>Array.from(document.querySelectorAll('main .tx .nm')).map(e=>e.textContent.trim()));
   await pg.evaluate(()=>setTab('incomes'));await wait(150);
   ok('вкладка Доходы — сентябрьская',JSON.stringify(await names())==='["Зарплата сентября"]',await names());
   await pg.evaluate(()=>setTab('planned'));await wait(150);
@@ -214,12 +214,12 @@ function checkPlural(ok){
 
   console.log('\n5. Вид не начавшегося периода');
   await pg.evaluate(()=>swBdg('b-oct'));await wait(250);
-  r=await pg.evaluate(()=>({hdr:(document.querySelector('.balbtn')||{}).textContent,
-    bar:(document.querySelector('.cur-bar')||{}).textContent,
-    hero:(document.querySelector('.hero-top')||{}).textContent,
-    big:(document.querySelector('.hero-big')||{}).textContent}));
+  r=await pg.evaluate(()=>({hdr:(document.querySelector('.hdr')||{textContent:''}).textContent,
+    bar:(document.querySelector('.cur-bar')||{textContent:''}).textContent,
+    hero:(document.querySelector('.hero-top')||{textContent:''}).textContent,
+    big:(document.querySelector('.hero .big')||{textContent:''}).textContent}));
   console.log('   ',JSON.stringify(r));
-  ok('в шапке период, а не «0 ₽ / день»',r.hdr.includes('окт'),r.hdr);
+  ok('в шапке период, а не «0 ₽ / день»',/окт/i.test(r.hdr),r.hdr);
   ok('полоса говорит «будущий», а не «прошлый»',r.bar.includes('будущий'),r.bar);
   ok('карточка называет дату старта',r.hero.includes('начнётся через 30'),r.hero);
   ok('крупно — вся сумма бюджета',r.big.replace(/\D/g,'')==='130000',r.big);
@@ -308,16 +308,16 @@ function checkPlural(ok){
      Math.abs(r.before.inv)>1&&Math.abs(r.inv)<0.01,r);
   r=await pg2.evaluate(()=>{
     var b=getAB(),cat=b.planned[0];
-    var before=(document.querySelector('.hero-sub')||{}).textContent||'';
+    var before=(document.querySelector('.hero .pills')||{textContent:''}).textContent||'';
     S.txs.push({id:'t-cat-today',seq:98,date:today(),name:'Аренда',category:cat.name,
       categoryEmoji:cat.emoji,plannedCatId:cat.id,amount:9000,budgetId:b.id,mod:Date.now()});
     render();
-    var sub=(document.querySelector('.hero-sub')||{}).textContent||'';
-    var w=parseFloat(((document.querySelector('.hero-fill')||{style:{}}).style.width)||'0');
+    var sub=(document.querySelector('.hero .pills')||{textContent:''}).textContent||'';
+    var w=parseFloat(((document.querySelector('.hero .bar i')||{style:{}}).style.width)||'0');
     S.txs=S.txs.filter(function(t){return t.id!=='t-cat-today';});render();
     return {before:before,sub:sub,w:w,bal:calcDayBal(b)};
   });
-  ok('категорийная трата дня видна в подписи, а не тонет в нуле',/по категориям/.test(r.sub),r.sub);
+  ok('категорийная трата дня видна в подписи, а не тонет в нуле',/по категориям/i.test(r.sub),r.sub);
   ok('но полоса от неё не обнулилась — она про дневной запас',r.w>0&&r.bal>0,r);
   ok('без категорийных трат лишней подписи нет',!/по категориям/.test(r.before),r.before);
 
@@ -363,9 +363,9 @@ function checkPlural(ok){
   await wait(SAVE);
 
   await pg3.evaluate(()=>setTab('incomes'));await wait(150);
-  r=await pg3.evaluate(()=>({cash:(document.querySelector('.srow-cash')||{}).textContent||'',
-    pend:(document.querySelector('.srow-pend')||{}).textContent||'',
-    wait:document.querySelectorAll('.t-wait').length}));
+  r=await pg3.evaluate(()=>({cash:(Array.from(document.querySelectorAll('.kv')).find(function(e){return /На картах/.test(e.textContent);})||{textContent:''}).textContent||'',
+    pend:(document.querySelector('.kv.pend')||{textContent:''}).textContent||'',
+    wait:document.querySelectorAll('.tx.wait').length}));
   ok('на экране Доходы есть строка «На картах сейчас»',/На картах сейчас/.test(r.cash),r.cash);
   ok('и строка ожидаемого прихода с датой',/25 сент/.test(r.pend)&&/150\s?000/.test(r.pend.replace(/ /g,' ')),r.pend);
   ok('сам ожидаемый доход помечен в списке',r.wait===1,r);
