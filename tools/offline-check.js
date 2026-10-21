@@ -21,7 +21,7 @@
  * потому что через него воркер не проходит.
  */
 const fs = require('fs'), http = require('http'), path = require('path');
-const {ROOT, seedStateBusy, loadPlaywright} = require('./demo.js');
+const {ROOT, seedStateBusy, loadPlaywright, freezeDate} = require('./demo.js');
 const pw = loadPlaywright();
 
 let fails = 0;
@@ -85,6 +85,9 @@ function buildWithWorker() {
 
   const br = await pw.chromium.launch();
   const ctx = await br.newContext({viewport: {width: 430, height: 932}});
+  /* «Сегодня» внутри посева seedStateBusy (31.08-05.09). Без этого с 1 октября
+     приложение открывало пустой октябрь, и проверка 3б падала сама по себе. */
+  await ctx.addInitScript(freezeDate('2026-09-10'));
   const pg = await ctx.newPage();
   const errors = [];
   pg.on('pageerror', e => errors.push(e.message));
