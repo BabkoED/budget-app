@@ -934,6 +934,150 @@ function checkPlural(ok){
    ok('и после закрытия окна приложение перезапускается',after===undefined,{after:after});
    await p.context().close();}
 
+  /* ── 14б. Ревью исправлений 22.10 ─────────────
+     Что нашло ревью диффа раздела 14. Тот же порядок: сначала падало на
+     коде до правки, потом прошло. */
+  console.log('\n14б. Ревью исправлений 22.10');
+  /* Подсказка перевода считала дневные своей формулой и разошлась с самим
+     переводом там, где recalcDaily идёт другой веткой: закрытый период
+     («без изменений», а итог −5 000), норма в минусе (обещала рост, норма
+     осталась 0), будущий период (дневные уходили в минус). */
+  for(const cs of [{name:'закрытый период',bid:'b-aug',neg:false},{name:'норма в минусе',bid:'b-sep',neg:true},{name:'будущий период',bid:'b-oct',neg:false}]){
+   const st=seedState();st.activeBudgetId=cs.bid;
+   const p=await open13('2026-09-10',st);
+   r=await p.evaluate(cs=>{
+     swBdg(cs.bid);var b=getAB();
+     b.planned.push(touch({id:'p-food',name:'Продукты',emoji:'',amount:10000,recur:true}));recalcDaily(b);
+     if(cs.neg)S.txs.push(touch({id:'ov',seq:90,date:'2026-09-05',name:'Аренда',category:'Аренда',categoryEmoji:'',plannedCatId:b.planned[0].id,amount:100000,budgetId:b.id}));
+     save();render();
+     openTr(cs.neg?'p-food':'');document.getElementById('mt').value=b.planned[0].id;document.getElementById('ma').value='5 000';updTrPrev();
+     var num=function(e){var s=e?e.textContent:'';return (/[−-]/.test(s)?-1:1)*+(s.replace(/\D/g,''));};
+     var d=Array.from(document.querySelectorAll('#tr-prev .trprow')).filter(function(x){return /Дневной бюджет/.test(x.firstChild.textContent);})[0];
+     var nr=document.querySelector('#tr-prev .trpday b');
+     var pv={bal:d?num(d.querySelector('b')):null,norm:nr?num(nr):null};
+     var was={bal:Math.round(calcDayBal(b)),norm:Math.round(b.dailyBudget)};
+     doTr();var b2=getAB();
+     return{bid:b2.id,prev:pv,was:was,fact:{bal:Math.round(calcDayBal(b2)),norm:Math.round(b2.dailyBudget)}};},cs);
+   /* Показанное = итог; не показанное не должно меняться. У закрытого
+     периода нормы на экране нет вовсе — дней не осталось. */
+   const near=(a,b)=>Math.abs(a-b)<=1;
+   const same=r.bid===cs.bid&&near(r.prev.bal===null?r.was.bal:r.prev.bal,r.fact.bal)&&
+     (cs.bid==='b-aug'||near(r.prev.norm===null?r.was.norm:r.prev.norm,r.fact.norm));
+   ok('подсказка перевода = итог перевода: '+cs.name,same,r);
+   await p.context().close();}
+  /* Точка вместо запятой: на части клавиатур десятичная клавиша даёт «.»,
+     и 99.99 записывалось как 9 999 — та же ошибка, что с запятой. */
+  {const st=seedState();st.activeBudgetId='b-sep';
+   st.txs.push({id:'k2',seq:6,date:'2026-09-09',name:'Аптека',category:'',categoryEmoji:'',plannedCatId:null,amount:100,budgetId:'b-sep',mod:1});
+   const p=await open13('2026-09-10',st);
+   await p.evaluate(()=>editTx('k2'));await wait(100);
+   await p.fill('#ma','');await p.type('#ma','99.99');
+   const shown=await p.inputValue('#ma');
+   await p.evaluate(()=>saveTx('k2'));await wait(150);
+   r=await p.evaluate(()=>S.txs.filter(t=>t.id==='k2')[0].amount);
+   ok('сумма с точкой: «99.99» сохраняется как 99, в поле «99,»',r===99&&shown==='99,',{shown:shown,saved:r});
+   await p.context().close();}
+  /* Двойное нажатие «Выйти» при висящей сети: второй вызов спрашивал
+     ещё раз уже поверх экрана входа, а флаг «правки в пути» переезжал
+     в следующий вход. */
+  {const st=seedState();st.activeBudgetId='b-sep';
+   const p=await open13('2026-09-10',st);
+   r=await p.evaluate(async()=>{window.__CONF__=0;window.confirm=function(){window.__CONF__++;return true;};window.__HANG__=true;
+     S.txs.push(touch({id:'so2',seq:42,date:'2026-09-10',name:'Двойной',category:'',plannedCatId:null,amount:60,budgetId:'b-sep'}));save();
+     var a=signOut();await new Promise(z=>setTimeout(z,1500));var c=signOut();await Promise.all([a,c]);await new Promise(z=>setTimeout(z,200));
+     return{asked:window.__CONF__,user:!!currentUser,pending:pendingSave};});
+   ok('двойное «Выйти» при висящей сети: один вопрос, после выхода правок «в пути» нет',r.asked===1&&!r.user&&!r.pending,r);
+   await p.context().close();}
+  /* Меню периода в последний день обещало «Прибавится завтра», хотя
+     карточка дня это уже не обещает: завтра другой период. */
+  {const st=seedState();st.activeBudgetId='b-sep';
+   const p=await open13('2026-09-30',st);
+   r=await p.evaluate(()=>{togDrop();var d=document.querySelector('.drop');return d?d.textContent:'';});
+   ok('меню периода в последний день: без «Прибавится завтра»',!!r&&!/Прибавится завтра/.test(r),r.slice(0,160));
+   await p.context().close();}
+  /* Выход вчера, вход сегодня без перезагрузки: пока читается облако,
+     сверка дня по вчерашней метке рисовала «Нет бюджета / Создать». */
+  {const st=seedState();st.activeBudgetId='b-sep';
+   const p=await open13('2026-09-10',st);
+   r=await p.evaluate(async()=>{await signOut();await new Promise(z=>setTimeout(z,100));
+     window.__HANG_READ__=true;window.__setDay('2026-09-11');
+     document.getElementById('au-email').value='anton@example.com';document.getElementById('au-pass').value='secret123';
+     document.getElementById('au-btn').click();await new Promise(z=>setTimeout(z,600));
+     window.dispatchEvent(new Event('visibilitychange'));await new Promise(z=>setTimeout(z,200));
+     return{user:!!currentUser,empty:/Нет бюджета/.test(document.getElementById('app').textContent),
+       create:Array.from(document.querySelectorAll('#app button')).some(b=>/Создать бюджет/.test(b.textContent))};});
+   ok('вход на другой день, облако ещё читается: «Создать бюджет» не предлагает',r.user&&!r.empty&&!r.create,r);
+   await p.context().close();}
+  /* Новое устройство, облако на каждый запрос отвечает дольше срока.
+     Каждый повтор начинался с тех же 6 с, и экран ожидания не отпускал
+     никогда; выйти с него было нельзя. */
+  async function newDev(setup){
+    const st=seedState();st.activeBudgetId='b-sep';
+    const p=await (await br.newContext({viewport:{width:430,height:932}})).newPage();
+    p.on('pageerror',e=>{console.log('PAGEERROR(14б):',e.message);fails++;});
+    p.on('dialog',d=>d.accept());
+    await p.addInitScript(freezeDate('2026-09-10'));await p.goto(url);
+    await p.evaluate(([st,setup])=>{window.__CLOUD__=JSON.parse(JSON.stringify(st));Object.assign(window,setup);},[st,setup]);
+    await p.evaluate(()=>window.__initApp());await p.waitForTimeout(6600);
+    return p;
+  }
+  {const p=await newDev({__READ_DELAY__:6500});
+   r=await p.evaluate(async()=>{var wait=cloudUnread;await retryCloud();return{wait:wait,n:S.budgets.length,unread:cloudUnread};});
+   ok('облако отвечает дольше срока: повтор ждёт дольше и бюджеты открываются',r.wait&&r.n===3&&!r.unread,r);
+   await p.context().close();}
+  {const p=await newDev({__HANG_READ__:true});
+   r=await p.evaluate(async()=>{var btn=Array.from(document.querySelectorAll('#app button')).filter(b=>/Выйти/.test(b.textContent))[0];
+     if(btn)btn.click();await new Promise(z=>setTimeout(z,200));
+     return{btn:!!btn,user:!!currentUser,auth:getComputedStyle(document.getElementById('auth-screen')).display!=='none'};});
+   ok('с экрана ожидания облака можно выйти из аккаунта',r.btn&&!r.user&&r.auth,r);
+   await p.context().close();}
+  /* Страж: ошибка чтения облака (а не срок) тоже ведёт на экран ожидания —
+     withDeadline превращает отказ в NOT_READ. Падала бы, если обёртку
+     поменять, и вернулась бы ловушка «Нет бюджета / Создать». */
+  {const p=await newDev({__READ_FAIL__:true});
+   r=await p.evaluate(async()=>{var t=document.getElementById('app').textContent,
+       out={wait:cloudUnread,empty:/Нет бюджета/.test(t),create:Array.from(document.querySelectorAll('#app button')).some(b=>/Создать бюджет/.test(b.textContent))};
+     window.__READ_FAIL__=false;await retryCloud();out.n=S.budgets.length;return out;});
+   ok('чтение облака с ошибкой: экран ожидания, а не «Создать бюджет»; повтор открывает бюджеты',r.wait&&!r.empty&&!r.create&&r.n===3,r);
+   await p.context().close();}
+  /* Пока шёл повтор, облако дошло само (realtime), человек внёс трату,
+     и запоздавший ответ повтора перезаписал состояние без неё. */
+  {const p=await newDev({__HANG_READ__:true});
+   r=await p.evaluate(async()=>{window.__HANG_READ__=false;window.__READ_DELAY__=1500;
+     var pr=retryCloud();window.__READ_DELAY__=0;
+     await pullAndMerge();renderBg();
+     var b=getAB();S.txs.push(touch({id:'late1',seq:77,date:'2026-09-10',name:'Свежая',category:'',plannedCatId:null,amount:90,budgetId:b.id}));save();
+     await pr;await new Promise(z=>setTimeout(z,100));
+     return{has:S.txs.some(t=>t.id==='late1'),n:S.budgets.length};});
+   ok('запоздавший ответ повтора не стирает свежую трату',r.has&&r.n===3,r);
+   await p.context().close();}
+  /* Выход, пока после входа ещё читается облако: ответ приходил уже
+     без владельца — бюджеты оседали в бэкапе «anon» и рисовались
+     поверх экрана входа. */
+  {const st=seedState();st.activeBudgetId='b-sep';
+   const p=await open13('2026-09-10',st);
+   r=await p.evaluate(async()=>{await signOut();await new Promise(z=>setTimeout(z,100));
+     window.__READ_DELAY__=1500;
+     document.getElementById('au-email').value='anton@example.com';document.getElementById('au-pass').value='secret123';
+     document.getElementById('au-btn').click();await new Promise(z=>setTimeout(z,300));
+     window.__READ_DELAY__=0;await signOut();await new Promise(z=>setTimeout(z,2000));
+     return{user:!!currentUser,n:S.budgets.length,anon:!!localStorage.getItem('budget_backup_anon'),
+       auth:getComputedStyle(document.getElementById('auth-screen')).display!=='none'};});
+   ok('выход во время загрузки: бюджеты не всплывают и не оседают без владельца',!r.user&&r.n===0&&!r.anon&&r.auth,r);
+   await p.context().close();}
+  /* Выход от SDK (отозванный вход), пока шла запись или подтяжка: ответ
+     облака сливался в уже пустое состояние и возвращал бюджеты на экран
+     поверх формы входа. */
+  for(const fn of ['saveToCloud','pullAndMerge']){
+   const st=seedState();st.activeBudgetId='b-sep';
+   const p=await open13('2026-09-10',st);
+   r=await p.evaluate(async fn=>{S.txs.push(touch({id:'tail1',seq:79,date:'2026-09-10',name:'Хвост',category:'',plannedCatId:null,amount:30,budgetId:'b-sep'}));save();clearTimeout(saveTimer);
+     window.__READ_DELAY__=1000;var pr=window[fn]();window.__READ_DELAY__=0;
+     window.__AUTHCB__('SIGNED_OUT',null);await pr;await new Promise(z=>setTimeout(z,150));
+     return{n:S.budgets.length,auth:getComputedStyle(document.getElementById('auth-screen')).display!=='none'};},fn);
+   ok('выход во время '+fn+': бюджеты не возвращаются поверх экрана входа',r.n===0&&r.auth,r);
+   await p.context().close();}
+
   const shot=path.join(os.tmpdir(),'budget-check.png');
   await pg.evaluate(()=>{drop=true;render();});await wait(150);
   await pg.screenshot({path:shot});

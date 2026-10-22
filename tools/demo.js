@@ -34,6 +34,12 @@ window.__CLOUD__=null; window.__UPSERTS__=0; window.__HANG__=false;
    на медленной сети. __AUTHCB__ — подписчик авторизации: выход и вход в моке
    шлют SIGNED_OUT и SIGNED_IN, как настоящий клиент. */
 window.__HANG_READ__=false; window.__AUTHCB__=null;
+/* __READ_DELAY__ — чтение облака отвечает с задержкой, мс. Снимок облака и
+   срок берутся в момент запроса: так видно, что запоздавший ответ везёт
+   старое состояние. */
+window.__READ_DELAY__=0;
+/* __READ_FAIL__ — чтение облака отвечает ошибкой (сеть оборвалась, 5xx). */
+window.__READ_FAIL__=false;
 function __auth(ev,s){ setTimeout(function(){ if(window.__AUTHCB__) window.__AUTHCB__(ev,s); },0); }
 function __cp(o){return JSON.parse(JSON.stringify(o));}
 function __net(v){ if(window.__HANG__) return new Promise(function(){});  /* висит, не падает */
@@ -50,6 +56,9 @@ window.supabase={createClient:function(){return {
     return {
       select:function(){ return {eq:function(){ return {maybeSingle:function(){
         if(window.__HANG_READ__) return new Promise(function(){});
+        if(window.__READ_FAIL__) return Promise.resolve({data:null,error:{message:'Failed to fetch'}});
+        if(window.__READ_DELAY__){var snap={data:window.__CLOUD__?{state:__cp(window.__CLOUD__)}:null,error:null},ms=window.__READ_DELAY__;
+          return new Promise(function(ok){setTimeout(function(){ok(snap);},ms);});}
         return __net({data: window.__CLOUD__?{state:__cp(window.__CLOUD__)}:null, error:null});
       }};}};},
       upsert:function(row){window.__CLOUD__=__cp(row.state);window.__UPSERTS__++;return __net({error:null});}

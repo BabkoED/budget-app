@@ -677,6 +677,7 @@ async function initApp() {
       offlineMode = false;
       rememberUid(currentUser.id);
       await loadFromCloud();
+      if (currentUser !== sess.user) return;   /* пока грузилось, вышли */
       startRealtime();
       render();
     }
@@ -692,6 +693,12 @@ async function initApp() {
       currentUser = null;
       S = {budgets:[], txs:[], activeBudgetId:null, rip:{}, at:0};
       invalidateSpentCache();
+      /* Правки «в пути», сверка дня и ожидание облака относятся к ушедшему
+         входу. Оставшись, они срабатывали в следующем: лишний вопрос при
+         выходе, «Создать бюджет», пока облако ещё читается. */
+      pendingSave = false; clearTimeout(saveTimer);
+      reconDay = null;
+      cloudUnread = false; clearTimeout(cloudRetryT);
       authMode = 'login';
       renderAuth();
     }
@@ -921,18 +928,25 @@ async function retryCloud() {
   clearTimeout(cloudRetryT);
   if (!cloudUnread || !currentUser || cloudTrying) return;
   cloudTrying = true; render();
-  try { await loadFromCloud(); } finally { cloudTrying = false; }
-  renderBg();
+  try { await loadFromCloud(true); } finally { cloudTrying = false; }
+  if (currentUser) renderBg();   /* после выхода — экран входа, не пустой бюджет */
 }
 
-async function loadFromCloud() {
+async function loadFromCloud(isRetry) {
   invalidateSpentCache();
-  var local = stampLegacy(loadLocal());
+  var local = stampLegacy(loadLocal()), me = currentUser;
+  /* Ответ мог прийти, когда он уже не нужен: из аккаунта вышли, или облако
+     дошло другим путём (realtime) и человек уже вносит траты. Запоздавший
+     ответ тогда не трогает состояние — иначе стирал свежую трату или
+     оставлял чужие бюджеты под ключом «anon». */
+  function stale(){ return currentUser !== me || (isRetry && !cloudUnread); }
   try {
     /* Тот же срок: без него «висящий» запрос к базе держал бы экран загрузки
        так же, как getSession. Не дождались — уходим в локальный бэкап, как
-       при обрыве; бэкапа нет — ждём облако, см. cloudUnread. */
-    var raw = await withDeadline(fetchCloud(), netDeadline(), NOT_READ);
+       при обрыве; бэкапа нет — ждём облако, см. cloudUnread. Повтор ждёт
+       дольше: с одинаковыми 6 с медленное облако не дочитывалось никогда. */
+    var raw = await withDeadline(fetchCloud(), isRetry ? 20000 : netDeadline(), NOT_READ);
+    if (stale()) return;
     cloudUnread = false;
     var cloud = raw === NOT_READ ? null : stampLegacy(raw);
     if (cloud && local) {
@@ -960,6 +974,7 @@ async function loadFromCloud() {
       }
     }
   } catch(e) {
+    if (stale()) return;
     /* Сеть упала — берём локальный бэкап, не теряем данные */
     S = (local && local.budgets) ? local : {budgets:[], txs:[], activeBudgetId:null, rip:{}, at:0};
   }
@@ -991,9 +1006,10 @@ function stateSig(st) {
    Возвращает true, если что-то реально изменилось. */
 async function pullAndMerge() {
   if (!currentUser) return false;
+  var me = currentUser;
   try {
     var cloud = stampLegacy(await fetchCloud());
-    if (!cloud) return false;
+    if (!cloud || currentUser !== me) return false;   /* вышли, пока читали — см. saveToCloud */
     if (cloudUnread) { cloudUnread = false; clearTimeout(cloudRetryT); }   /* облако дошло само */
     var before = stateSig(S);
     var merged = mergeState(cloud, S);
@@ -1046,7 +1062,7 @@ async function saveToCloud() {
      предупреждает, что она пропадёт вместе с бэкапом (см. signOut). */
   if (offlineMode) { setSync('offline'); return; }
   if (!currentUser) return;
-  var gen0 = saveGen;
+  var gen0 = saveGen, me = currentUser;
   try {
     /* Читаем облако перед записью и сливаем: если со второго устройства
        что-то прилетело, пока мы редактировали, оно не будет затёрто. */
@@ -1056,6 +1072,9 @@ async function saveToCloud() {
        Не дождались или ошибка чтения — не пишем: правка в локальном бэкапе,
        pendingSave поднят, повтор ниже, по сети и при возврате. */
     var raw = await withDeadline(fetchCloud(), netDeadline(), NOT_READ);
+    /* Пока читали, из аккаунта вышли: слияние вернуло бы бюджеты в пустое
+       состояние и на экран поверх формы входа. */
+    if (currentUser !== me) return;
     if (raw === NOT_READ) {
       setSync(navigator.onLine ? 'error' : 'offline');
       clearTimeout(saveTimer);
@@ -1297,13 +1316,20 @@ async function doRegister() {
 /* Выход стирает локальный бэкап (см. SIGNED_OUT). Несохранённая правка
    пропадала вместе с ним (22.10.2026). Поэтому сначала дописываем облако,
    с крайним сроком, а не вышло — спрашиваем. */
+/* Один выход за раз: дозапись ждёт до 12 с, и второе нажатие спрашивало
+   ещё раз — уже поверх экрана входа. */
+var signingOut = false;
 async function signOut() {
-  if (pendingSave && currentUser && !offlineMode) {
-    clearTimeout(saveTimer);
-    await withDeadline(saveToCloud(), 2*netDeadline(), null);   /* чтение и запись */
-  }
-  if (pendingSave && !confirm('Последние правки ещё не дошли до облака. Если выйти сейчас, они пропадут с этого устройства. Выйти всё равно?')) return;
-  await sb.auth.signOut();
+  if (signingOut || !currentUser) return;
+  signingOut = true;
+  try {
+    if (pendingSave && !offlineMode) {
+      clearTimeout(saveTimer);
+      await withDeadline(saveToCloud(), 2*netDeadline(), null);   /* чтение и запись */
+    }
+    if (pendingSave && !confirm('Последние правки ещё не дошли до облака. Если выйти сейчас, они пропадут с этого устройства. Выйти всё равно?')) return;
+    await sb.auth.signOut();
+  } finally { signingOut = false; }
 }
 
 /* ═══════════════════════════════════════════════
@@ -1363,10 +1389,11 @@ function normMoney(n){
 /* Запятая остаётся в поле метой «дальше копейки»: стёртая, она давала
    приписать цифры после неё к рублям, и 99,99 записывалось как 9 999
    (22.10.2026). Цифры после запятой не принимаются, pf читает «99,» как 99. */
+/* Точка — тот же разделитель: на части клавиатур десятичная клавиша даёт
+   «.», и 99.99 записывалось как 9 999. pf тоже читает точку как запятую. */
 function fmtInp(el){
-  var v=el.value, c=v.indexOf(',');
-  var raw=(c<0?v:v.slice(0,c)).replace(/[^\d.]/g,'');
-  var whole=raw.split('.')[0];
+  var v=el.value, c=v.search(/[,.]/);
+  var whole=(c<0?v:v.slice(0,c)).replace(/\D/g,'');
   el.value=whole.replace(/\B(?=(\d{3})+(?!\d))/g,'\u00A0')+(c<0?'':',');
 }
 /* Автокапитализация: "350 кофе" -> "350 Кофе" во время ввода.
@@ -1721,12 +1748,6 @@ function reconcileRates(b){
   touch(b);
   return true;
 }
-/* Разовый переход на новое основание котла. Снимок b.pot у старых бюджетов
-   посчитан от лимитов, поэтому просто подменить формулу мало: recalcDaily
-   увидел бы delta=0 и оставил завышенную норму. Вместо этого помечаем бюджет
-   и даём recalcDaily отработать один раз — накопленный перерасход размажется
-   по оставшимся дням как обычная правка. Метка едет вместе с бюджетом при
-   слиянии, поэтому второе устройство не спишет перерасход повторно. */
 /* День, на который последний раз сводились период и норма. Приложение,
    открытое через полночь, показывало вчерашний остаток, а 1-го числа
    отклоняло утреннюю трату: «дата вне периода» (22.10.2026). */
@@ -1738,6 +1759,12 @@ function checkDay(){
   renderBg();
 }
 setInterval(function(){ if(document.visibilityState==='visible'&&currentUser)checkDay(); },60000);
+/* Разовый переход на новое основание котла. Снимок b.pot у старых бюджетов
+   посчитан от лимитов, поэтому просто подменить формулу мало: recalcDaily
+   увидел бы delta=0 и оставил завышенную норму. Вместо этого помечаем бюджет
+   и даём recalcDaily отработать один раз — накопленный перерасход размажется
+   по оставшимся дням как обычная правка. Метка едет вместе с бюджетом при
+   слиянии, поэтому второе устройство не спишет перерасход повторно. */
 function reconcileOnLoad(){
   if(!S||!S.budgets)return;
   reconDay=today();
@@ -2203,7 +2230,7 @@ function rDrop(b,bal){
           row('Будет в день',fmt(b.dailyBudget))+
           row('Всего в бюджете',fmt(total),total>=0?'gd':'rd',true)
         : row('Осталось на сегодня',fmt(bal),bal>=0?'gd':'rd')+
-          row('Прибавится завтра',fmt(b.dailyBudget))+
+          (td<b.dateTo?row('Прибавится завтра',fmt(b.dailyBudget)):'')+
           (ovT>0?row('Съел перерасход','−'+fmt(ovT),'rd'):'')+
           (futAcc>0?row('Ещё начислят до '+fmtSh(b.dateTo),fmt(futAcc)):'')+
           row('Общий остаток',fmt(total),total>=0?'gd':'rd',true))+
@@ -2826,32 +2853,34 @@ function updTrPrev(){
     if(!_trCtx.pln.some(function(p){return p.id===id;}))return 0;
     return lim(id)-spent(id);
   }
-  /* Подсказка обязана показывать то, что сделает doTr. Дневные меняются
-     не на сумму перевода, а на сдвиг котла, разложенный по оставшимся дням:
-     котёл считает категорию по max(лимит, потрачено), поэтому «Покрыть
-     перерасход» не меняет дневные вовсе — перерасход уже списан. Раньше
-     подсказка обещала −5 000 ₽ сегодня, а перевод не менял ничего
-     (22.10.2026). */
-  function part(id,L){var sp=spent(id);return sp>L?sp:L;}
-  var dPot=0;
-  if(fid)dPot+=part(fid,lim(fid))-part(fid,lim(fid)-amt);
-  if(tid)dPot+=part(tid,lim(tid))-part(tid,lim(tid)+amt);
-  var bb=getAB(),t=today();
+  /* Подсказка обязана показывать то, что сделает doTr, поэтому не считает
+     своей формулой, а делает тот же перевод на копии бюджета — как подсказка
+     лимита выше. Своя формула разошлась с переводом дважды (22.10.2026):
+     «Покрыть перерасход» обещал −5 000 ₽ сегодня, а перерасход уже был
+     списан с котла; в закрытом периоде, при норме в минусе и в будущем
+     периоде recalcDaily идёт другими ветками, и подсказка их не знала. */
+  var bb=getAB(),t=today(),cb=null;
+  if(bb){
+    cb=JSON.parse(JSON.stringify(bb));
+    cb.planned.forEach(function(p){if(p.id===fid)p.amount-=amt;if(p.id===tid)p.amount+=amt;});
+    recalcDaily(cb);
+  }
   var leftDays=!bb||t>bb.dateTo?0:getDays(t>bb.dateFrom?t:bb.dateFrom,bb.dateTo);
-  var per=leftDays>0?dPot/leftDays:0;
+  var dayNew=cb?calcDayBal(cb):_trCtx.dayBal;
   function getName(id){
     if(!id)return 'Дневной бюджет';
     var a=_trCtx.pln.filter(function(p){return p.id===id;});return a.length?(a[0].emoji||'')+' '+a[0].name:'';
   }
-  var fC=getRem(fid),fN=fid?fC-amt:fC+per,tC=getRem(tid),tN=tid?tC+amt:tC+per;
+  var fC=getRem(fid),fN=fid?fC-amt:dayNew,tC=getRem(tid),tN=tid?tC+amt:dayNew;
   var rows='<div class="trprow"><span>'+esc(getName(fid))+'</span><span>'+fmt(fC)+' → <b style="color:'+(fN<0?'var(--rd)':'var(--gd)')+'">'+fmt(fN)+'</b></span></div>';
   rows+='<div class="trprow"><span>'+esc(getName(tid))+'</span><span>'+fmt(tC)+' → <b style="color:'+(tN<0?'var(--rd)':'var(--gd)')+'">'+fmt(tN)+'</b></span></div>';
   /* Цена решения в понятных единицах: на сколько изменится каждый
      оставшийся день */
-  if(bb&&leftDays>0&&(!fid||!tid||dPot)){
+  var dNorm=cb?cb.dailyBudget-bb.dailyBudget:0;
+  if(bb&&leftDays>0&&(!fid||!tid||Math.abs(dNorm)>=0.005)){
     rows+='<div class="trprow trpday"><span>Дневная норма</span><span>'+
-      fmt(bb.dailyBudget)+' → <b style="color:'+(per<0?'var(--rd)':'var(--gd)')+'">'+
-      fmt(bb.dailyBudget+per)+'</b></span></div>';
+      fmt(bb.dailyBudget)+' → <b style="color:'+(dNorm<0?'var(--rd)':'var(--gd)')+'">'+
+      fmt(cb.dailyBudget)+'</b></span></div>';
   }
   el.innerHTML='<div class="trpbox">'+rows+'</div>';
 }
@@ -3011,6 +3040,7 @@ function rCloudWait(){
     '<div class="empty-t">Облако не ответило</div>'+
     '<div class="empty-s">Бюджеты лежат в облаке, а на этом устройстве их ещё нет. Пробую снова каждые 15 секунд.</div>'+
     '<button type="button" class="btn bp" onclick="retryCloud()"'+(cloudTrying?' disabled':'')+'>'+(cloudTrying?'Проверяю…':'Повторить сейчас')+'</button>'+
+    '<button type="button" class="auth-link" style="margin-top:20px" onclick="signOut()">Выйти из аккаунта</button>'+
   '</div></div>';
 }
 function rEmpty(){
