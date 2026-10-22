@@ -40,7 +40,7 @@ function __net(v){ if(window.__HANG__) return new Promise(function(){});  /* Ð²Ð
   return Promise.resolve(v); }
 window.supabase={createClient:function(){return {
   auth:{
-    getSession:function(){return __net({data:{session:{user:{id:'u1',email:'anton@example.com'}}}});},
+    getSession:function(){return __net({data:{session:window.__NOSESSION__?null:{user:{id:'u1',email:'anton@example.com'}}},error:null});},
     onAuthStateChange:function(cb){window.__AUTHCB__=cb;return {data:{subscription:{unsubscribe:function(){}}}};},
     signOut:function(){__auth('SIGNED_OUT',null);return Promise.resolve({error:null});},
     signInWithPassword:function(){__auth('SIGNED_IN',{user:{id:'u1',email:'anton@example.com'}});return Promise.resolve({data:{},error:null});},

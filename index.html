@@ -624,8 +624,16 @@ function startOffline() {
   render();
   /* Сеть вернулась — перезагружаемся, чтобы подняться с настоящей сессией
      и слить правки с облаком. Модалку не рвём: человек мог набирать сумму. */
-  window.addEventListener('online', function() { if (!modal) location.reload(); });
+  window.addEventListener('online', reloadWhenFree);
   return true;
+}
+/* Перезапуск из офлайн-режима ждёт, пока закроют окно, а не отменяется:
+   раньше открытое окно в момент появления сети оставляло режим на весь
+   сеанс (22.10.2026). */
+function reloadWhenFree() {
+  if (!offlineMode) return;
+  if (!modal) location.reload();
+  else setTimeout(reloadWhenFree, 3000);
 }
 
 async function initApp() {
@@ -640,12 +648,17 @@ async function initApp() {
     await loadFromCloud();
     startRealtime();
     render();
+  } else if (got && !got.error && navigator.onLine) {
+    /* Сеть есть, и сервер прямо ответил «сессии нет» — значит, вход
+       истёк. Офлайн-режим здесь держался весь сеанс: траты не уходили
+       в облако, а войти было негде (22.10.2026). */
+    renderAuth();
   } else if (startOffline()) {
     /* Подняли локальный бэкап. Но сессия могла просто не уложиться в срок на
        медленном канале — досматриваем её в фоне и, если всё-таки пришла,
        перезапускаемся уже с облаком. Модалку не рвём. */
     Promise.resolve(sessP).then(function(r) {
-      if (offlineMode && r && r.data && r.data.session && !modal) location.reload();
+      if (r && r.data && r.data.session) reloadWhenFree();
     }).catch(function() {});
   } else {
     renderAuth();
@@ -1171,7 +1184,7 @@ window.addEventListener('pagehide', flushSave);
 window.addEventListener('online',  function(){
   if (cloudUnread) { retryCloud(); return; }
   if (pendingSave) saveToCloud();
-  else { setSync('saved'); if (currentUser) pullAndMerge().then(function(c){ if(c) renderBg(); }); }
+  else { setSync(offlineMode ? 'offline' : 'saved'); if (currentUser) pullAndMerge().then(function(c){ if(c) renderBg(); }); }
 });
 window.addEventListener('offline', function(){ setSync('offline'); });
 
@@ -1312,8 +1325,10 @@ function today(){return localISO(new Date());}
 function yesterday(){var d=new Date();d.setDate(d.getDate()-1);return localISO(d);}
 function uid(){return Math.random().toString(36).slice(2,9);}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function getDays(a,b){return Math.max(1,Math.floor((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/864e5)+1);}
-function daysBw(a,b){return Math.max(0,Math.floor((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/864e5));}
+/* round, а не floor: в поясе с летним временем сутки перехода длятся 23 часа,
+   и floor давал марту 30 дней вместо 31 (22.10.2026). */
+function getDays(a,b){return Math.max(1,Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/864e5)+1);}
+function daysBw(a,b){return Math.max(0,Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/864e5));}
 function lastDOM(y,m){var d=new Date(y,m+1,0).getDate();return y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');}
 function firstDOM(y,m){return y+'-'+String(m+1).padStart(2,'0')+'-01';}
 function monthNameNext(dateTo){
@@ -2509,19 +2524,22 @@ function rHero(b){
     '</section>';
   }
   var tail=ended?'период закрыт':left>0?left+' '+plurDays(left)+' до конца':'последний день';
+  /* Завтра в последний день — уже другой период со своей нормой: ни остаток,
+     ни перерасход туда не переходят (22.10.2026). */
+  var last=!ended&&left===0;
   var tomorrow=bal+b.dailyBudget;
   return '<section class="hero" aria-label="'+(ended?'Итог периода':'Осталось на сегодня')+'">'+
     '<div class="hero-top"><span>'+(ended?'Итог периода':'Осталось на сегодня')+'</span><span>'+tail+'</span></div>'+
     '<div class="big '+(pos?'gd':'rd')+'">'+(pos?'':'−')+fmt(Math.abs(bal))+'</div>'+
     '<div class="bar" role="img" aria-label="'+(pos?'Дневной запас: осталось '+remPct+'%':'Вышел из дневного бюджета')+'"><i class="'+(pos?'':'rd')+'" style="width:'+(pos?remPct:100)+'%"></i></div>'+
-    '<div class="pills'+(ended?' two':'')+'">'+
+    '<div class="pills'+(ended||last?' two':'')+'">'+
       pill('Потрачено',fmt(spentToday))+
       pill('По категориям',fmt(catToday))+
-      (ended?'':(pos
+      (ended||last?'':(pos
         ? pill('Завтра','+'+fmt(b.dailyBudget),'gd')
         : pill('Завтра будет',(tomorrow<0?'−':'')+fmt(Math.abs(tomorrow)),tomorrow<0?'rd':'')))+
     '</div>'+
-    (!pos&&!ended?'<div class="note rd">'+SV(IP.alert,16,2.4)+'<span>Перерасход <b>'+fmt(-bal)+'</b> спишется с завтрашней нормы '+fmt(b.dailyBudget)+'</span></div>':'')+
+    (!pos&&!ended?'<div class="note rd">'+SV(IP.alert,16,2.4)+'<span>Перерасход <b>'+fmt(-bal)+'</b> '+(last?'останется в итоге периода':'спишется с завтрашней нормы '+fmt(b.dailyBudget))+'</span></div>':'')+
     (!ended&&!b.dailyBudget?'<div class="note">'+SV(IP.alert,16,2.4)+'<span>Дневных до конца периода не осталось</span></div>':'')+
   '</section>';
 }
@@ -2798,31 +2816,42 @@ function updTrPrev(){
   var tid=(document.getElementById('mt')||{}).value||'';
   var amt=pf((document.getElementById('ma')||{}).value);
   if(!amt||fid===tid){el.innerHTML='';return;}
+  function lim(id){var a=_trCtx.pln.filter(function(p){return p.id===id;});return a.length?a[0].amount:0;}
+  function spent(id){
+    var sp=0;for(var i=0;i<S.txs.length;i++){var tx=S.txs[i];if(tx.budgetId===_trCtx.bid&&tx.plannedCatId===id)sp+=tx.amount;}
+    return sp;
+  }
   function getRem(id){
     if(!id)return _trCtx.dayBal;
-    var a=_trCtx.pln.filter(function(p){return p.id===id;});if(!a.length)return 0;
-    var sp=0;for(var i=0;i<S.txs.length;i++){var tx=S.txs[i];if(tx.budgetId===_trCtx.bid&&tx.plannedCatId===id)sp+=tx.amount;}
-    return a[0].amount-sp;
+    if(!_trCtx.pln.some(function(p){return p.id===id;}))return 0;
+    return lim(id)-spent(id);
   }
+  /* Подсказка обязана показывать то, что сделает doTr. Дневные меняются
+     не на сумму перевода, а на сдвиг котла, разложенный по оставшимся дням:
+     котёл считает категорию по max(лимит, потрачено), поэтому «Покрыть
+     перерасход» не меняет дневные вовсе — перерасход уже списан. Раньше
+     подсказка обещала −5 000 ₽ сегодня, а перевод не менял ничего
+     (22.10.2026). */
+  function part(id,L){var sp=spent(id);return sp>L?sp:L;}
+  var dPot=0;
+  if(fid)dPot+=part(fid,lim(fid))-part(fid,lim(fid)-amt);
+  if(tid)dPot+=part(tid,lim(tid))-part(tid,lim(tid)+amt);
+  var bb=getAB(),t=today();
+  var leftDays=!bb||t>bb.dateTo?0:getDays(t>bb.dateFrom?t:bb.dateFrom,bb.dateTo);
+  var per=leftDays>0?dPot/leftDays:0;
   function getName(id){
     if(!id)return 'Дневной бюджет';
     var a=_trCtx.pln.filter(function(p){return p.id===id;});return a.length?(a[0].emoji||'')+' '+a[0].name:'';
   }
-  var fC=getRem(fid),fN=fC-amt,tC=getRem(tid),tN=tC+amt;
+  var fC=getRem(fid),fN=fid?fC-amt:fC+per,tC=getRem(tid),tN=tid?tC+amt:tC+per;
   var rows='<div class="trprow"><span>'+esc(getName(fid))+'</span><span>'+fmt(fC)+' → <b style="color:'+(fN<0?'var(--rd)':'var(--gd)')+'">'+fmt(fN)+'</b></span></div>';
   rows+='<div class="trprow"><span>'+esc(getName(tid))+'</span><span>'+fmt(tC)+' → <b style="color:'+(tN<0?'var(--rd)':'var(--gd)')+'">'+fmt(tN)+'</b></span></div>';
-  /* Когда деньги берутся из дневного бюджета — сразу показываем цену решения
-     в понятных единицах: на сколько похудеет каждый оставшийся день */
-  var bb=getAB();
-  if(bb&&(!fid||!tid)){
-    var t=today();
-    var leftDays=t>bb.dateTo?0:getDays(t>bb.dateFrom?t:bb.dateFrom,bb.dateTo);
-    if(leftDays>0){
-      var per=amt/leftDays, up=!fid;   /* берём из дневного → норма падает */
-      rows+='<div class="trprow trpday"><span>Дневная норма</span><span>'+
-        fmt(bb.dailyBudget)+' → <b style="color:'+(up?'var(--rd)':'var(--gd)')+'">'+
-        fmt(bb.dailyBudget+(up?-per:per))+'</b></span></div>';
-    }
+  /* Цена решения в понятных единицах: на сколько изменится каждый
+     оставшийся день */
+  if(bb&&leftDays>0&&(!fid||!tid||dPot)){
+    rows+='<div class="trprow trpday"><span>Дневная норма</span><span>'+
+      fmt(bb.dailyBudget)+' → <b style="color:'+(per<0?'var(--rd)':'var(--gd)')+'">'+
+      fmt(bb.dailyBudget+per)+'</b></span></div>';
   }
   el.innerHTML='<div class="trpbox">'+rows+'</div>';
 }
@@ -3033,6 +3062,11 @@ function bindMain(b){
     var f=(document.getElementById('be-from')||{}).value, t=(document.getElementById('be-to')||{}).value;
     if(!f||!t){alert('Укажи обе даты');return;}
     if(f>t){alert('Дата начала позже даты конца');return;}
+    /* Сужение оставляло траты снаружи: в счёте они были, а поправить их
+       нельзя — дата вне периода (22.10.2026). Считаем только те, что
+       окажутся снаружи из-за этой правки. */
+    var out=S.txs.filter(function(x){return x.budgetId===b.id&&x.date>=b.dateFrom&&x.date<=b.dateTo&&(x.date<f||x.date>t);}).length;
+    if(out){alert('За новыми датами останется '+out+' '+plural(out,'трата','траты','трат')+'. Сначала перенеси или удали их.');return;}
     for(var bi=0;bi<S.budgets.length;bi++){
       var ex=S.budgets[bi];
       if(ex.id===b.id)continue;
@@ -3082,7 +3116,8 @@ function bindMain(b){
   window.doQA=function(){
     var raw=((document.getElementById('qa-inp')||{}).value||qaVal||'').trim();
     qaVal=raw;
-    var p=parseQA(raw);if(!p||!p.amount)return;
+    var p=parseQA(raw);
+    if(!p||!p.amount){if(raw)alert('Не вижу суммы больше нуля. Пиши так: «350 кофе»');return;}
     var useDate=today();
     if(qaDate==='yesterday')useDate=yesterday();
     else if(qaDate==='custom'&&qaCustom)useDate=qaCustom;
@@ -3130,7 +3165,8 @@ function bindMain(b){
     var n=((document.getElementById('mn')||{}).value||'').trim();
     var a=pf((document.getElementById('ma')||{}).value);
     var e=((document.getElementById('me')||{}).value||'💰').trim();
-    if(!n||!a)return;
+    if(!n){alert('Укажи название');return;}
+    if(!a){alert('Укажи сумму больше нуля');return;}
     var rc=!!(document.getElementById('mr')||{}).checked;
     /* Дата вне периода бессмысленна: этот доход относится к этому бюджету,
        и «придёт 5 ноября» в сентябрьском периоде ничего не значит.
@@ -3172,7 +3208,8 @@ function bindMain(b){
     var n=((document.getElementById('mn')||{}).value||'').trim();
     var a=pf((document.getElementById('ma')||{}).value);
     var e=((document.getElementById('me')||{}).value||'✨').trim();
-    if(!n||!a)return;
+    if(!n){alert('Укажи название');return;}
+    if(!a){alert('Лимит должен быть больше нуля. Категория не нужна — удали её.');return;}
     var rc=!!(document.getElementById('mr')||{}).checked;
     if(modal.type==='add-planned')b.planned.push(touch({id:uid(),name:n,emoji:e,amount:a,recur:rc}));
     else{var pl=b.planned.filter(function(x){return x.id===modal.data.id;})[0];if(pl){pl.name=n;pl.emoji=e;pl.amount=a;pl.recur=rc;touch(pl);}}

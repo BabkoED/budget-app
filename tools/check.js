@@ -854,6 +854,86 @@ function checkPlural(ok){
    ok('мастер: дата начала позже конца — бюджет не создаётся',r.n1===r.n0&&!!r.alert,r);
    await p.context().close();}
 
+  /* Окно перевода: подсказка = то, что сделает перевод. «Покрыть перерасход»
+     обещал −5 000 ₽ сегодня, а перерасход уже был списан с котла. */
+  {const st=seedState();st.activeBudgetId='b-sep';
+   const p=await open13('2026-09-10',st);
+   const prev=()=>p.evaluate(()=>{var num=function(e){var s=e?e.textContent:'';return (/[−-]/.test(s)?-1:1)*+(s.replace(/\D/g,''));};
+     var rows=Array.from(document.querySelectorAll('#tr-prev .trprow'));
+     var d=rows.filter(function(r){return /Дневной бюджет/.test(r.firstChild.textContent);})[0];
+     return{bal:d?num(d.querySelector('b')):null,norm:num(document.querySelector('#tr-prev .trpday b'))};});
+   const fact=()=>p.evaluate(()=>{var b=getAB();return{bal:Math.round(calcDayBal(b)),norm:Math.round(b.dailyBudget)};});
+   const near=(a,b)=>Math.abs(a.bal-b.bal)<=1&&Math.abs(a.norm-b.norm)<=1;
+   await p.evaluate(()=>{var b=getAB(),c=b.planned[0];S.txs.push(touch({id:'ov1',seq:61,date:'2026-09-05',name:'Аренда',category:c.name,categoryEmoji:'',plannedCatId:c.id,amount:25000,budgetId:'b-sep'}));save();render();
+     openTr(c.id);});await wait(150);
+   let pv=await prev();await p.evaluate(()=>doTr());await wait(150);let fc=await fact();
+   ok('«Покрыть перерасход»: подсказка = итог перевода',near(pv,fc),{prev:pv,fact:fc});
+   await p.evaluate(()=>{var b=getAB();b.planned.push(touch({id:'p-food',name:'Продукты',emoji:'',amount:10000,recur:true}));recalcDaily(b);save();render();
+     openTr('');document.getElementById('mt').value='p-food';document.getElementById('ma').value='2 100';updTrPrev();});
+   pv=await prev();await p.evaluate(()=>doTr());await wait(150);fc=await fact();
+   ok('дневные → категория: подсказка = итог перевода',near(pv,fc),{prev:pv,fact:fc});
+   await p.context().close();}
+  /* Последний день периода: завтра другой период, перерасход ни с чего
+     не спишется. */
+  {const st=seedState();st.activeBudgetId='b-sep';
+   const p=await open13('2026-09-30',st);
+   r=await p.evaluate(()=>{var bal=calcDayBal(getAB());document.getElementById('qa-inp').value=Math.round(bal+2000)+' техника';qaVal=document.getElementById('qa-inp').value;doQA();
+     return (document.querySelector('.hero')||{textContent:''}).textContent;});
+   ok('последний день в минусе: не обещает списать с завтрашней нормы',!/завтрашней нормы|Завтра будет/.test(r)&&/итоге периода/.test(r),r);
+   await p.context().close();}
+  /* Сужение периода не оставляет траты снаружи. */
+  {const st=seedState();st.activeBudgetId='b-sep';
+   st.txs.push({id:'h1',seq:71,date:'2026-09-05',name:'Химчистка',category:'',categoryEmoji:'',plannedCatId:null,amount:1500,budgetId:'b-sep',mod:1});
+   const p=await open13('2026-09-20',st);
+   r=await p.evaluate(()=>{window.__ALERT__=null;om('budget-edit');document.getElementById('be-from').value='2026-09-10';document.getElementById('be-to').value='2026-09-30';
+     saveBdgDates();var b=getAB();return{from:b.dateFrom,alert:window.__ALERT__};});
+   ok('сужение периода с тратой снаружи отклоняется с числом трат',r.from==='2026-09-01'&&/1 трата/.test(r.alert||''),r);
+   await p.context().close();}
+  /* Летнее время: в Берлине март считался 30 днями. */
+  {const c=await br.newContext({viewport:{width:430,height:932},timezoneId:'Europe/Berlin'});const p=await c.newPage();
+   await p.goto(url);
+   r=await p.evaluate(()=>({m:getDays('2027-03-01','2027-03-31'),o:getDays('2026-10-01','2026-10-31'),bw:daysBw('2027-03-01','2027-03-31')}));
+   ok('пояс с летним временем: в марте 31 день, в октябре 31',r.m===31&&r.o===31&&r.bw===30,r);
+   await c.close();}
+  /* Действия без ответа: пустая сумма, доход без названия, лимит 0. */
+  {const st=seedState();st.activeBudgetId='b-sep';
+   const p=await open13('2026-09-10',st);
+   r=await p.evaluate(()=>{var out={};window.__ALERT__=null;document.getElementById('qa-inp').value='кофе';qaVal='кофе';doQA();out.qa=window.__ALERT__;
+     window.__ALERT__=null;om('add-income');document.getElementById('ma').value='5 000';saveInc();out.inc=window.__ALERT__;out.open=!!modal;closeModal();
+     var b=getAB(),c=b.planned[0];window.__ALERT__=null;editPln(c.id);
+     if(modal&&modal.type==='edit-planned'){document.getElementById('ma').value='0';savePln();}
+     out.pln=window.__ALERT__;out.lim=c.amount;return out;});
+   ok('ввод без суммы и доход без названия объясняют, что не так',!!r.qa&&!!r.inc&&r.open,r);
+   ok('лимит 0 не сохраняется молча',!!r.pln&&r.lim===20000,r);
+   await p.context().close();}
+  /* Офлайн-режим при живой сети. а) сервер ответил «сессии нет» — нужен
+     вход, а не офлайн на весь сеанс. б) сеть появилась при открытом окне —
+     перезапуск ждёт закрытия окна, точка не зеленеет без записи. */
+  {const st=seedState();st.activeBudgetId='b-sep';
+   const p=await (await br.newContext({viewport:{width:430,height:932}})).newPage();
+   p.on('pageerror',e=>{console.log('PAGEERROR(14s):',e.message);fails++;});
+   await p.addInitScript(freezeDate('2026-09-10'));await p.goto(url);
+   await p.evaluate(st=>{window.__CLOUD__=JSON.parse(JSON.stringify(st));window.__NOSESSION__=true;
+     localStorage.setItem('budget_last_uid','u1');localStorage.setItem('budget_backup_u1',JSON.stringify(st));},st);
+   await p.evaluate(()=>window.__initApp());await p.waitForTimeout(900);
+   r=await p.evaluate(()=>({off:offlineMode,auth:getComputedStyle(document.getElementById('auth-screen')).display!=='none'}));
+   ok('сеть есть, сессии нет: экран входа, а не офлайн-режим',!r.off&&r.auth,r);
+   await p.context().close();}
+  {const st=seedState();st.activeBudgetId='b-sep';
+   const p=await (await br.newContext({viewport:{width:430,height:932}})).newPage();
+   p.on('pageerror',e=>{console.log('PAGEERROR(14r):',e.message);fails++;});
+   await p.addInitScript(freezeDate('2026-09-10'));await p.goto(url);
+   await p.evaluate(st=>{window.__CLOUD__=JSON.parse(JSON.stringify(st));window.__HANG__=true;
+     localStorage.setItem('budget_last_uid','u1');localStorage.setItem('budget_backup_u1',JSON.stringify(st));},st);
+   await p.evaluate(()=>window.__initApp());await p.waitForTimeout(7000);
+   r=await p.evaluate(()=>{window.__MARK__=1;var off=offlineMode;om('add-income');window.dispatchEvent(new Event('online'));
+     return{off:off,sync:syncState,mark:window.__MARK__};});
+   await p.evaluate(()=>closeModal());await p.waitForTimeout(3600);
+   const after=await p.evaluate(()=>window.__MARK__);
+   ok('сеть появилась при открытом окне: точка не зеленеет без записи',r.off&&r.sync!=='saved',r);
+   ok('и после закрытия окна приложение перезапускается',after===undefined,{after:after});
+   await p.context().close();}
+
   const shot=path.join(os.tmpdir(),'budget-check.png');
   await pg.evaluate(()=>{drop=true;render();});await wait(150);
   await pg.screenshot({path:shot});
