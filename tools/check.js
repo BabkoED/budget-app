@@ -945,6 +945,9 @@ function checkPlural(ok){
   for(const cs of [{name:'закрытый период',bid:'b-aug',neg:false},{name:'норма в минусе',bid:'b-sep',neg:true},{name:'будущий период',bid:'b-oct',neg:false}]){
    const st=seedState();st.activeBudgetId=cs.bid;
    const p=await open13('2026-09-10',st);
+   /* swBdg обязателен: при загрузке приложение само открывает текущий
+     период, и activeBudgetId из посева не держится. Без него первая версия
+     этой проверки молча мерила сентябрь и проходила на старом коде. */
    r=await p.evaluate(cs=>{
      swBdg(cs.bid);var b=getAB();
      b.planned.push(touch({id:'p-food',name:'Продукты',emoji:'',amount:10000,recur:true}));recalcDaily(b);
