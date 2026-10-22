@@ -898,14 +898,30 @@ async function fetchCloud() {
   return (res.data && res.data.state && res.data.state.budgets) ? res.data.state : null;
 }
 
+/* Облако не ответило при старте, а локального бэкапа нет: новое устройство
+   на медленной сети. Пустой экран здесь врёт — он предлагает «Создать
+   бюджет», и человек заводил второй бюджет поверх настоящего, облачного
+   (22.10.2026). Поэтому отдельный экран ожидания и повтор: сам через 15 с,
+   при возврате на вкладку, при появлении сети и по кнопке. */
+var cloudUnread = false, cloudRetryT = null, cloudTrying = false;
+async function retryCloud() {
+  clearTimeout(cloudRetryT);
+  if (!cloudUnread || !currentUser || cloudTrying) return;
+  cloudTrying = true; render();
+  try { await loadFromCloud(); } finally { cloudTrying = false; }
+  renderBg();
+}
+
 async function loadFromCloud() {
   invalidateSpentCache();
   var local = stampLegacy(loadLocal());
   try {
     /* Тот же срок: без него «висящий» запрос к базе держал бы экран загрузки
-       так же, как getSession. null означает «не дождались» — и мы честно
-       уходим в локальный бэкап, как при обрыве. */
-    var cloud = stampLegacy(await withDeadline(fetchCloud(), netDeadline(), null));
+       так же, как getSession. Не дождались — уходим в локальный бэкап, как
+       при обрыве; бэкапа нет — ждём облако, см. cloudUnread. */
+    var raw = await withDeadline(fetchCloud(), netDeadline(), NOT_READ);
+    cloudUnread = false;
+    var cloud = raw === NOT_READ ? null : stampLegacy(raw);
     if (cloud && local) {
       /* Обе стороны живые — не выбираем одну, а сливаем.
          Трата, внесённая с телефона, больше не пропадает от того,
@@ -924,6 +940,11 @@ async function loadFromCloud() {
       saveToCloud();
     } else {
       S = {budgets:[], txs:[], activeBudgetId:null, rip:{}, at:0};
+      if (raw === NOT_READ) {
+        cloudUnread = true;
+        clearTimeout(cloudRetryT);
+        cloudRetryT = setTimeout(retryCloud, 15000);
+      }
     }
   } catch(e) {
     /* Сеть упала — берём локальный бэкап, не теряем данные */
@@ -960,6 +981,7 @@ async function pullAndMerge() {
   try {
     var cloud = stampLegacy(await fetchCloud());
     if (!cloud) return false;
+    if (cloudUnread) { cloudUnread = false; clearTimeout(cloudRetryT); }   /* облако дошло само */
     var before = stateSig(S);
     var merged = mergeState(cloud, S);
     S = merged;
@@ -1007,7 +1029,9 @@ async function saveToCloud() {
   /* Офлайн-старт: сессии нет, писать нечем. Просто выйти нельзя — индикатор
      залипнет на «сохраняю» навсегда, и человек будет думать, что не сохранилось.
      Локально всё уже записано в save(), поэтому честный статус — «офлайн». */
-  if (offlineMode) { pendingSave = false; setSync('offline'); return; }
+  /* pendingSave не снимаем: правка и правда не в облаке. По нему выход
+     предупреждает, что она пропадёт вместе с бэкапом (см. signOut). */
+  if (offlineMode) { setSync('offline'); return; }
   if (!currentUser) return;
   var gen0 = saveGen;
   try {
@@ -1074,11 +1098,16 @@ function flushSave() {
       state: st,
       updated_at: new Date().toISOString()
     });
-    var blob = new Blob([payload], {type: 'application/json'});
-    /* sendBeacon не умеет кастомные заголовки — поэтому fetch с keepalive */
+    /* sendBeacon не умеет кастомные заголовки — поэтому fetch с keepalive.
+       Но keepalive не берёт тело больше 64 КиБ: fetch падает сразу, и при
+       сотнях трат запись не уходила вовсе (22.10.2026). Большое тело идёт
+       обычным fetch: при уходе в другое приложение страница жива и запрос
+       доезжает; при закрытии может оборваться — тогда правка уедет при
+       следующем запуске, pendingSave поднят. */
+    var big = new Blob([payload]).size > 60000;
     fetch(url, {
       method: 'PATCH',
-      keepalive: true,
+      keepalive: !big,
       headers: {
         'apikey': SUPA_KEY,
         'Authorization': 'Bearer ' + (sbToken() || SUPA_KEY),
@@ -1131,6 +1160,8 @@ function stopRealtime() {
 window.addEventListener('visibilitychange', function() {
   if (document.visibilityState === 'hidden') { flushSave(); return; }
   if (!currentUser) return;
+  if (cloudUnread) { retryCloud(); return; }
+  checkDay();
   /* Несохранённое (в том числе после условного flushSave) — записать со
      слиянием; saveToCloud сам подтянет чужое и перерисует. */
   if (pendingSave) saveToCloud();
@@ -1138,6 +1169,7 @@ window.addEventListener('visibilitychange', function() {
 });
 window.addEventListener('pagehide', flushSave);
 window.addEventListener('online',  function(){
+  if (cloudUnread) { retryCloud(); return; }
   if (pendingSave) saveToCloud();
   else { setSync('saved'); if (currentUser) pullAndMerge().then(function(c){ if(c) renderBg(); }); }
 });
@@ -1160,6 +1192,7 @@ function renderAuth() {
   document.getElementById('au-pass').placeholder = '••••••••';
   document.getElementById('au-pass').autocomplete = 'current-password';
   document.getElementById('au-btn').textContent = 'Войти';
+  document.getElementById('au-btn').disabled = false;   /* doSignIn выключил её до входа */
   document.getElementById('au-toggle').textContent = 'Нет аккаунта? Зарегистрироваться →';
   document.getElementById('au-err').textContent = '';
   document.getElementById('au-email').value = '';
@@ -1176,6 +1209,7 @@ function renderRegister() {
   document.getElementById('au-pass').placeholder = 'Минимум 6 символов';
   document.getElementById('au-pass').autocomplete = 'new-password';
   document.getElementById('au-btn').textContent = 'Создать аккаунт';
+  document.getElementById('au-btn').disabled = false;
   document.getElementById('au-toggle').textContent = '← Уже есть аккаунт';
   document.getElementById('au-err').textContent = '';
   document.getElementById('au-email').value = '';
@@ -1230,7 +1264,10 @@ async function doRegister() {
     if (btn) { btn.textContent = 'Создать аккаунт'; btn.disabled = false; }
   } else {
     setAuthErr('');
-    /* Supabase может требовать подтверждения email */
+    /* Supabase может требовать подтверждения email. #app спрятан экраном
+       входа — показываем его, иначе письмо «Проверь почту» никто не видит. */
+    document.getElementById('auth-screen').style.display = 'none';
+    document.getElementById('app').style.display = '';
     document.getElementById('app').innerHTML =
       '<div class="auth-wrap"><div class="auth-logo">✦ <span>Б</span>юджет</div>' +
       '<div class="auth-card" style="text-align:center">' +
@@ -1244,7 +1281,15 @@ async function doRegister() {
 
 
 
+/* Выход стирает локальный бэкап (см. SIGNED_OUT). Несохранённая правка
+   пропадала вместе с ним (22.10.2026). Поэтому сначала дописываем облако,
+   с крайним сроком, а не вышло — спрашиваем. */
 async function signOut() {
+  if (pendingSave && currentUser && !offlineMode) {
+    clearTimeout(saveTimer);
+    await withDeadline(saveToCloud(), 2*netDeadline(), null);   /* чтение и запись */
+  }
+  if (pendingSave && !confirm('Последние правки ещё не дошли до облака. Если выйти сейчас, они пропадут с этого устройства. Выйти всё равно?')) return;
   await sb.auth.signOut();
 }
 
@@ -1300,10 +1345,14 @@ function normMoney(n){
 }
 /* \u041A\u043E\u043F\u0435\u0439\u043A\u0438 \u043D\u0435 \u0432\u0432\u043E\u0434\u044F\u0442\u0441\u044F \u0432\u043E\u043E\u0431\u0449\u0435: \u0432\u0441\u0451 \u043F\u043E\u0441\u043B\u0435 \u0437\u0430\u043F\u044F\u0442\u043E\u0439 \u043E\u0442\u0431\u0440\u0430\u0441\u044B\u0432\u0430\u0435\u0442\u0441\u044F \u043F\u0440\u044F\u043C\u043E \u043F\u0440\u0438 \u043D\u0430\u0431\u043E\u0440\u0435,
    \u043F\u043E\u044D\u0442\u043E\u043C\u0443 \u0432 \u043F\u043E\u043B\u0435 \u0432\u0441\u0435\u0433\u0434\u0430 \u0432\u0438\u0434\u043D\u043E \u0440\u043E\u0432\u043D\u043E \u0442\u0443 \u0441\u0443\u043C\u043C\u0443, \u043A\u043E\u0442\u043E\u0440\u0430\u044F \u0431\u0443\u0434\u0435\u0442 \u0437\u0430\u043F\u0438\u0441\u0430\u043D\u0430. */
+/* Запятая остаётся в поле метой «дальше копейки»: стёртая, она давала
+   приписать цифры после неё к рублям, и 99,99 записывалось как 9 999
+   (22.10.2026). Цифры после запятой не принимаются, pf читает «99,» как 99. */
 function fmtInp(el){
-  var raw=el.value.replace(/[^\d.,]/g,'').replace(',','.');
+  var v=el.value, c=v.indexOf(',');
+  var raw=(c<0?v:v.slice(0,c)).replace(/[^\d.]/g,'');
   var whole=raw.split('.')[0];
-  el.value=whole.replace(/\B(?=(\d{3})+(?!\d))/g,'\u00A0');
+  el.value=whole.replace(/\B(?=(\d{3})+(?!\d))/g,'\u00A0')+(c<0?'':',');
 }
 /* Автокапитализация: "350 кофе" -> "350 Кофе" во время ввода.
    Работает только на первой букве после первого пробела, идущего сразу
@@ -1663,8 +1712,20 @@ function reconcileRates(b){
    и даём recalcDaily отработать один раз — накопленный перерасход размажется
    по оставшимся дням как обычная правка. Метка едет вместе с бюджетом при
    слиянии, поэтому второе устройство не спишет перерасход повторно. */
+/* День, на который последний раз сводились период и норма. Приложение,
+   открытое через полночь, показывало вчерашний остаток, а 1-го числа
+   отклоняло утреннюю трату: «дата вне периода» (22.10.2026). */
+var reconDay=null;
+function checkDay(){
+  if(!reconDay||today()===reconDay)return;
+  invalidateSpentCache();
+  reconcileOnLoad();
+  renderBg();
+}
+setInterval(function(){ if(document.visibilityState==='visible'&&currentUser)checkDay(); },60000);
 function reconcileOnLoad(){
   if(!S||!S.budgets)return;
+  reconDay=today();
   var cur=getCurrentBudget(),changed=false;
   for(var i=0;i<S.budgets.length;i++){
     var b=S.budgets[i];
@@ -1859,6 +1920,7 @@ function render(){
   var app=document.getElementById('app');
   if(app)app.style.display='';
   var b=getAB();
+  if(!b&&tab!=='wizard'&&cloudUnread){app.innerHTML=rCloudWait();return;}
   if(!b&&tab!=='wizard'){app.innerHTML=rEmpty();bindEmpty();return;}
   if(tab==='wizard'){app.innerHTML=rWiz();bindWiz();return;}
   var pg='';
@@ -2913,6 +2975,15 @@ function rWz2(){
   '<div class="wznav"><button type="button" class="btn bs wzbk" onclick="wizStep=1;render()">← Назад</button><button type="button" class="btn bp" onclick="wzCr()">Запустить →</button></div></div>';
 }
 
+function rCloudWait(){
+  return '<header class="hdr" role="banner"><span class="ttl"><span>Бюджет</span></span></header>'+
+  '<div class="pg"><div class="empty">'+
+    '<div class="empty-mk" aria-hidden="true">✦</div>'+
+    '<div class="empty-t">Облако не ответило</div>'+
+    '<div class="empty-s">Бюджеты лежат в облаке, а на этом устройстве их ещё нет. Пробую снова каждые 15 секунд.</div>'+
+    '<button type="button" class="btn bp" onclick="retryCloud()"'+(cloudTrying?' disabled':'')+'>'+(cloudTrying?'Проверяю…':'Повторить сейчас')+'</button>'+
+  '</div></div>';
+}
 function rEmpty(){
   return '<header class="hdr" role="banner"><span class="ttl"><span>Бюджет</span></span></header>'+
   '<div class="pg"><div class="empty">'+
@@ -3220,6 +3291,7 @@ function bindWiz(){
   };
   window.wzCr=function(){
     var d=wd,ti=wdTI(),tp=wdTP(),avail=ti-tp,days=getDays(d.dateFrom,d.dateTo);
+    if(d.dateFrom>d.dateTo){alert('Дата начала позже даты конца');return;}   /* как в saveBdgDates */
     /* Проверка пересечения с существующими бюджетами */
     for(var bi=0;bi<S.budgets.length;bi++){
       var ex=S.budgets[bi];

@@ -735,6 +735,125 @@ function checkPlural(ok){
    ok('сеть ожила: обе траты в облаке, статус «сохранено»',r.wife&&r.mine&&!r.pending&&r.sync==='saved',r);
    await p.context().close();}
 
+  /* ── 14. Аудит 22.10 ──────────────────────────
+     Ошибки, найденные проверкой 22.10.2026. Каждая проверка сначала падала
+     на старом коде, потом прошла на исправленном. */
+  console.log('\n14. Аудит 22.10');
+  /* Запятая в поле суммы: «,» на телефонной клавиатуре стиралась, а цифры
+     после неё приписывались к рублям — 99,99 сохранялось как 9 999. */
+  {const st=seedState();st.activeBudgetId='b-sep';
+   st.txs.push({id:'k1',seq:5,date:'2026-09-09',name:'Аптека',category:'',categoryEmoji:'',plannedCatId:null,amount:100,budgetId:'b-sep',mod:1});
+   const p=await open13('2026-09-10',st);
+   await p.evaluate(()=>editTx('k1'));await wait(100);
+   await p.fill('#ma','');await p.type('#ma','99,99');
+   const shown=await p.inputValue('#ma');
+   await p.evaluate(()=>saveTx('k1'));await wait(150);
+   r=await p.evaluate(()=>S.txs.filter(t=>t.id==='k1')[0].amount);
+   ok('сумма с запятой: «99,99» сохраняется как 99, а не 9 999',r===99,{shown:shown,saved:r});
+   ok('и в поле видно ровно то, что сохранится',shown==='99,',shown);
+   await p.context().close();}
+  /* Новое устройство, облако не ответило за срок: экран «Нет бюджета»
+     предлагал создать бюджет, и человек заводил второй поверх облачного. */
+  {const st=seedState();st.activeBudgetId='b-sep';
+   const p=await (await br.newContext({viewport:{width:430,height:932}})).newPage();
+   p.on('pageerror',e=>{console.log('PAGEERROR(14):',e.message);fails++;});
+   p.on('dialog',d=>d.accept());
+   await p.addInitScript(freezeDate('2026-09-10'));await p.goto(url);
+   await p.evaluate(st=>{window.__CLOUD__=JSON.parse(JSON.stringify(st));window.__HANG_READ__=true;},st);
+   await p.evaluate(()=>window.__initApp());await p.waitForTimeout(7000);
+   r=await p.evaluate(()=>({empty:/Нет бюджета/.test(document.getElementById('app').textContent),
+     create:Array.from(document.querySelectorAll('#app button')).some(b=>/Создать бюджет/.test(b.textContent)),n:S.budgets.length}));
+   ok('новое устройство, облако молчит: создать бюджет не предлагает',!r.empty&&!r.create,r);
+   await p.evaluate(()=>{window.__HANG_READ__=false;window.dispatchEvent(new Event('visibilitychange'));});
+   await p.waitForTimeout(800);
+   r=await p.evaluate(()=>({n:S.budgets.length,shown:(getAB()||{}).id}));
+   ok('облако ответило: открылись настоящие бюджеты',r.n===3&&r.shown==='b-sep',r);
+   await p.context().close();}
+  /* Сброс при закрытии большого состояния. fetch с keepalive не берёт тело
+     больше 64 КиБ и падает сразу — при сотнях трат запись не уходила вовсе.
+     Здесь настоящий fetch браузера, сеть подменена только на выходе. */
+  {const st=seedState();st.activeBudgetId='b-sep';
+   const p=await open13('2026-09-10',st);
+   const reqs=[];
+   await p.route('https://yxrgnookxekrsqxkgowp.supabase.co/**',q=>{reqs.push(q.request().method());
+     q.fulfill({status:204,headers:{'Access-Control-Allow-Origin':'*','Access-Control-Allow-Headers':'*','Access-Control-Allow-Methods':'*'},body:''});});
+   r=await p.evaluate(()=>{for(var i=0;i<500;i++)S.txs.push({id:'bulk'+i,seq:100+i,date:'2026-09-0'+(1+i%9),name:'Пятёрочка '+i,category:'',categoryEmoji:'',
+       plannedCatId:null,amount:100+i,budgetId:'b-sep',mod:Date.now()});
+     save();clearTimeout(saveTimer);return new Blob([JSON.stringify({state:S})]).size;});
+   await p.evaluate(()=>flushSave());await wait(800);
+   ok('закрытие с состоянием больше 64 КиБ: запись всё равно уходит',r>65536&&reqs.includes('PATCH'),{bytes:r,reqs:reqs});
+   await p.context().close();}
+  /* Выход с несохранённым: бэкап стирался сразу, правка пропадала. Теперь
+     выход сначала дописывает облако, а не вышло — спрашивает. Тут же вход
+     и регистрация: кнопка «Войти» после выхода оставалась выключенной,
+     «Проверь почту» писалось в скрытый блок. */
+  {const st=seedState();st.activeBudgetId='b-sep';
+   const p=await open13('2026-09-10',st);
+   r=await p.evaluate(async()=>{window.__HANG__=true;window.__CONF__=0;window.confirm=function(){window.__CONF__++;return false;};
+     S.txs.push(touch({id:'so1',seq:41,date:'2026-09-10',name:'Перед выходом',category:'',plannedCatId:null,amount:60,budgetId:'b-sep'}));save();
+     await signOut();await new Promise(z=>setTimeout(z,100));
+     return{asked:window.__CONF__,user:!!currentUser,backup:!!localStorage.getItem('budget_backup_u1')};});
+   ok('выход с несохранённым: спрашивает и без «да» не выходит',r.asked===1&&r.user&&r.backup,r);
+   r=await p.evaluate(async()=>{window.__HANG__=false;window.__CONF__=0;await signOut();await new Promise(z=>setTimeout(z,100));
+     return{asked:window.__CONF__,user:!!currentUser,inCloud:window.__CLOUD__.txs.some(t=>t.id==='so1')};});
+   ok('сеть есть: дописывает облако и выходит без вопроса',r.asked===0&&!r.user&&r.inCloud,r);
+   r=await p.evaluate(async()=>{window.confirm=function(){return true;};
+     document.getElementById('au-email').value='anton@example.com';document.getElementById('au-pass').value='secret123';
+     document.getElementById('au-btn').click();await new Promise(z=>setTimeout(z,600));
+     var inUser=!!currentUser;await signOut();await new Promise(z=>setTimeout(z,100));
+     var b=document.getElementById('au-btn');return{inUser:inUser,disabled:b.disabled,text:b.textContent};});
+   ok('вход, затем выход: кнопка «Войти» снова нажимается',r.inUser&&!r.disabled&&r.text==='Войти',r);
+   r=await p.evaluate(async()=>{toggleAuthMode();
+     document.getElementById('au-email').value='new@example.com';document.getElementById('au-pass').value='secret123';
+     document.getElementById('au-btn').click();await new Promise(z=>setTimeout(z,300));
+     var app=document.getElementById('app'),scr=document.getElementById('auth-screen');
+     return{appVis:getComputedStyle(app).display!=='none',authVis:getComputedStyle(scr).display!=='none',mail:/Проверь почту/.test(app.textContent)};});
+   ok('регистрация: «Проверь почту» видно на экране',r.appVis&&r.mail&&!r.authVis,r);
+   r=await p.evaluate(()=>{var l=document.querySelector('#app .auth-link');if(l)l.click();var b=document.getElementById('au-btn');
+     return{authVis:getComputedStyle(document.getElementById('auth-screen')).display!=='none',disabled:b.disabled,text:b.textContent};});
+   ok('и «← Войти» возвращает к рабочей кнопке входа',r.authVis&&!r.disabled&&r.text==='Войти',r);
+   await p.context().close();}
+  /* Офлайн-старт: правки лежат только в бэкапе, а pendingSave снимался
+     сразу — выход стирал их без вопроса. */
+  {const st=seedState();st.activeBudgetId='b-sep';
+   const p=await (await br.newContext({viewport:{width:430,height:932}})).newPage();
+   p.on('pageerror',e=>{console.log('PAGEERROR(14o):',e.message);fails++;});
+   await p.addInitScript(freezeDate('2026-09-10'));await p.goto(url);
+   await p.evaluate(st=>{window.__CLOUD__=JSON.parse(JSON.stringify(st));window.__HANG__=true;
+     localStorage.setItem('budget_last_uid','u1');localStorage.setItem('budget_backup_u1',JSON.stringify(st));},st);
+   await p.evaluate(()=>window.__initApp());await p.waitForTimeout(7000);
+   r=await p.evaluate(async()=>{var off=offlineMode;window.__CONF__=0;window.confirm=function(){window.__CONF__++;return false;};
+     S.txs.push(touch({id:'of1',seq:51,date:'2026-09-10',name:'В самолёте',category:'',plannedCatId:null,amount:70,budgetId:'b-sep'}));save();
+     await new Promise(z=>setTimeout(z,800));await signOut();await new Promise(z=>setTimeout(z,100));
+     return{off:off,asked:window.__CONF__,backup:(localStorage.getItem('budget_backup_u1')||'').indexOf('В самолёте')>-1};});
+   ok('офлайн: выход с правкой в бэкапе спрашивает и без «да» не стирает',r.off&&r.asked===1&&r.backup,r);
+   await p.context().close();}
+  /* Приложение открыто через полночь. Экран показывал вчерашний остаток,
+     а на границе периода утренняя трата отклонялась: «дата вне периода». */
+  {const st=seedState();st.activeBudgetId='b-sep';
+   const p=await open13('2026-09-30',st);
+   await p.evaluate(()=>{window.__setDay('2026-10-01');window.dispatchEvent(new Event('visibilitychange'));});await wait(300);
+   r=await p.evaluate(()=>{window.__ALERT__=null;document.getElementById('qa-inp').value='350 кофе';qaVal='350 кофе';doQA();
+     var t=S.txs[S.txs.length-1];return{shown:getAB().id,alert:window.__ALERT__,date:t.date,b:t.budgetId};});
+   ok('открыто через полночь в новый период: утренняя трата вносится',r.shown==='b-oct'&&!r.alert&&r.date==='2026-10-01'&&r.b==='b-oct',r);
+   await p.context().close();}
+  {const st=seedState();st.activeBudgetId='b-sep';
+   const p=await open13('2026-09-10',st);
+   const big=()=>p.evaluate(()=>+((document.querySelector('.hero .big')||{textContent:''}).textContent.replace(/\D/g,'')));
+   const b0=await big();
+   await p.evaluate(()=>{window.__setDay('2026-09-11');window.dispatchEvent(new Event('visibilitychange'));});await wait(300);
+   const want=await p.evaluate(()=>Math.round(calcDayBal(getAB()))), b1=await big();
+   ok('через полночь в том же периоде: на экране остаток нового дня',b1===want&&b1!==b0,{b0:b0,b1:b1,want:want});
+   await p.context().close();}
+  /* Мастер: дата начала позже конца. Окно правки дат это отклоняло,
+     мастер создавал бюджет с отрицательным числом дней. */
+  {const st=seedState();st.activeBudgetId='b-sep';
+   const p=await open13('2026-09-10',st);
+   r=await p.evaluate(()=>{window.__ALERT__=null;newBdg();wzN(0);wzN(1);wd.dateFrom='2026-11-30';wd.dateTo='2026-11-01';
+     var n=S.budgets.length;wzCr();return{n0:n,n1:S.budgets.length,alert:window.__ALERT__};});
+   ok('мастер: дата начала позже конца — бюджет не создаётся',r.n1===r.n0&&!!r.alert,r);
+   await p.context().close();}
+
   const shot=path.join(os.tmpdir(),'budget-check.png');
   await pg.evaluate(()=>{drop=true;render();});await wait(150);
   await pg.screenshot({path:shot});

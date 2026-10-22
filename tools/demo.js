@@ -30,18 +30,26 @@ function loadPlaywright() {
    ни откат выбора периода. См. CLAUDE.md. */
 const FAKE = `<script>
 window.__CLOUD__=null; window.__UPSERTS__=0; window.__HANG__=false;
+/* __HANG_READ__ — висит только чтение облака, вход отвечает: новое устройство
+   на медленной сети. __AUTHCB__ — подписчик авторизации: выход и вход в моке
+   шлют SIGNED_OUT и SIGNED_IN, как настоящий клиент. */
+window.__HANG_READ__=false; window.__AUTHCB__=null;
+function __auth(ev,s){ setTimeout(function(){ if(window.__AUTHCB__) window.__AUTHCB__(ev,s); },0); }
 function __cp(o){return JSON.parse(JSON.stringify(o));}
 function __net(v){ if(window.__HANG__) return new Promise(function(){});  /* висит, не падает */
   return Promise.resolve(v); }
 window.supabase={createClient:function(){return {
   auth:{
     getSession:function(){return __net({data:{session:{user:{id:'u1',email:'anton@example.com'}}}});},
-    onAuthStateChange:function(){return {data:{subscription:{unsubscribe:function(){}}}};},
-    signOut:function(){return Promise.resolve({error:null});}
+    onAuthStateChange:function(cb){window.__AUTHCB__=cb;return {data:{subscription:{unsubscribe:function(){}}}};},
+    signOut:function(){__auth('SIGNED_OUT',null);return Promise.resolve({error:null});},
+    signInWithPassword:function(){__auth('SIGNED_IN',{user:{id:'u1',email:'anton@example.com'}});return Promise.resolve({data:{},error:null});},
+    signUp:function(){return Promise.resolve({data:{},error:null});}
   },
   from:function(){
     return {
       select:function(){ return {eq:function(){ return {maybeSingle:function(){
+        if(window.__HANG_READ__) return new Promise(function(){});
         return __net({data: window.__CLOUD__?{state:__cp(window.__CLOUD__)}:null, error:null});
       }};}};},
       upsert:function(row){window.__CLOUD__=__cp(row.state);window.__UPSERTS__++;return __net({error:null});}
@@ -139,7 +147,10 @@ async function serve(html) {
 }
 
 /* «Сегодня» фиксируем, иначе проверки живут ровно один день. */
+/* __setDay — перевести часы на другой день, не перезагружая страницу:
+   так проверяется приложение, открытое через полночь. */
 const freezeDate = day => `(function(){var F=new Date('${day}T09:00:00'),D=Date;
+  window.__setDay=function(d){F=new D(d+'T09:00:00');};
   function P(){ if(!arguments.length) return new D(F.getTime()); return new D(...arguments); }
   P.prototype=D.prototype; P.now=function(){return F.getTime();}; P.parse=D.parse; P.UTC=D.UTC;
   window.Date=P;})()`;
